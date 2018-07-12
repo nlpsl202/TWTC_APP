@@ -9,6 +9,10 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import java.io.File;
+import java.sql.CallableStatement;
+import java.sql.Connection;
+import java.sql.ResultSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -21,6 +25,8 @@ public class WiFiConnectSetting extends Activity {
     ConnectionClass Connection;
     private MyDBHelper mydbHelper;
     Button settingBtn,ReturnBtn;
+    File file;
+    ResultSet rs=null;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -36,6 +42,8 @@ public class WiFiConnectSetting extends Activity {
         IPTxt = (EditText)findViewById(R.id.IPTxt);
         settingBtn=(Button)findViewById(R.id.SettingBtn);
         ReturnBtn=(Button)findViewById(R.id.ReturnBtn);
+
+        file = new File(getFilesDir()+"//connectData.xml");
 
         //如果資料庫內先前已設定IP，則抓出來顯示在IP欄位上
         if(mydbHelper.GetConnectIP()!=null){
@@ -66,6 +74,38 @@ public class WiFiConnectSetting extends Activity {
                 finish();
             }
         });
+
+        rs=DownloadDeviceSetup();
+        String a="";
+        try {
+            while (rs.next()) {
+                a= rs.getString("DL_IsInUse");
+            }
+        }
+        catch (Exception e) {
+        Log.d("MyDB.java/查詢館內人數SP", e.toString());
+        WriteLog.appendLog("MyDBHelper.java/查詢館內人數SP/Exception:" + e.toString());
+        }
+    }
+
+    //更新手持所屬園區
+    public ResultSet DownloadDeviceSetup(){
+        ResultSet rs=null;
+        ConnectionClass.ip=ReadXML.ReadValue("ServerIP");
+        ConnectionClass.db="TWTC_CDPS";
+        ConnectionClass.un=ReadXML.ReadValue("sa");
+        ConnectionClass.password=ReadXML.ReadValue("SQLPassWord");
+        Connection con = ConnectionClass.CONN();
+        try {
+            CallableStatement cstmt = con.prepareCall("{ call dbo.SP_DownloadDeviceSetup(?)}");
+            cstmt.setString("DeviceID",ReadXML.ReadValue("MachineID"));
+            rs = cstmt.executeQuery();
+        }
+        catch (Exception e) {
+            Log.d("MyDB.java/查詢館內人數SP", e.toString());
+            WriteLog.appendLog("MyDBHelper.java/查詢館內人數SP/Exception:" + e.toString());
+        }
+        return rs;
     }
 
     /**

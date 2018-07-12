@@ -49,9 +49,9 @@ public class BluetoothConnectSetting extends Activity
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.bluetooth_connect_setting);
-        getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE, R.layout.titlebar);
+        //getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE, R.layout.titlebar);
 
         textViewStatus=(TextView) findViewById(R.id.textViewStatus);
         buttonSearch = (Button) findViewById(R.id.buttonSearch);
@@ -125,6 +125,9 @@ public class BluetoothConnectSetting extends Activity
                     }else{
                         findBT(Address.getText().toString());
                     }
+                    Intent callSub = new Intent();
+                    callSub.setClass(BluetoothConnectSetting.this, BluetoothTickets.class);
+                    startActivityForResult(callSub, 0);
                 }catch(Exception ex){
                     Toast.makeText(BluetoothConnectSetting.this, "連接藍牙失敗", Toast.LENGTH_SHORT).show();
                 }

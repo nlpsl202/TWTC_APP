@@ -9,7 +9,7 @@
         android:layout_width="match_parent"
         android:gravity="center"
         android:layout_height="60dp"
-        android:text="Bluetooth連線設定"
+        android:text="Bluetooth連線驗票"
         android:id="@+id/textViewTitle"
         android:background="@color/darkgrey"
         android:textColor="#ffffff"

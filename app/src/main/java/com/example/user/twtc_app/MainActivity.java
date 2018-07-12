@@ -84,7 +84,7 @@ public class MainActivity extends Activity {
 
         //SQLite
         mydbHelper = new MyDBHelper(this);
-        mydbHelper.InsertToConnectIP("172.16.30.181");
+        /*mydbHelper.InsertToConnectIP("172.16.30.181");
         if(mydbHelper.GetConnectIP()==""){
             Toast.makeText(MainActivity.this, "請先進行資料庫連線設定！", Toast.LENGTH_SHORT).show();
             Log.d("MainActivity.java","尚未設定資料庫連線IP位置！");
@@ -101,7 +101,7 @@ public class MainActivity extends Activity {
             } else {
                 Toast.makeText(MainActivity.this, "資料庫已更新。", Toast.LENGTH_SHORT).show();
             }
-        }
+        }*/
 
         //SPS_ID_Edt = (EditText) findViewById(R.id.SPS_ID_Edt);
         btnlogin = (Button) findViewById(R.id.LoginBtn);
@@ -203,7 +203,7 @@ public class MainActivity extends Activity {
     @Override
     public void onRestart(){
         super.onRestart();
-        ConnectionClass.ip = mydbHelper.GetConnectIP().trim();
+        /*ConnectionClass.ip = mydbHelper.GetConnectIP().trim();
         con = ConnectionClass.CONN();
         if(!CheckSpsInfoData()){
             Toast.makeText(MainActivity.this, "無法更新資料庫", Toast.LENGTH_SHORT).show();
@@ -213,7 +213,7 @@ public class MainActivity extends Activity {
             Toast.makeText(MainActivity.this, "無法更新資料庫", Toast.LENGTH_SHORT).show();
         } else {
             Toast.makeText(MainActivity.this, "資料庫已更新。", Toast.LENGTH_SHORT).show();
-        }
+        }*/
     }
 
     //檢查場站的cSpsInfo是否有進行更新

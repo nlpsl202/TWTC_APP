@@ -6,94 +6,30 @@
         android:weightSum="1"
         android:background="@drawable/background2">
 
-        <RelativeLayout
-            android:orientation="horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="90dp">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_alignParentLeft="true"
-                android:orientation="vertical">
-
-                <TextView
-                    android:id="@+id/UserDeviceTxt"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="UserDeviceTxt"
-                    android:textColor="#000000"
-                    android:layout_marginTop="20dp"
-                    android:layout_marginLeft="25dp"
-                    android:layout_alignParentLeft="true"/>
-
-                <TextView
-                    android:id="@+id/DeviceIdTxt"
-                    android:layout_width="250px"
-                    android:layout_height="wrap_content"
-                    android:text="裝置代號："
-                    android:textColor="#000000"
-                    android:layout_marginRight="15dp"
-                    android:layout_alignParentRight="true"
-                    android:gravity="left"
-                    android:visibility="gone"/>
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="95dp"
-                android:layout_height="match_parent"
-                android:layout_alignParentRight="true"
-                android:orientation="vertical">
-
-                <TextView
-                    android:id="@+id/InternetStatusTxtStatic"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="15dp"
-                    android:layout_gravity="center"
-                    android:text="網路狀態"
-                    android:textColor="#000000" />
-
-                <TextView
-                    android:id="@+id/InternetStatusTxt"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="5dp"
-                    android:layout_gravity="center"
-                    android:text="InternetStatusTxt"
-                    android:textColor="#000000"
-                    android:textSize="20dp" />/>
-
-                <TextView
-                    android:id="@+id/BluetoothStatusTxt"
-                    android:layout_width="250px"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentRight="true"
-                    android:layout_marginRight="15px"
-                    android:paddingTop="40px"
-                    android:text="BluetoothStatusTxt"
-                    android:textColor="#000000"
-                    android:visibility="gone" />
-
-            </LinearLayout>
-
-        </RelativeLayout>
-
         <LinearLayout
             android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
             <Button
-                android:id="@+id/OnlineTicketBtn"
+                android:id="@+id/BluetoothTicketBtn"
                 android:layout_width="wrap_content"
                 android:layout_height="200dp"
                 android:layout_weight="0.15"
                 android:background="@drawable/after_login_btn_selector"
-                android:text="連     線     驗     票"
+                android:text="Bluetooth  連  線  驗  票"
                 android:textColor="#ffffff"
-                android:textSize="60px"/>
+                android:textSize="60px" />
+
+            <Button
+                android:id="@+id/WifiTicketBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="200dp"
+                android:layout_weight="0.15"
+                android:background="@drawable/after_login_btn_selector"
+                android:text="WiFi  連  線  驗  票"
+                android:textColor="#ffffff"
+                android:textSize="60px" />
 
             <Button
                 android:id="@+id/OffineTicketBtn"
@@ -106,47 +42,6 @@
                 android:textSize="60px"/>
 
             <Button
-                android:id="@+id/BluetoothTicketBtn"
-                android:layout_width="wrap_content"
-                android:layout_height="200dp"
-                android:layout_weight="0.15"
-                android:background="@drawable/after_login_btn_selector"
-                android:text="藍     牙     驗     票"
-                android:textColor="#ffffff"
-                android:textSize="60px"/>
-
-            <Button
-                android:id="@+id/OfflineImportBtn"
-                style="?android:attr/buttonStyleSmall"
-                android:layout_width="wrap_content"
-                android:layout_height="200dp"
-                android:layout_weight="0.15"
-                android:background="@drawable/after_login_btn_selector"
-                android:text="票  券  狀  態  查  詢"
-                android:textColor="#ffffff"
-                android:textSize="60px"/>
-
-            <Button
-                android:id="@+id/WifiConBtn"
-                android:layout_width="wrap_content"
-                android:layout_height="200dp"
-                android:layout_weight="0.15"
-                android:background="@drawable/after_login_btn_selector"
-                android:text="WiFi  連  線  設  定"
-                android:textColor="#ffffff"
-                android:textSize="60px" />
-
-            <Button
-                android:id="@+id/BluetoothConBtn"
-                android:layout_width="wrap_content"
-                android:layout_height="200dp"
-                android:layout_weight="0.15"
-                android:background="@drawable/after_login_btn_selector"
-                android:text="藍  牙  連  線  設  定"
-                android:textColor="#ffffff"
-                android:textSize="60px" />
-
-            <Button
                 android:id="@+id/OfflineExportBtn"
                 style="?android:attr/buttonStyleSmall"
                 android:layout_width="wrap_content"
@@ -156,6 +51,16 @@
                 android:text="離  線  資  料  上  傳"
                 android:textColor="#ffffff"
                 android:textSize="60px" />
+
+            <Button
+                android:id="@+id/SystemSettingBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="200dp"
+                android:layout_weight="0.15"
+                android:background="@drawable/after_login_btn_selector"
+                android:text="系     統     設     定"
+                android:textColor="#ffffff"
+                android:textSize="60px"/>
 
         </LinearLayout>
 
