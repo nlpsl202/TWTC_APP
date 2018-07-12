@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical"
+    android:background="#ffffff">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:gravity="center"
+        android:layout_height="60dp"
+        android:text="Bluetooth連線設定"
+        android:id="@+id/textViewTitle"
+        android:background="@color/darkgrey"
+        android:textColor="#ffffff"
+        android:textSize="50px" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:orientation="horizontal"
+        android:background="#FFFFFF">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/textViewStatus"
+            android:text="藍牙狀態"
+            android:textColor="#000000"
+            android:textSize="50px"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="155px"/>
+
+        <Button
+            android:id="@+id/btbt"
+            android:layout_width="200px"
+            android:layout_height="45dp"
+            android:background="@drawable/btoff"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="60dp" />
+
+        <Switch
+            android:id="@+id/sw"
+            android:layout_width="200px"
+            android:layout_height="45dp"
+            android:switchMinWidth="60dp"
+            android:thumbTextPadding="@dimen/switch_thumb_radius"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="60dp"
+            android:checked="false"
+            android:longClickable="false"
+            android:textOff="OFF"
+            android:textOn="ON"
+            android:theme="@style/SwitchStyle"
+            android:visibility="gone"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="100px"
+            android:text="Bluetooth Address"
+            android:gravity="center"
+            android:textSize="60px"
+            android:textColor="#000000"/>
+
+        <EditText
+            android:id="@+id/Address"
+            android:layout_width="600px"
+            android:layout_height="120px"
+            android:layout_gravity="center"
+            android:hint="請輸入或按兩側按鈕掃描Address"/>
+
+        <Button
+            android:id="@+id/buttonSearch"
+            android:layout_width="500px"
+            android:layout_height="120px"
+            android:layout_weight="0.15"
+            android:text="連       線"
+            android:textColor="#ffffff"
+            android:textSize="60px"
+            android:layout_gravity="center"/>
+
+    </LinearLayout>
+
+    <ListView
+        android:id="@+id/listview"
+        android:layout_width="match_parent"
+        android:layout_height="180dp"
+        android:visibility="gone">
+    </ListView>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dip"
+        android:orientation="horizontal"
+        android:gravity="center|bottom"
+        android:layout_weight="1"
+        android:layout_marginBottom="15dp">
+
+        <Button
+            android:id="@+id/ReturnBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="150px"
+            android:text="回    上    頁"
+            android:textColor="#ffffff"
+            android:textSize="60px" />
+    </LinearLayout>
+
+</LinearLayout>

@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="@drawable/background">
+
+    <!--<RelativeLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:layout_marginTop="250dp">
+
+        <ImageView
+            android:id="@+id/inputText"
+            android:layout_width="130dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:src="@drawable/activity_main_text" />
+
+        <EditText
+            android:layout_width="250dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/SPS_ID_Edt"
+            android:background="@drawable/activity_main_input"
+            android:inputType="text"
+            android:paddingLeft="40dp"
+            android:hint="請掃描園區QRCODE"
+            android:layout_alignParentRight="true"/>
+
+    </RelativeLayout>-->
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="55dp"
+        android:layout_marginTop="250dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/textView"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="帳號："
+            android:textColor="#000000"
+            android:layout_marginLeft="30dp"/>
+
+        <EditText
+            android:layout_width="250dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/Account_txt"
+            android:singleLine="true"
+            android:hint="請輸入帳號" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:weightSum="1" >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/textView2"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="密碼："
+            android:textColor="#000000"
+            android:layout_marginLeft="30dp"/>
+
+        <EditText
+            android:layout_width="250dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/Password_txt"
+            android:inputType="textPassword"
+            android:hint="請輸入密碼" />
+    </LinearLayout>
+
+    <Button
+        android:layout_width="350dp"
+        android:layout_height="100dp"
+        android:id="@+id/LoginBtn"
+        android:background="@drawable/activity_main_btn_selector"
+        android:layout_marginTop="10dp"
+        android:layout_gravity="center"/>
+
+    <Button
+        android:layout_width="350dp"
+        android:layout_height="80dp"
+        android:id="@+id/ConnectSettingBtn"
+        android:background="@drawable/after_login_btn_selector"
+        android:text="連  線  設  定"
+        android:textColor="#ffffff"
+        android:textSize="20dp"
+        android:layout_gravity="center"/>
+
+</LinearLayout>

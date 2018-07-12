@@ -1,0 +1,10 @@
+<resources>
+    <style name="TitleBar">
+        <item name="android:background">#ffffff</item>
+        <item name="android:orientation">horizontal</item>
+    </style>
+    <style name="TitleBarTheme" parent="android:Theme">
+        <item name="android:windowTitleSize">80dip</item>
+        <item name="android:windowTitleBackgroundStyle">@style/TitleBar</item>
+    </style>
+</resources>

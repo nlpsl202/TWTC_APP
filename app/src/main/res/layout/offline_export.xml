@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:background="@drawable/offline_export_title"
+        android:layout_alignParentTop="true"
+        android:id="@+id/title">
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/background4"
+        android:layout_below="@+id/title"
+        android:layout_above="@+id/ReturnBtn">
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="130dp"
+            android:id="@+id/ImportBtn"
+            android:background="@drawable/offline_export_btn_selector"
+            android:textColor="#ffffff"
+            android:textSize="60px" />
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="330dp"
+            android:background="@drawable/result_background">
+
+            <TextView
+                android:id="@+id/ResultTxt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="70dp"
+                android:layout_marginRight="70dp"
+                android:layout_marginTop="50dp"
+                android:textColor="#000000"
+                android:textSize="25dp" />
+
+            <TextView
+                android:id="@+id/ResultTxt2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="70dp"
+                android:layout_marginRight="70dp"
+                android:layout_marginTop="10dp"
+                android:textColor="#000000"
+                android:textSize="20dp" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/ReturnBtn"
+        android:layout_width="160dp"
+        android:layout_height="75dp"
+        android:background="@drawable/lastpage_btn_selector"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentBottom="true"/>
+
+    <Button
+        android:id="@+id/NextBtn"
+        android:layout_width="160dp"
+        android:layout_height="75dp"
+        android:background="@drawable/nextpage_btn_selector"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true"/>
+
+    <Button
+        android:id="@+id/HomeBtn"
+        android:layout_width="130dp"
+        android:layout_height="100dp"
+        android:background="@drawable/home_btn_selector"
+        android:layout_centerInParent="true"
+        android:layout_alignParentBottom="true"/>
+
+</RelativeLayout>

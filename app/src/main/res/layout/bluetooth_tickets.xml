@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#ffffff">
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:weightSum="1">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:gravity="center"
+            android:layout_height="60dp"
+            android:text="藍牙驗票"
+            android:id="@+id/textViewTitle"
+            android:background="@color/darkgrey"
+            android:textColor="#ffffff"
+            android:textSize="50px"
+            android:layout_marginBottom="50px"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="25dp">
+    </LinearLayout>
+
+    <RelativeLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_marginTop="110px">
+
+        <ImageView
+            android:layout_width="60dp"
+            android:layout_height="37dp"
+            android:layout_alignParentLeft="true" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="請按兩側按鈕掃描QRCODE"
+            android:id="@+id/textview1"
+            android:textColor="#000000"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="15px" />
+
+        <ImageView
+            android:layout_width="60dp"
+            android:layout_height="37dp"
+            android:layout_alignParentRight="true" />
+    </RelativeLayout>
+
+    <!--<Button
+        android:layout_width="wrap_content"
+        android:layout_height="150px"
+        android:text="開　啟　掃　描　器"
+        android:id="@+id/ScannerBtn"
+
+        android:textColor="#ffffff"
+        android:textSize="60px" />-->
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/BResultTxt"
+            android:textColor="#000000"
+            android:textSize="15dp"
+            android:layout_marginLeft="15px" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dip"
+        android:orientation="horizontal"
+        android:gravity="center|bottom"
+        android:layout_weight="1"
+        android:layout_marginBottom="15dp">
+
+        <Button
+            android:id="@+id/ReturnBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="150px"
+            android:text="回    上    頁"
+            android:textColor="#ffffff"
+            android:textSize="60px" />
+    </LinearLayout>
+</LinearLayout>

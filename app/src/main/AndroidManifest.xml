@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.example.user.twtc_app" >
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <application
+        android:allowBackup="true"
+        android:icon="@drawable/icon"
+        android:label="南港手持"
+        android:supportsRtl="true"
+        android:theme="@style/TitleBarTheme">
+        <activity android:name="com.example.user.twtc_app.Splash"
+            android:theme="@style/Theme.AppCompat.NoActionBar"
+            android:screenOrientation="portrait">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="com.example.user.twtc_app.AfterLogin"
+            android:screenOrientation="portrait">
+        </activity>
+        <activity
+            android:name="com.example.user.twtc_app.OnlineTickets"
+            android:screenOrientation="portrait">
+        </activity>
+        <activity
+            android:name="com.example.user.twtc_app.OfflineTickets"
+            android:screenOrientation="portrait">
+        </activity>
+        <activity
+            android:name="com.example.user.twtc_app.BluetoothTickets"
+            android:screenOrientation="portrait">
+        </activity>
+        <activity
+            android:name="com.example.user.twtc_app.OfflineImport"
+            android:screenOrientation="portrait">
+        </activity>
+        <activity
+            android:name="com.example.user.twtc_app.OfflineExport"
+            android:screenOrientation="portrait">
+        </activity>
+        <activity
+            android:name="com.example.user.twtc_app.MainActivity"
+            android:screenOrientation="portrait">
+        </activity>
+        <activity
+            android:name="com.example.user.twtc_app.ConnectSetting"
+            android:screenOrientation="portrait">
+        </activity>
+        <activity
+            android:name="com.example.user.twtc_app.WiFiConnectSetting"
+            android:screenOrientation="portrait">
+        </activity>
+        <activity
+            android:name="com.example.user.twtc_app.BluetoothConnectSetting"
+            android:screenOrientation="portrait">
+        </activity>
+        <activity
+            android:name="com.example.user.twtc_app.OnlineTicketsCheck"
+            android:screenOrientation="portrait">
+        </activity>
+    </application>
+</manifest>
