@@ -60,7 +60,7 @@ public class BluetoothTickets extends Activity {
         }
 
         ReturnBtn=(Button)findViewById(R.id.ReturnBtn);
-        ResultTxt=(TextView) findViewById(R.id.BResultTxt);
+        ResultTxt=(TextView) findViewById(R.id.ResultTxt);
 
         //取得現在驗票的園區代碼與裝置代號
         Intent intent = getIntent();

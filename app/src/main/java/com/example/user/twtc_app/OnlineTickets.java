@@ -34,7 +34,7 @@ import javax.crypto.spec.SecretKeySpec;
  */
 public class OnlineTickets extends Activity {
     private static final String key="SET31275691$00000000000000000000";
-    TextView ResultTxt,ResultTxt2,PeopleNumTxt;
+    TextView ResultTxt,ResultTxt2;
     String result="",DEVICE_ID,SPS_ID;
     Button ReturnBtn;
     LinearLayout FailedLayout;
@@ -63,7 +63,7 @@ public class OnlineTickets extends Activity {
         SPS_ID=intent.getStringExtra("SPS_ID");
 
         ResultTxt=(TextView) findViewById(R.id.ResultTxt);
-        PeopleNumTxt=(TextView) findViewById(R.id.PeopleNumTxt);
+        //PeopleNumTxt=(TextView) findViewById(R.id.PeopleNumTxt);
         ReturnBtn=(Button)findViewById(R.id.ReturnBtn);
         ResultTxt2=(TextView) findViewById(R.id.ResultTxt2);
         FailedLayout=(LinearLayout) findViewById(R.id.FailedLayout);
@@ -78,14 +78,6 @@ public class OnlineTickets extends Activity {
         connectionClass = new ConnectionClass();
         con= connectionClass.CONN();
 
-        //查詢館內人數
-        PeopleNumTxt.setText("目前館內人數 "+mydbHelper.executePeopleNumStoredProcedure(con)+" 人");
-        PeopleNumTxt.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v) {
-                PeopleNumTxt.setText("目前館內人數 "+mydbHelper.executePeopleNumStoredProcedure(con)+" 人");
-            }
-        });
 
         //掃描驗票
         cbMgr=(ClipboardManager)getSystemService(Context.CLIPBOARD_SERVICE);

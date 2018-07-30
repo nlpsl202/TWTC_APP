@@ -1,31 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
-
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="60dp"
-        android:background="@drawable/offline_tickets_title"
-        android:layout_alignParentTop="true"
-        android:id="@+id/title">
-    </LinearLayout>
+    android:layout_height="match_parent"
+    android:background="@drawable/offline_ticket_background">
 
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@drawable/background3"
-        android:layout_below="@+id/title"
-        android:layout_above="@+id/ReturnBtn">
+        android:layout_height="match_parent">
 
         <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="300dp"
-            android:layout_marginTop="130dp"
-            android:background="@drawable/result_background"
-            android:orientation="horizontal">
+            android:layout_width="280dp"
+            android:layout_height="280dp"
+            android:layout_marginTop="180dp"
+            android:background="@drawable/offline_ticket_data"
+            android:orientation="horizontal"
+            android:layout_gravity="center">
 
             <TextView
                 android:id="@+id/ResultTxt"
@@ -63,28 +53,37 @@
 
     </LinearLayout>
 
-    <Button
-        android:id="@+id/ReturnBtn"
-        android:layout_width="160dp"
-        android:layout_height="75dp"
-        android:background="@drawable/lastpage_btn_selector"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentBottom="true"/>
-
-    <Button
-        android:id="@+id/NextBtn"
-        android:layout_width="160dp"
-        android:layout_height="75dp"
-        android:background="@drawable/nextpage_btn_selector"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentBottom="true"/>
-
-    <Button
-        android:id="@+id/HomeBtn"
-        android:layout_width="130dp"
+    <RelativeLayout
+        android:id="@+id/ReturnLayout"
+        android:layout_width="match_parent"
         android:layout_height="100dp"
-        android:background="@drawable/home_btn_selector"
-        android:layout_centerInParent="true"
-        android:layout_alignParentBottom="true"/>
+        android:layout_alignParentBottom="true"
+        android:background="@drawable/offline_ticket_bottom_bar">
+
+        <Button
+            android:id="@+id/ReturnBtn"
+            android:layout_width="140dp"
+            android:layout_height="60dp"
+            android:background="@drawable/lastpage_btn_selector"
+            android:layout_alignParentLeft="true"
+            android:layout_marginTop="35dp"/>
+
+        <Button
+            android:id="@+id/HomeBtn"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:background="@drawable/home_btn_selector"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="35dp"/>
+
+        <Button
+            android:id="@+id/NextBtn"
+            android:layout_width="140dp"
+            android:layout_height="60dp"
+            android:background="@drawable/nextpage_btn_selector"
+            android:layout_alignParentRight="true"
+            android:layout_marginTop="35dp"/>
+
+    </RelativeLayout>
 
 </RelativeLayout>

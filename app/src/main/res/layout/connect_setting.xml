@@ -2,204 +2,220 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#ffffff">
-
-    <TextView
-        android:layout_width="match_parent"
-        android:gravity="center"
-        android:layout_height="60dp"
-        android:text="系統設定"
-        android:id="@+id/textViewTitle"
-        android:background="@color/darkgrey"
-        android:textColor="#ffffff"
-        android:textSize="50px"
-        android:layout_marginBottom="50px"/>
+    android:background="@drawable/connect_setting_background">
 
     <LinearLayout
-        android:orientation="horizontal"
+        android:orientation="vertical"
+        android:layout_width="300dp"
+        android:layout_height="450dp"
+        android:layout_marginTop="80dp"
+        android:layout_gravity="center"
+        android:background="@drawable/connect_setting_data_background">
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:weightSum="1"
+            android:layout_marginTop="10dp">
+
+            <ImageView
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:id="@+id/textView"
+                android:background="@drawable/machineid_text"
+                android:layout_marginLeft="40dp"
+                android:layout_gravity="bottom"/>
+
+            <EditText
+                android:layout_width="160dp"
+                android:layout_height="40dp"
+                android:id="@+id/MachineID_et"
+                android:background="@drawable/connect_setting_edittext_background"
+                android:layout_marginLeft="20dp"
+                android:singleLine="true"
+                android:textColor="#ffffff"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="1"
+            android:layout_marginTop="20dp">
+
+            <ImageView
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:id="@+id/textView2"
+                android:layout_marginLeft="40dp"
+                android:background="@drawable/ip_text" />
+
+            <EditText
+                android:layout_width="160dp"
+                android:layout_height="40dp"
+                android:id="@+id/IP_et"
+                android:background="@drawable/connect_setting_edittext_background"
+                android:layout_marginLeft="20dp"
+                android:singleLine="true"
+                android:textColor="#ffffff"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:weightSum="1"
+            android:layout_marginTop="20dp">
+
+            <ImageView
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:id="@+id/textView3"
+                android:layout_marginLeft="40dp"
+                android:background="@drawable/sqlaccount_text"/>
+
+            <EditText
+                android:layout_width="160dp"
+                android:layout_height="40dp"
+                android:id="@+id/SqlAccount_et"
+                android:background="@drawable/connect_setting_edittext_background"
+                android:layout_marginLeft="20dp"
+                android:singleLine="true"
+                android:textColor="#ffffff"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:weightSum="1"
+            android:layout_marginTop="20dp">
+
+            <ImageView
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:id="@+id/textView4"
+                android:layout_marginLeft="40dp"
+                android:background="@drawable/sqlpassword_text"/>
+
+            <EditText
+                android:layout_width="160dp"
+                android:layout_height="40dp"
+                android:id="@+id/SqlPassword_et"
+                android:background="@drawable/connect_setting_edittext_background"
+                android:layout_marginLeft="20dp"
+                android:singleLine="true"
+                android:textColor="#ffffff"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:weightSum="1"
+            android:layout_marginTop="20dp">
+
+            <ImageView
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:id="@+id/textView5"
+                android:layout_marginLeft="40dp"
+                android:background="@drawable/password_text"/>
+
+            <EditText
+                android:layout_width="160dp"
+                android:layout_height="40dp"
+                android:id="@+id/Password_et"
+                android:background="@drawable/connect_setting_edittext_background"
+                android:layout_marginLeft="20dp"
+                android:singleLine="true"
+                android:textColor="#ffffff"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:weightSum="1"
+            android:layout_marginTop="20dp">
+
+            <ImageView
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:id="@+id/textView6"
+                android:layout_marginLeft="40dp"
+                android:background="@drawable/url_text"/>
+
+            <EditText
+                android:layout_width="160dp"
+                android:layout_height="40dp"
+                android:id="@+id/URL_et"
+                android:background="@drawable/connect_setting_edittext_background"
+                android:layout_marginLeft="20dp"
+                android:singleLine="true"
+                android:textColor="#ffffff"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:weightSum="1"
+            android:layout_marginTop="20dp">
+
+            <ImageView
+                android:layout_width="40dp"
+                android:layout_height="20dp"
+                android:id="@+id/textView7"
+                android:layout_marginLeft="40dp"
+                android:background="@drawable/rfid_text"
+                android:layout_gravity="center_vertical"/>
+
+            <CheckBox
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:id="@+id/RFID_cb"
+                android:layout_marginLeft="20dp"
+                android:button="@drawable/checkbox_selector"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:weightSum="1">
-
-        <TextView
-            android:layout_width="130dp"
-            android:layout_height="wrap_content"
-            android:text="機號："
-            android:id="@+id/textView"
-            android:textColor="#000000"
-            android:textSize="50px"
-            android:gravity="right"/>
-
-        <EditText
-            android:layout_width="200dp"
-            android:layout_height="wrap_content"
-            android:id="@+id/MachineID_et"
-            android:singleLine="true"/>
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:weightSum="1">
-
-        <TextView
-            android:layout_width="130dp"
-            android:layout_height="wrap_content"
-            android:id="@+id/textView2"
-            android:text="IP："
-            android:textColor="#000000"
-            android:textSize="50px"
-            android:gravity="right"/>
-
-        <EditText
-            android:layout_width="200dp"
-            android:layout_height="wrap_content"
-            android:id="@+id/IP_et"
-            android:singleLine="true"/>
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:weightSum="1">
-
-        <TextView
-            android:layout_width="130dp"
-            android:layout_height="wrap_content"
-            android:text="SQL帳號："
-            android:id="@+id/textView3"
-            android:textColor="#000000"
-            android:textSize="50px"
-            android:gravity="right"/>
-
-        <EditText
-            android:layout_width="200dp"
-            android:layout_height="wrap_content"
-            android:id="@+id/SqlAccount_et"
-            android:singleLine="true"/>
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:weightSum="1">
-
-        <TextView
-            android:layout_width="130dp"
-            android:layout_height="wrap_content"
-            android:text="SQL密碼："
-            android:id="@+id/textView4"
-            android:textColor="#000000"
-            android:textSize="50px"
-            android:gravity="right"/>
-
-        <EditText
-            android:layout_width="200dp"
-            android:layout_height="wrap_content"
-            android:id="@+id/SqlPassword_et"
-            android:singleLine="true"/>
-
-    </LinearLayout>
-
-    <LinearLayout
-    android:orientation="horizontal"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:weightSum="1">
-
-        <TextView
-            android:layout_width="130dp"
-            android:layout_height="wrap_content"
-            android:text="密碼："
-            android:id="@+id/textView5"
-            android:textColor="#000000"
-            android:textSize="50px"
-            android:gravity="right"/>
-
-        <EditText
-            android:layout_width="200dp"
-            android:layout_height="wrap_content"
-            android:id="@+id/Password_et"
-            android:singleLine="true"/>
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:weightSum="1">
-
-        <TextView
-            android:layout_width="130dp"
-            android:layout_height="wrap_content"
-            android:text="URL："
-            android:id="@+id/textView6"
-            android:textColor="#000000"
-            android:textSize="50px"
-            android:gravity="right"/>
-
-        <EditText
-            android:layout_width="200dp"
-            android:layout_height="wrap_content"
-            android:id="@+id/URL_et"
-            android:singleLine="true"/>
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:weightSum="1">
-
-        <TextView
-            android:layout_width="130dp"
-            android:layout_height="wrap_content"
-            android:text="RFID："
-            android:id="@+id/textView7"
-            android:textColor="#000000"
-            android:textSize="50px"
-            android:gravity="right"/>
-
-        <CheckBox
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/RFID_cb"
-            android:textSize="60px" />
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dip"
         android:orientation="horizontal"
         android:gravity="center|bottom"
-        android:layout_weight="1"
         android:layout_marginBottom="15dp">
 
         <Button
-            android:layout_width="wrap_content"
-            android:layout_height="150px"
-            android:id="@+id/Return_btn"
-            android:text="返    回"
+            android:layout_width="100dp"
+            android:layout_height="50dp"
+            android:id="@+id/Confirm_btn"
             android:textColor="#ffffff"
-            android:textSize="60px" />
+            android:background="@drawable/connect_setting_yes_btn_selector"
+            android:textSize="60px"
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="70dp"/>
 
         <Button
-            android:layout_width="wrap_content"
-            android:layout_height="150px"
-            android:id="@+id/Confirm_btn"
-            android:text="確    認"
+            android:layout_width="100dp"
+            android:layout_height="50dp"
+            android:id="@+id/Return_btn"
             android:textColor="#ffffff"
-            android:textSize="60px" />
+            android:background="@drawable/connect_setting_no_btn_selector"
+            android:textSize="60px"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="70dp"/>
 
-    </LinearLayout>
+    </RelativeLayout>
 
 </LinearLayout>

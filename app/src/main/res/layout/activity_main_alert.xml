@@ -3,59 +3,34 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_marginLeft="20dp"
-    android:layout_marginRight="20dp">
+    android:background="@drawable/after_login_alert_background">
 
-    <LinearLayout
+    <Button
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:id="@+id/CancelBtn"
+        android:background="@drawable/after_login_alert_no"
+        android:layout_marginLeft="15dp"
+        android:layout_marginTop="15dp"/>
+
+    <EditText
+        android:id="@+id/pass_et"
         android:layout_width="wrap_content"
-        android:layout_height="200dp"
+        android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:layout_marginTop="50dp"
-        android:background="@drawable/popup_background"
-        android:orientation="vertical">
+        android:textColor="#ffffff"
+        android:background="@drawable/after_login_alert_edittext"
+        android:textSize="20dp"
+        android:inputType="textPassword"
+        android:layout_marginTop="200dp"/>
 
-        <TextView
-            android:id="@+id/ResultTxt"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="70dp"
-            android:layout_gravity="center"
-            android:text="請輸入密碼"
-            android:textColor="#000000"
-            android:textSize="20dp" />
-
-        <EditText
-            android:id="@+id/pass_et"
-            android:layout_width="200dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:layout_gravity="center"
-            android:textColor="#000000"
-            android:textSize="20dp" />
-
-    </LinearLayout>
-
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginTop="20dp">
-
-        <Button
-            android:layout_width="140dp"
-            android:layout_height="60dp"
-            android:id="@+id/ConfirmBtn"
-            android:background="@drawable/yes_btn_selector"
-            android:textColor="#ffffff"
-            android:layout_alignParentLeft="true"/>
-
-        <Button
-            android:layout_width="140dp"
-            android:layout_height="60dp"
-            android:id="@+id/CancelBtn"
-            android:background="@drawable/no_btn_selector"
-            android:textColor="#ffffff"
-            android:layout_alignParentRight="true"/>
-
-    </RelativeLayout>
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="150dp"
+        android:id="@+id/ConfirmBtn"
+        android:background="@drawable/after_login_yes_btn_selector"
+        android:textColor="#ffffff"
+        android:layout_gravity="center"
+        android:layout_marginTop="50dp"/>
 
 </LinearLayout>

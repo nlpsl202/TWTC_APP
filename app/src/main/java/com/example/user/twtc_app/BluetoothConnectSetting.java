@@ -53,7 +53,6 @@ public class BluetoothConnectSetting extends Activity
         setContentView(R.layout.bluetooth_connect_setting);
         //getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE, R.layout.titlebar);
 
-        textViewStatus=(TextView) findViewById(R.id.textViewStatus);
         buttonSearch = (Button) findViewById(R.id.buttonSearch);
         ReturnBtn=(Button)findViewById(R.id.ReturnBtn);
         btbt=(Button)findViewById(R.id.btbt);
@@ -74,11 +73,11 @@ public class BluetoothConnectSetting extends Activity
         if(mBluetoothAdapter.isEnabled()) {
             btbt.setBackgroundResource(R.drawable.bton);
             sw.setChecked(true);
-            textViewStatus.setText("藍牙開啟");
+            //textViewStatus.setText("藍牙開啟");
         }else{
             btbt.setBackgroundResource(R.drawable.btoff);
             sw.setChecked(false);
-            textViewStatus.setText("藍牙關閉");
+            //textViewStatus.setText("藍牙關閉");
         }
 
         //Bluetooth On/Off
@@ -90,11 +89,11 @@ public class BluetoothConnectSetting extends Activity
                 if (mBluetoothAdapter.isEnabled()) {
                     btbt.setBackgroundResource(R.drawable.btoff);
                     mBluetoothAdapter.disable();
-                    textViewStatus.setText("藍牙關閉");
+                    //textViewStatus.setText("藍牙關閉");
                 } else {
                     btbt.setBackgroundResource(R.drawable.bton);
                     mBluetoothAdapter.enable();
-                    textViewStatus.setText("藍牙開啟");
+                    //textViewStatus.setText("藍牙開啟");
                 }
             }
         });
@@ -106,10 +105,10 @@ public class BluetoothConnectSetting extends Activity
                 sw.setClickable(false);
                 if (buttonView.isChecked()) {
                     mBluetoothAdapter.enable();
-                    textViewStatus.setText("藍牙開啟");
+                    //textViewStatus.setText("藍牙開啟");
                 } else {
                     mBluetoothAdapter.disable();
-                    textViewStatus.setText("藍牙關閉");
+                    //textViewStatus.setText("藍牙關閉");
                 }
             }
         });
@@ -138,8 +137,8 @@ public class BluetoothConnectSetting extends Activity
         cbMgr.addPrimaryClipChangedListener( new ClipboardManager.OnPrimaryClipChangedListener() {
             public void onPrimaryClipChanged() {
                 try{
-                    Address.setText("");
-                    setVibrate(100);
+                    //Address.setText("");
+                    //setVibrate(100);
                     /*if(connectedBluetoothDevices.size()>0){
                         Toast.makeText(BluetoothConnectSetting.this,"藍牙裝置已連線", Toast.LENGTH_SHORT).show();
                     }else{
@@ -257,7 +256,7 @@ public class BluetoothConnectSetting extends Activity
                     case BluetoothAdapter.STATE_OFF:
                         btbt.setBackgroundResource(R.drawable.btoff);
                         sw.setChecked(false);
-                        textViewStatus.setText("藍牙關閉");
+                        //textViewStatus.setText("藍牙關閉");
                         sw.setClickable(true);
                         btbt.setClickable(true);
                         break;
@@ -268,7 +267,7 @@ public class BluetoothConnectSetting extends Activity
                     case BluetoothAdapter.STATE_ON:
                         btbt.setBackgroundResource(R.drawable.bton);
                         sw.setChecked(true);
-                        textViewStatus.setText("藍牙開啟");
+                        //textViewStatus.setText("藍牙開啟");
                         sw.setClickable(true);
                         btbt.setClickable(true);
                         break;

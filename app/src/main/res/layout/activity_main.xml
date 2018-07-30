@@ -2,8 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:background="@drawable/background">
+    android:layout_height="fill_parent">
 
     <!--<RelativeLayout
         android:orientation="horizontal"
@@ -80,7 +79,7 @@
         android:layout_width="350dp"
         android:layout_height="100dp"
         android:id="@+id/LoginBtn"
-        android:background="@drawable/activity_main_btn_selector"
+        android:background="@drawable/wifi_ticket_btn_selector"
         android:layout_marginTop="10dp"
         android:layout_gravity="center"/>
 
@@ -88,7 +87,6 @@
         android:layout_width="350dp"
         android:layout_height="80dp"
         android:id="@+id/ConnectSettingBtn"
-        android:background="@drawable/after_login_btn_selector"
         android:text="連  線  設  定"
         android:textColor="#ffffff"
         android:textSize="20dp"

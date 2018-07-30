@@ -1,67 +1,63 @@
 <?xml version="1.0" encoding="utf-8"?>
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        android:orientation="vertical"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:weightSum="1"
+    android:background="@drawable/after_login_background" >
+
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:weightSum="1"
-        android:background="@drawable/background2">
+        android:layout_height="140dp"
+        android:layout_marginTop="130dp">
 
-        <LinearLayout
-            android:orientation="vertical"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
+        <Button
+            android:id="@+id/BluetoothTicketBtn"
+            android:layout_width="150dp"
+            android:layout_height="140dp"
+            android:background="@drawable/bluetooth_ticket_btn_selector"
+            android:layout_marginLeft="25dp"
+            android:layout_alignParentLeft="true"/>
 
-            <Button
-                android:id="@+id/BluetoothTicketBtn"
-                android:layout_width="wrap_content"
-                android:layout_height="200dp"
-                android:layout_weight="0.15"
-                android:background="@drawable/after_login_btn_selector"
-                android:text="Bluetooth  連  線  驗  票"
-                android:textColor="#ffffff"
-                android:textSize="60px" />
+        <Button
+            android:id="@+id/WifiTicketBtn"
+            android:layout_width="150dp"
+            android:layout_height="140dp"
+            android:background="@drawable/wifi_ticket_btn_selector"
+            android:layout_marginRight="25dp"
+            android:layout_alignParentRight="true"/>
 
-            <Button
-                android:id="@+id/WifiTicketBtn"
-                android:layout_width="wrap_content"
-                android:layout_height="200dp"
-                android:layout_weight="0.15"
-                android:background="@drawable/after_login_btn_selector"
-                android:text="WiFi  連  線  驗  票"
-                android:textColor="#ffffff"
-                android:textSize="60px" />
+    </RelativeLayout>
 
-            <Button
-                android:id="@+id/OffineTicketBtn"
-                android:layout_width="wrap_content"
-                android:layout_height="200dp"
-                android:layout_weight="0.15"
-                android:background="@drawable/after_login_btn_selector"
-                android:text="離     線     驗     票"
-                android:textColor="#ffffff"
-                android:textSize="60px"/>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="140dp"
+        android:layout_marginTop="10dp">
 
-            <Button
-                android:id="@+id/OfflineExportBtn"
-                style="?android:attr/buttonStyleSmall"
-                android:layout_width="wrap_content"
-                android:layout_height="200dp"
-                android:layout_weight="0.15"
-                android:background="@drawable/after_login_btn_selector"
-                android:text="離  線  資  料  上  傳"
-                android:textColor="#ffffff"
-                android:textSize="60px" />
+        <Button
+            android:id="@+id/OffineTicketBtn"
+            android:layout_width="150dp"
+            android:layout_height="140dp"
+            android:background="@drawable/offline_ticket_btn_selector"
+            android:layout_marginLeft="25dp"
+            android:layout_alignParentLeft="true"/>
 
-            <Button
-                android:id="@+id/SystemSettingBtn"
-                android:layout_width="wrap_content"
-                android:layout_height="200dp"
-                android:layout_weight="0.15"
-                android:background="@drawable/after_login_btn_selector"
-                android:text="系     統     設     定"
-                android:textColor="#ffffff"
-                android:textSize="60px"/>
+        <Button
+            android:id="@+id/OfflineExportBtn"
+            android:layout_width="150dp"
+            android:layout_height="140dp"
+            android:background="@drawable/offline_export_btn_selector"
+            android:layout_marginRight="25dp"
+            android:layout_alignParentRight="true"/>
 
-        </LinearLayout>
+    </RelativeLayout>
 
-    </LinearLayout>
+    <Button
+        android:id="@+id/ConnectSettingBtn"
+        android:layout_width="310dp"
+        android:layout_height="140dp"
+        android:background="@drawable/connect_setting_btn_selector"
+        android:layout_gravity="center|bottom"
+        android:layout_marginTop="10dp"/>
+
+</LinearLayout>

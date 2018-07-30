@@ -1,11 +1,9 @@
 package com.example.user.twtc_app;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Color;
@@ -57,7 +55,7 @@ public class OfflineExport extends Activity {
             public void onClick(View v) {
                 if(checkInternetConnect()) {
                     //判斷SQLITE內是否有UltraLight03內TRANSFER_STATUS不為OK的資料（待上傳的意思）
-                    if (mydbHelper.GetUltraLight03NOTOKNumber() > 0) {
+                    //if (mydbHelper.GetUltraLight03NOTOKNumber() > 0) {
                         alertDialog = new Dialog(OfflineExport.this);
                         alertDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
                         alertDialog.setContentView(R.layout.offline_export_alert);
@@ -66,7 +64,7 @@ public class OfflineExport extends Activity {
                         a.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                int getNumber=0;
+                                /*int getNumber=0;
                                 mydbHelper.SelectFromUltraLight03();
                                 getNumber=mydbHelper.GetUltraLight03ExpNmber();
                                 ResultTxt.setText("成功匯出！");
@@ -80,7 +78,7 @@ public class OfflineExport extends Activity {
                                 //});
                                 //alertad.show();//顯示對話框
                                 mydbHelper.DeleteUltraLight03Exp();//清除已顯示過的匯出紀錄
-                                alertDialog.cancel();
+                                alertDialog.cancel();*/
                             }
                         });
                         Button b =(Button)alertDialog.findViewById(R.id.CancelBtn);
@@ -115,9 +113,9 @@ public class OfflineExport extends Activity {
                             public void onClick(DialogInterface dialog, int i) { }
                         });
                         alertad.show();//顯示對話框*/
-                    }else{
-                        ResultTxt.setText("無法匯出！");
-                        ResultTxt2.setText("目前無離線驗票資料！");
+                    //}else{
+                    //    ResultTxt.setText("無法匯出！");
+                    //    ResultTxt2.setText("目前無離線驗票資料！");
                         /*AlertDialog.Builder alertad = new AlertDialog.Builder(OfflineExport.this);
                         alertad.setTitle("離線資料上傳");
                         alertad.setMessage("目前無離線驗票資料！");
@@ -125,16 +123,16 @@ public class OfflineExport extends Activity {
                             public void onClick(DialogInterface dialog, int i) { }
                         });
                         alertad.show();//顯示對話框*/
-                    }
+                    //}
                 }else
                 {
-                    AlertDialog.Builder alertad = new AlertDialog.Builder(OfflineExport.this);
+                    /*AlertDialog.Builder alertad = new AlertDialog.Builder(OfflineExport.this);
                     alertad.setTitle("無法匯出");
                     alertad.setMessage("請確認網路狀態！");
                     alertad.setPositiveButton("關閉", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int i) { }
                     });
-                    alertad.show();//顯示對話框
+                    alertad.show();//顯示對話框*/
                 }
             }
         });

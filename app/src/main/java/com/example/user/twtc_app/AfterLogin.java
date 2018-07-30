@@ -20,7 +20,7 @@ import java.sql.Connection;
  */
 public class AfterLogin  extends Activity {
 
-    Button BluetoothTicketBtn,WifiTicketBtn,OffineTicketBtn,OfflineExportBtn,SystemSettingBtn;
+    Button BluetoothTicketBtn,WifiTicketBtn,OffineTicketBtn,OfflineExportBtn,ConnectSettingBtn;
     private MyDBHelper mydbHelper;
     //SQL SERVER //建立連線
     ConnectionClass connectionClass;
@@ -28,11 +28,14 @@ public class AfterLogin  extends Activity {
     Dialog alertDialog;
     File file;
     EditText pass_et;
+    XmlHelper xmlHelper;
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.after_login);
+
+        xmlHelper=new XmlHelper(getFilesDir()+"//connectData.xml");
         //requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
         //getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE, R.layout.titlebar);
 
@@ -75,7 +78,7 @@ public class AfterLogin  extends Activity {
         WifiTicketBtn=(Button)findViewById(R.id.WifiTicketBtn);
         OffineTicketBtn=(Button)findViewById(R.id.OffineTicketBtn);
         OfflineExportBtn=(Button)findViewById(R.id.OfflineExportBtn);
-        SystemSettingBtn=(Button)findViewById(R.id.SystemSettingBtn);
+        ConnectSettingBtn=(Button)findViewById(R.id.ConnectSettingBtn);
 
         file = new File(getFilesDir()+"//connectData.xml");
 
@@ -121,7 +124,7 @@ public class AfterLogin  extends Activity {
         });
 
         //切換至系統設定
-        SystemSettingBtn.setOnClickListener(new View.OnClickListener() {
+        ConnectSettingBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 try{
@@ -135,7 +138,7 @@ public class AfterLogin  extends Activity {
                         @Override
                         public void onClick(View v) {
                             if(file.exists()){
-                                if(!pass_et.getText().toString().equals(ReadXML.ReadValue("SetupPassWord"))){
+                                if(!pass_et.getText().toString().equals(xmlHelper.ReadValue("SetupPassWord"))&&xmlHelper.ReadValue("SetupPassWord")!=""){
                                     Toast.makeText(AfterLogin.this, "密碼錯誤", Toast.LENGTH_SHORT).show();
                                 }else{
                                     alertDialog.cancel();

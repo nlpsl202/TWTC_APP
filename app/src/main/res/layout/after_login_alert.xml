@@ -32,7 +32,7 @@
         android:layout_height="60dp"
         android:layout_marginTop="20dp"
         android:id="@+id/ConfirmBtn"
-        android:background="@drawable/yes_btn_selector"
+        android:background="@drawable/after_login_yes_btn_selector"
         android:textColor="#ffffff"
         android:layout_gravity="center_horizontal"/>
 
