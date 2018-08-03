@@ -1,6 +1,7 @@
 package com.example.user.twtc_app;
 
 import android.app.Activity;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
@@ -8,9 +9,12 @@ import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.nfc.NfcAdapter;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.HandlerThread;
 import android.os.Vibrator;
 import android.util.Base64;
 import android.view.View;
@@ -38,9 +42,34 @@ public class BluetoothTickets extends Activity {
     private MyDBHelper mydbHelper;
     TextView ResultTxt;
     String result="",DEVICE_ID,SPS_ID,getdata,qr,TICKET_NO,TK_CODE,TK_NAME;
-    Button ReturnBtn;
+    Button ReturnBtn,HomeBtn;
     private ClipboardManager cbMgr;
     private ClipboardManager.OnPrimaryClipChangedListener mPrimaryClipChangedListener;
+
+    //RFID
+    NfcAdapter mNfcAdapter;
+    PendingIntent mPendingIntent;
+    Bitmap bitmap;
+    private Handler mThreadHandler;
+    private HandlerThread mThread;
+    private class RFIDBlock4Info {
+        public Byte bCardType;
+        public Byte[] bStartDate;
+        public Byte[] bEndDate;
+        public Byte[] bCardID;
+        public RFIDBlock4Info(Byte[] a, Byte[] b, Byte[] c) {
+            bCardType = 0;
+            bStartDate = a;
+            bEndDate = b;
+            bCardID = c;
+        }
+    }
+    RFIDBlock4Info BlockInfo = new RFIDBlock4Info(new Byte[3], new Byte[3], new Byte[8]);
+
+    //參數XML
+    XmlHelper xmlHelper;
+    private int UDSTime = 30;
+
     OutputStream mmOutputStream;
     InputStream mmInputStream;
     Thread workerThread;
@@ -59,15 +88,8 @@ public class BluetoothTickets extends Activity {
         }
 
         ReturnBtn=(Button)findViewById(R.id.ReturnBtn);
+        HomeBtn=(Button)findViewById(R.id.HomeBtn);
         ResultTxt=(TextView) findViewById(R.id.ResultTxt);
-
-        //取得現在驗票的園區代碼與裝置代號
-        Intent intent = getIntent();
-        SPS_ID=intent.getStringExtra("SPS_ID");
-        DEVICE_ID=intent.getStringExtra("DEVICE_ID");
-
-        //SQLITE
-        mydbHelper = new MyDBHelper(this);
 
         //設定藍牙收發資料
         try{
@@ -99,8 +121,16 @@ public class BluetoothTickets extends Activity {
         };
         cbMgr.addPrimaryClipChangedListener( mPrimaryClipChangedListener);
 
-        //回上頁按鈕
+        //回上頁
         ReturnBtn.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
+
+        //Home
+        HomeBtn.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
                 finish();
@@ -126,16 +156,14 @@ public class BluetoothTickets extends Activity {
     }
 
     //設定藍牙收發資料
-    void setBT() throws IOException
-    {
+    void setBT() throws IOException {
         mmOutputStream = BluetoothConnectSetting.mmSocket.getOutputStream();
         mmInputStream = BluetoothConnectSetting.mmSocket.getInputStream();
         beginListenForData();
     }
 
     //透過藍牙發送資料
-    void sendData(String data)
-    {
+    void sendData(String data) {
         try
         {
             mmOutputStream.write(data.getBytes());
@@ -148,40 +176,34 @@ public class BluetoothTickets extends Activity {
     }
 
     //接收透過藍牙所傳過來的資料
-    void beginListenForData()
-    {
+    void beginListenForData() {
         final Handler handler = new Handler();
         final byte delimiter = 10; //This is the ASCII code for a newline character
 
         stopWorker = false;
         readBufferPosition = 0;
         readBuffer = new byte[1024];
-        workerThread = new Thread(new Runnable()
-        {
-            public void run()
-            {
-                while(!Thread.currentThread().isInterrupted() && !stopWorker)
-                {
-                    try
-                    {
+        workerThread = new Thread(new Runnable() {
+            public void run() {
+                while(!Thread.currentThread().isInterrupted() && !stopWorker) {
+                    try {
+                        byte[] buffer = new byte[1024];
+                        buffer = new byte[1024];
+                        int received = 0;
+
                         int bytesAvailable = mmInputStream.available();
-                        if(bytesAvailable > 0)
-                        {
+                        if(bytesAvailable > 0) {
                             byte[] packetBytes = new byte[bytesAvailable];
                             mmInputStream.read(packetBytes);
-                            for(int i=0;i<bytesAvailable;i++)
-                            {
+                            for(int i=0;i<bytesAvailable;i++) {
                                 byte b = packetBytes[i];
-                                if(b == delimiter)
-                                {
+                                if(b == delimiter) {
                                     byte[] encodedBytes = new byte[readBufferPosition];
                                     System.arraycopy(readBuffer, 0, encodedBytes, 0, encodedBytes.length);
                                     final String data = new String(encodedBytes, "UTF-8");
                                     readBufferPosition = 0;
-                                    handler.post(new Runnable()
-                                    {
-                                        public void run()
-                                        {
+                                    handler.post(new Runnable() {
+                                        public void run() {
                                             if (data.split("\\?")[0].indexOf("OPEN") > -1) {
                                                 TK_CODE=getdata.split("@")[5];
                                                 TK_NAME=data.split("\\?")[1];
@@ -221,15 +243,13 @@ public class BluetoothTickets extends Activity {
                                         }
                                     });
                                 }
-                                else
-                                {
+                                else {
                                     readBuffer[readBufferPosition++] = b;
                                 }
                             }
                         }
                     }
-                    catch (IOException ex)
-                    {
+                    catch (IOException ex) {
                         stopWorker = true;
                     }
                 }

@@ -278,7 +278,7 @@ public class OnlineTickets extends Activity {
             }
         });
 
-        //回上頁
+        //Home
         HomeBtn.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
@@ -349,7 +349,7 @@ public class OnlineTickets extends Activity {
             DateTime dtStartDate , dtEndDate;
             Image img = null;
 
-            for (; ; ) {
+            /*for (; ; ) {
                 synchronized(m_LockFlag){
                     BlockInfo.bCardType = 0x00;
                     BlockInfo.bCardID=new Byte[BlockInfo.bCardID.length];
@@ -409,8 +409,7 @@ public class OnlineTickets extends Activity {
                         }
                     }
                 }
-            }
-
+            }*/
         }
     };
 
