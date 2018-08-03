@@ -233,23 +233,6 @@ public class MainActivity extends Activity {
                 // Get the rowcount column value.
                 int ResultCount = rs.getInt("rowcounts") ;
                 rs.close() ;
-                //假如目前SQLite內的StatioConf數量和場站的不同，則DROP掉SQLITE的StatioConf，重新產生StatioConf
-                if(mydbHelper.GetSpsInfoNumber()!=ResultCount)
-                {
-                    //刪除SQLITE
-                    mydbHelper.DeleteSpsInfo();
-                    //重新插入
-                    mydbHelper.InsertToSpsInfo();
-                    return true;
-                    //Toast.makeText(MainActivity.this,  "AFCAC資料庫已更新。", Toast.LENGTH_SHORT).show();
-                }
-                else
-                {
-                    //更新MODIFYDT不為NULL的資料
-                    mydbHelper.UpdateSpsInfo();
-                    return  true;
-                    //Toast.makeText(MainActivity.this,  "AFCAC資料庫已更新2。", Toast.LENGTH_SHORT).show();
-                }
             }
         } catch (Exception ex) {
             Log.d("MainActivity.java","Exception:"+ex);
@@ -257,6 +240,7 @@ public class MainActivity extends Activity {
             return false;
             //Toast.makeText(MainActivity.this,  "Exception "+ex, Toast.LENGTH_SHORT).show();
         }
+        return false;
     }
 
     //檢查場站的cStatioConf是否有進行更新
@@ -277,22 +261,7 @@ public class MainActivity extends Activity {
                 int ResultCount = rs.getInt("rowcounts") ;
                 rs.close() ;
                 //假如目前SQLite內的StatioConf數量和場站的不同，則DROP掉SQLITE的StatioConf，重新產生StatioConf
-                if(mydbHelper.GetStationConfNumber()!=ResultCount)
-                {
-                    //刪除SQLITE
-                    mydbHelper.DeleteStationConf();
-                    //重新插入
-                    mydbHelper.InsertToStationConf();
-                    return true;
-                    //Toast.makeText(MainActivity.this,  "AFCAC資料庫已更新。", Toast.LENGTH_SHORT).show();
-                }
-                else
-                {
-                    //更新MODIFYDT不為NULL的資料
-                    mydbHelper.UpdateStationConf();
-                    return  true;
-                    //Toast.makeText(MainActivity.this,  "AFCAC資料庫已更新2。", Toast.LENGTH_SHORT).show();
-                }
+
             }
         } catch (Exception ex) {
             Log.d("MainActivity.java","Exception:"+ex);
@@ -300,6 +269,7 @@ public class MainActivity extends Activity {
             return false;
             //Toast.makeText(MainActivity.this,  "Exception "+ex, Toast.LENGTH_SHORT).show();
         }
+        return false;
     }
 
     //檢查場站的cTicketKind是否有進行更新
@@ -320,22 +290,7 @@ public class MainActivity extends Activity {
                 int ResultCount = rs.getInt("rowcounts") ;
                 rs.close() ;
                 //假如目前SQLite內的cTicketKind數量和場站的不同，則DROP掉SQLITE的cTicketKind，重新產生cTicketKind
-                if(mydbHelper.GetTicketKindNumber()!=ResultCount)
-                {
-                    //刪除SQLITE
-                    mydbHelper.DeleteTicketKind();
-                    //重新插入
-                    mydbHelper.InsertTocTicketKind();
-                    return true;
-                    //Toast.makeText(MainActivity.this,  "AFCAC資料庫已更新。", Toast.LENGTH_SHORT).show();
-                }
-                else
-                {
-                    //更新MODIFYDT不為NULL的資料
-                    mydbHelper.UpdateTicketKind();
-                    return  true;
-                    //Toast.makeText(MainActivity.this,  "AFCAC資料庫已更新2。", Toast.LENGTH_SHORT).show();
-                }
+
             }
         } catch (Exception ex) {
             Log.d("MainActivity.java","Exception:"+ex);
@@ -343,6 +298,7 @@ public class MainActivity extends Activity {
             return false;
             //Toast.makeText(MainActivity.this,  "Exception "+ex, Toast.LENGTH_SHORT).show();
         }
+        return false;
     }
 
     //於登入頁面按下返回鍵後跳出確認視窗

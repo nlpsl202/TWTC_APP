@@ -52,7 +52,6 @@ public class BluetoothTickets extends Activity {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.bluetooth_tickets);
-        //getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE, R.layout.titlebar);
 
         //判斷藍牙現在是否連接中
         if(BluetoothConnectSetting.connectedBluetoothDevices.size()==0){
@@ -201,7 +200,7 @@ public class BluetoothTickets extends Activity {
                                                 ResultArray[7]=df.format(c.getTime());
                                                 ResultArray[8]="";
                                                 ResultArray[9]=getDateTime();
-                                                mydbHelper.InsertToSQLiteUltraLight03(ResultArray, "OK");
+                                                //mydbHelper.InsertToSQLiteUltraLight03(ResultArray, "OK");
                                             }else if(data.split("\\?")[0].indexOf("逾時") > -1){
                                                 setResultText(result = "票券狀態：驗票失敗，" +data.split("\\?")[0]+ "\n\n票券號碼："+getdata.split("@")[4] + "\n\n票券種類："+data.split("\\?")[1] + "\n\n票券入場紀錄：");
                                                 ResultTxt.setTextColor(Color.RED);

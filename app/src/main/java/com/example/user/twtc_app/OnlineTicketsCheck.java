@@ -73,14 +73,6 @@ public class OnlineTicketsCheck extends Activity {
         connectionClass = new ConnectionClass();
         con= connectionClass.CONN();
 
-        //查詢館內人數
-        PeopleNumTxt.setText("目前館內人數 "+mydbHelper.executePeopleNumStoredProcedure(con)+" 人");
-        PeopleNumTxt.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v) {
-                PeopleNumTxt.setText("目前館內人數 "+mydbHelper.executePeopleNumStoredProcedure(con)+" 人");
-            }
-        });
 
         //掃描驗票
         cbMgr=(ClipboardManager)getSystemService(Context.CLIPBOARD_SERVICE);
@@ -106,7 +98,7 @@ public class OnlineTicketsCheck extends Activity {
                     cstmt.registerOutParameter(5, java.sql.Types.VARCHAR);
                     cstmt.execute();
                     String RETURN_MSG = cstmt.getString(4);
-                    String TK_NAME = mydbHelper.GetTKName(TK_CODE);
+                    String TK_NAME = "";
                     String RETURN_MSG_DATETIME = cstmt.getString(5);
                     cstmt.close();
                     if (RETURN_MSG.indexOf("可入") > -1) {

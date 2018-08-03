@@ -50,7 +50,7 @@ public class OfflineImport extends Activity {
             public void onClick(View v) {
                 if(checkInternetConnect()) {
                     //從網路資料庫匯入UL3至SQLITE
-                    if (mydbHelper.GetUltraLight03Number() > 0) {
+                    if (1 > 0) {
                         //有資料則無法匯入！
                         AlertDialog.Builder alertad = new AlertDialog.Builder(OfflineImport.this);
                         alertad.setTitle("無法匯入");
@@ -62,7 +62,7 @@ public class OfflineImport extends Activity {
                         alertad.show();//顯示對話框
                     } else {
                         int insertNo=0;//儲存從場站資料庫匯入幾筆數量
-                        insertNo=mydbHelper.InsertToUltraLight03();
+                        insertNo=1;
                         AlertDialog.Builder completead = new AlertDialog.Builder(OfflineImport.this);
                         completead.setTitle("成功匯入");
                         completead.setMessage("已匯入今日出入館紀錄" + insertNo + "筆！");
@@ -72,7 +72,6 @@ public class OfflineImport extends Activity {
                             }
                         });
                         completead.show();//顯示對話框
-                        DataShowToList(mydbHelper.GetUltraLight03());
                     }
                 }
                 else{

@@ -45,17 +45,12 @@ public class WiFiConnectSetting extends Activity {
 
         file = new File(getFilesDir()+"//connectData.xml");
 
-        //如果資料庫內先前已設定IP，則抓出來顯示在IP欄位上
-        if(mydbHelper.GetConnectIP()!=null){
-            IPTxt.setText(mydbHelper.GetConnectIP().trim());
-        }
 
         settingBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 IP = IPTxt.getText().toString();
                 if(isIP(IP)){
-                    mydbHelper.InsertToConnectIP(IP);
                     Toast.makeText(WiFiConnectSetting.this, "IP設定完成", Toast.LENGTH_SHORT).show();
                     Log.d("WiFiConnectSetting.java", "IP設定完成");
                     WriteLog.appendLog("WiFiConnectSetting.java/IP設定完成");

@@ -38,13 +38,15 @@ public class OfflineTickets extends Activity {
     private ClipboardManager.OnPrimaryClipChangedListener mPrimaryClipChangedListener;
     //SQLITE
     private MyDBHelper mydbHelper;
-
+    XmlHelper xmlHelper;
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         //requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
         setContentView(R.layout.offline_tickets);
         //getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE, R.layout.titlebar);
+
+        xmlHelper=new XmlHelper(getFilesDir()+"//connectData.xml");
 
         //接收上個頁面傳來的值
         Intent intent = getIntent();
@@ -78,7 +80,7 @@ public class OfflineTickets extends Activity {
                     SimpleDateFormat df3 = new SimpleDateFormat("yyyy-MM-dd");
                     Calendar c = Calendar.getInstance();
                     String[] ResultArray = new String[10];
-                    if (mydbHelper.IsTICKETNOexist(TICKET_NO, SPS_ID, df3.format(c.getTime()))) {
+                    if (1==1) {
                         FailedLayout.setVisibility(View.VISIBLE);
                         setResultText(result = "票券狀態    ");
                         setResultText2(result = "此票券已入場！");
@@ -87,7 +89,7 @@ public class OfflineTickets extends Activity {
                         //ResultTxt.setTextColor(Color.RED);
                     } else {
                         FailedLayout.setVisibility(View.GONE);
-                        setResultText(result = "票券狀態    驗票成功" + "\n\n票券號碼    " + TICKET_NO + "\n\n票券種類    " + mydbHelper.GetTKName(TK_CODE) + "\n\n票券入場紀錄\n\n" + df.format(c.getTime()));
+                        setResultText(result = "票券狀態    驗票成功" + "\n\n票券號碼    " + TICKET_NO + "\n\n票券種類    " + "" + "\n\n票券入場紀錄\n\n" + df.format(c.getTime()));
                         //ResultTxt.setTextColor(Color.BLUE);
                         ResultArray[0] = "A";
                         ResultArray[1] = TICKET_NO;
@@ -99,7 +101,7 @@ public class OfflineTickets extends Activity {
                         ResultArray[7] = df2.format(c.getTime());
                         ResultArray[8] = "";
                         ResultArray[9] = getDateTime();
-                        mydbHelper.InsertToSQLiteUltraLight03(ResultArray, "");
+                        //mydbHelper.InsertToSQLiteUltraLight03(ResultArray, "");
                     }
                     //Toast.makeText(OfflineTickets.this,new String(descryptBytes), Toast.LENGTH_SHORT).show();
                 } catch (Exception ex) {

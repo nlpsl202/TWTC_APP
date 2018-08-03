@@ -6,10 +6,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
-import java.sql.CallableStatement;
-import java.sql.Connection;
 import java.sql.ResultSet;
-import java.sql.Statement;
 import java.util.ArrayList;
 
 /**
@@ -17,12 +14,44 @@ import java.util.ArrayList;
  */
 public class MyDBHelper extends SQLiteOpenHelper {
     protected ArrayList<String[]> Result = null;
-    protected String CREATE_CSPSINFO = "create table if not exists cSpsInfo(SPS_ID text NOT NULL, SPS_NAME text, SPS_SDATE text,SPS_EDATE text, SYNCTIME text, CREATEDT text, CREATEID text, MODIFYDT text, MODIFYID text,PRIMARY KEY (SPS_ID))";
-    protected String CREATE_CSTATIONCONF = "create table if not exists cStationConf(DEVICE_ID text NOT NULL, DeviceTypeID text, SPS_ID text,MCNO text, IP text,MACMFRC text, IMEI_CODE text,TRANSFER_STATUS text, SYNCTIME text, CREATEID text, CREATEDT text, MODIFYID text,MODIFYDT text,PRIMARY KEY (DEVICE_ID))";
-    protected String CREATE_CTicketKind = "create table if not exists cTicketKind(TK_CODE text NOT NULL, TK_NAME text NOT NULL, TK_NAME_ENG text, TK_NAME_JAP text, TK_PRICE Integer,TK_BACK_FEE Integer,TK_DAYS text,TK_START_TM text,TK_UNTIL_TM text,SP_MEMO text, SYNCTIME text, CREATEDT text, CREATEID text, MODIFYDT text,MODIFYID text,PRIMARY KEY (TK_CODE))";
-    protected String CREATE_ConnectIP = "create table if not exists cConnectIP(IP text NOT NULL,PRIMARY KEY (IP))";
-    protected String CREATE_PULTRALIGHT03 = "create table if not exists pUltraLight03(TICKET_TYPE text NOT NULL, TICKET_NO text NOT NULL, SPS_ID text NOT NULL, TK_ENTER_DT text NOT NULL, IN_OUT_TYPE text NOT NULL, DEVICE_ID text NOT NULL, TK_CODE text NOT NULL, QRCODE text , INSERT_DB_DATETIME text, TRANSFER_STATUS text, CREATEID text, CREATEDT text, MODIFYID text,MODIFYDT text,PRIMARY KEY (TICKET_TYPE,TICKET_NO,SPS_ID,TK_ENTER_DT))";
-    protected String CREATE_PULTRALIGHT03_EXP = "create table if not exists pUltraLight03Exp(TICKET_TYPE text NOT NULL, TICKET_NO text NOT NULL, SPS_ID text NOT NULL, TK_ENTER_DT text NOT NULL, IN_OUT_TYPE text NOT NULL, DEVICE_ID text NOT NULL, TK_CODE text NOT NULL, QRCODE text , INSERT_DB_DATETIME text, TRANSFER_STATUS text, CREATEID text, CREATEDT text, MODIFYID text,MODIFYDT text,PRIMARY KEY (TICKET_TYPE,TICKET_NO,SPS_ID,TK_ENTER_DT))";
+    protected String CREATE_BADGETYPE = "create table if not exists BadgeType(BT_TypeID text NOT NULL," +
+                                                                             "BT_TypeName text ," +
+                                                                             "BT_MaterialType text," +
+                                                                             "BT_Memo text," +
+                                                                             "PRIMARY KEY (BT_TypeID))";
+    protected String CREATE_BARCODELOG = "create table if not exists BarcodeLog(DeviceID text," +
+                                                                               "DirectionType text," +
+                                                                               "SensorCode text," +
+                                                                               "SysCode BLOB," +
+                                                                               "Current_EL_Code text," +
+                                                                               "EL_Code text," +
+                                                                               "BT_TypeID text," +
+                                                                               "VP_ValidDateRule text," +
+                                                                               "VP_ValidDateBegin text," +
+                                                                               "VP_ValidDateEnd text," +
+                                                                               "VP_ValidTimeRule text," +
+                                                                               "VP_ValidTimeBegin text," +
+                                                                               "VP_ValidTimeEnd text," +
+                                                                               "VP_UseAreaAssign text," +
+                                                                               "VP_UsageTimeType text," +
+                                                                               "VP_UsageTimeTotal Integer," +
+                                                                               "VP_UsageTimePerDay Integer," +
+                                                                               "IV_CheckCode text," +
+                                                                               "IV_CheckCode2 text," +
+                                                                               "Result text," +
+                                                                               "SenseDT text," +
+                                                                               "Rec text," +
+                                                                               "PRIMARY KEY (Rec))";
+    protected String CREATE_WORKCARDLOG = "create table if not exists WorkCardLog(DeviceID text," +
+                                                                                 "DirectionType text," +
+                                                                                 "SensorCode text," +
+                                                                                 "CodeNo text," +
+                                                                                 "Current_EL_Code Integer," +
+                                                                                 "EL_CODE Integer," +
+                                                                                 "Result text," +
+                                                                                 "SenseDT text," +
+                                                                                 "Rec text," +
+                                                                                 "PRIMARY KEY (Rec))";
 
     private final static String DATABASE_NAME = "mydata.db";
     private final static int DATABASE_VERSION = 1;
@@ -36,12 +65,9 @@ public class MyDBHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase Database) {
         // TODO Auto-generated method stub
         //create table
-        Database.execSQL(CREATE_CSPSINFO);
-        Database.execSQL(CREATE_CSTATIONCONF);
-        Database.execSQL(CREATE_PULTRALIGHT03);
-        Database.execSQL(CREATE_PULTRALIGHT03_EXP);
-        Database.execSQL(CREATE_CTicketKind);
-        Database.execSQL(CREATE_ConnectIP);
+        Database.execSQL(CREATE_BADGETYPE);
+        Database.execSQL(CREATE_BARCODELOG);
+        Database.execSQL(CREATE_WORKCARDLOG);
 
         Log.d("MyDBHelper.java", "SQLITE的TABLE建立成功");
         WriteLog.appendLog("MyDBHelper.java/SQLITE的TABLE建立成功");
@@ -52,7 +78,53 @@ public class MyDBHelper extends SQLiteOpenHelper {
         // TODO Auto-generated method stub
     }
 
-    //從場站資料庫插入SpsInfo至SQLITE
+    //刪除存在的票劵狀態名稱
+    public void DeleteBadgeType(){
+        super.getWritableDatabase().execSQL("Delete From BadgeType");
+        super.getWritableDatabase().execSQL("VACUUM");
+        super.close();
+    }
+
+    public void DeleteOfflineData(String sql){
+        super.getWritableDatabase().execSQL(sql);
+        super.getWritableDatabase().execSQL("VACUUM");
+        super.close();
+    }
+
+    //插入當前票劵狀態名稱
+    public void InsertToBadgeType(ResultSet rs){
+        StringBuilder sb = new StringBuilder();
+        try {
+            while (rs.next()){
+                sb.append("Insert into BadgeType(BT_TypeID,BT_TypeName,BT_MaterialType,BT_Memo)Values");
+                sb.append("('" + rs.getString("BT_TypeID") + "','" + rs.getString("BT_TypeName") + "'");
+                sb.append(",'" + rs.getString("BT_MaterialType") + "','" + rs.getString("BT_Memo") + "')");
+                super.getWritableDatabase().execSQL(sb.toString());
+                super.close();
+                sb.delete(0, sb.length());
+            }
+        }
+        catch(Exception ex) {
+            WriteLog.appendLog("MyDBHelper.java/InsertToBadgeType/Exception:" + ex.toString());
+        }
+    }
+
+    //取得離線驗票資料
+    public Cursor SelectFromBarcodeLog(){
+        Cursor cursor = super.getReadableDatabase().rawQuery("Select * From BarcodeLog", null);
+        super.close();
+        return cursor;
+    }
+
+    //取得離線工作證驗票資料
+    public Cursor SelectFromWorkCardLog(){
+        Cursor cursor = super.getReadableDatabase().rawQuery("Select * From WorkCardLog", null);
+        super.close();
+        return cursor;
+    }
+}
+
+    /*//從場站資料庫插入SpsInfo至SQLITE
     public boolean InsertToSpsInfo(){
         try {
             Connection con = ConnectionClass.CONN();
@@ -68,7 +140,7 @@ public class MyDBHelper extends SQLiteOpenHelper {
                 while (rs.next())
                 {   //從場站資料庫抓資料儲存至SQLITE
                     String statement = "insert into cSpsInfo (SPS_ID,SPS_NAME,SPS_SDATE,SPS_EDATE,SYNCTIME,CREATEDT,CREATEID,MODIFYDT,MODIFYID)" +
-                                       "values('"+rs.getString("SPS_ID")+"','"+rs.getString("SPS_NAME")+"','"+rs.getString("SPS_SDATE")+"','"+rs.getString("SPS_EDATE")+"','"+rs.getString("SYNCTIME")+"','"+rs.getString("CREATEDT")+"','"+rs.getString("CREATEID")+"','"+rs.getString("MODIFYDT")+"','"+rs.getString("MODIFYID")+"')";
+                            "values('"+rs.getString("SPS_ID")+"','"+rs.getString("SPS_NAME")+"','"+rs.getString("SPS_SDATE")+"','"+rs.getString("SPS_EDATE")+"','"+rs.getString("SYNCTIME")+"','"+rs.getString("CREATEDT")+"','"+rs.getString("CREATEID")+"','"+rs.getString("MODIFYDT")+"','"+rs.getString("MODIFYID")+"')";
                     super.getWritableDatabase().execSQL(statement);
                 }
                 super.close();
@@ -123,8 +195,8 @@ public class MyDBHelper extends SQLiteOpenHelper {
             }
             else{
                 String query = "SELECT TICKET_TYPE,TICKET_NO,SPS_ID,TK_ENTER_DT,IN_OUT_TYPE,DEVICE_ID,TK_CODE,QRCODE,INSERT_DB_DATETIME,TRANSFER_STATUS,CREATEDT,CREATEID,MODIFYDT,MODIFYID "+
-                               "FROM pUltraLight03 " +
-                               "where CONVERT(char(6), TK_ENTER_DT, 12)=CONVERT(char(6), getdate(), 12)";
+                        "FROM pUltraLight03 " +
+                        "where CONVERT(char(6), TK_ENTER_DT, 12)=CONVERT(char(6), getdate(), 12)";
                 Statement stmt = con.createStatement();
                 ResultSet rs = stmt.executeQuery(query);
                 while (rs.next())
@@ -148,12 +220,12 @@ public class MyDBHelper extends SQLiteOpenHelper {
     public void InsertToSQLiteUltraLight03(String[] ResultArray,String TRS){
         if(TRS.equals("OK")){//連線驗票TICKET_TYPE text NOT NULL, TICKET_NO text NOT NULL, SPS_ID text NOT NULL, TK_ENTER_DT text NOT NULL, IN_OUT_TYPE text NOT NULL, DEVICE_ID text NOT NULL, TK_CODE text NOT NULL, QRCODE text , INSERT_DB_DATETIME text, TRANSFER_STATUS text, CREATEID text, CREATEDT text, MODIFYID text,MODIFYDT text
             String statement = "insert into pUltraLight03 (TICKET_TYPE,TICKET_NO,SPS_ID,TK_ENTER_DT,IN_OUT_TYPE,DEVICE_ID,TK_CODE,QRCODE,INSERT_DB_DATETIME,TRANSFER_STATUS,CREATEID,CREATEDT, MODIFYID ,MODIFYDT)" +
-                               "values('" + ResultArray[0] + "','" + ResultArray[1] + "','" + ResultArray[2] + "','" + ResultArray[9] + "','" + ResultArray[3] + "','" + ResultArray[4] + "','" + ResultArray[5] + "','" + ResultArray[6] + "','" + ResultArray[7] + "','OK','" + ResultArray[8] + "','" + ResultArray[9] + "','" + ResultArray[8] +"','" + ResultArray[9] + "')";
+                    "values('" + ResultArray[0] + "','" + ResultArray[1] + "','" + ResultArray[2] + "','" + ResultArray[9] + "','" + ResultArray[3] + "','" + ResultArray[4] + "','" + ResultArray[5] + "','" + ResultArray[6] + "','" + ResultArray[7] + "','OK','" + ResultArray[8] + "','" + ResultArray[9] + "','" + ResultArray[8] +"','" + ResultArray[9] + "')";
             super.getWritableDatabase().execSQL(statement);
             super.close();
         }else {//離線驗票
             String statement = "insert into pUltraLight03 (TICKET_TYPE,TICKET_NO,SPS_ID,TK_ENTER_DT,IN_OUT_TYPE,DEVICE_ID,TK_CODE,QRCODE,INSERT_DB_DATETIME,TRANSFER_STATUS,CREATEID,CREATEDT, MODIFYID ,MODIFYDT)" +
-                               "values('" + ResultArray[0] + "','" + ResultArray[1] + "','" + ResultArray[2] + "','" + ResultArray[9] + "','" + ResultArray[3] + "','" + ResultArray[4] + "','" + ResultArray[5] + "','" + ResultArray[6] + "','" + ResultArray[7] + "','','" + ResultArray[8] + "','" + ResultArray[9] + "','" + ResultArray[8] +"','" + ResultArray[9] + "')";
+                    "values('" + ResultArray[0] + "','" + ResultArray[1] + "','" + ResultArray[2] + "','" + ResultArray[9] + "','" + ResultArray[3] + "','" + ResultArray[4] + "','" + ResultArray[5] + "','" + ResultArray[6] + "','" + ResultArray[7] + "','','" + ResultArray[8] + "','" + ResultArray[9] + "','" + ResultArray[8] +"','" + ResultArray[9] + "')";
             super.getWritableDatabase().execSQL(statement);
             super.close();
         }
@@ -483,8 +555,8 @@ public class MyDBHelper extends SQLiteOpenHelper {
         }
     }
     //執行匯出SP_
-    public String executeExportStoredProcedure(Connection con,String TICKET_TYPE,String TICKET_NO,String SPS_ID,String TK_ENTER_DT,String IN_OUT_TYPE,
-                                               String DEVICE_ID,String TK_CODE,String QRCODE,String INSERT_DB_DATETIME,String TRANSFER_STATUS,String CREATEID,String CREATEDT,String MODIFYID,String MODIFYDT) {
+    public String executeExportStoredProcedure(Connection con, String TICKET_TYPE, String TICKET_NO, String SPS_ID, String TK_ENTER_DT, String IN_OUT_TYPE,
+                                               String DEVICE_ID, String TK_CODE, String QRCODE, String INSERT_DB_DATETIME, String TRANSFER_STATUS, String CREATEID, String CREATEDT, String MODIFYID, String MODIFYDT) {
         String RETURN_MSG="";
         try {
             CallableStatement cstmt = con.prepareCall("{ call dbo.SP_HD_UpLoad_pUltraLight03(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}");
@@ -526,7 +598,7 @@ public class MyDBHelper extends SQLiteOpenHelper {
                                         String TK_CODE,String QRCODE,String INSERT_DB_DATETIME,String TRANSFER_STATUS,String CREATEID,
                                         String CREATEDT,String MODIFYID,String MODIFYDT){
         String statement = "insert into pUltraLight03Exp (TICKET_TYPE,TICKET_NO,SPS_ID,TK_ENTER_DT,IN_OUT_TYPE,DEVICE_ID,TK_CODE ,QRCODE,INSERT_DB_DATETIME,TRANSFER_STATUS,CREATEID,CREATEDT,MODIFYID,MODIFYDT)" +
-                           "values('"+TICKET_TYPE+"','"+TICKET_NO+"','"+SPS_ID+"','"+TK_ENTER_DT+"','"+IN_OUT_TYPE+"','"+DEVICE_ID+"','"+TK_CODE+"','"+QRCODE+"','"+INSERT_DB_DATETIME+"','"+TRANSFER_STATUS+"','"+CREATEID+"','"+CREATEDT+"','"+MODIFYID+"','"+MODIFYDT+"')";
+                "values('"+TICKET_TYPE+"','"+TICKET_NO+"','"+SPS_ID+"','"+TK_ENTER_DT+"','"+IN_OUT_TYPE+"','"+DEVICE_ID+"','"+TK_CODE+"','"+QRCODE+"','"+INSERT_DB_DATETIME+"','"+TRANSFER_STATUS+"','"+CREATEID+"','"+CREATEDT+"','"+MODIFYID+"','"+MODIFYDT+"')";
         super.getWritableDatabase().execSQL(statement);
     }
 
@@ -606,5 +678,4 @@ public class MyDBHelper extends SQLiteOpenHelper {
         }catch(Exception ex){
             WriteLog.appendLog("MyDBHelper.java/UpdateDeviceSPS_ID/Exception:" + ex.toString());
         }
-    }
-}
+    }*/

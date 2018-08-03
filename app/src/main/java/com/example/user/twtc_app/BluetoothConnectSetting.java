@@ -15,10 +15,7 @@ import android.os.Vibrator;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
-import android.widget.CompoundButton;
 import android.widget.EditText;
-import android.widget.Switch;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.IOException;
@@ -38,26 +35,27 @@ public class BluetoothConnectSetting extends Activity
     public static BluetoothDevice connectedBluetoothDevice;
     public static BluetoothSocket mmSocket;
     private ClipboardManager cbMgr;
+    private ClipboardManager.OnPrimaryClipChangedListener mPrimaryClipChangedListener;
     EditText Address;
-    TextView textViewStatus;
-    Button buttonSearch,ReturnBtn,btbt;
-    Switch sw;
+    Button BtBtn,ConnectBtn,ReturnBtn,HomeBtn;
     BluetoothAdapter mBluetoothAdapter;
     BluetoothDevice mmDevice;
     String address;
+    XmlHelper xmlHelper;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.bluetooth_connect_setting);
-        //getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE, R.layout.titlebar);
 
-        buttonSearch = (Button) findViewById(R.id.buttonSearch);
+        BtBtn=(Button)findViewById(R.id.BtBtn);
+        ConnectBtn = (Button) findViewById(R.id.ConnectBtn);
         ReturnBtn=(Button)findViewById(R.id.ReturnBtn);
-        btbt=(Button)findViewById(R.id.btbt);
-        sw = (Switch)findViewById(R.id.sw);
+        HomeBtn=(Button)findViewById(R.id.HomeBtn);
         Address=(EditText) findViewById(R.id.Address);
+
+        xmlHelper=new XmlHelper(getFilesDir()+"//connectData.xml");
 
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
@@ -71,50 +69,29 @@ public class BluetoothConnectSetting extends Activity
         registerReceiver(mReceiver2, filter2);
 
         if(mBluetoothAdapter.isEnabled()) {
-            btbt.setBackgroundResource(R.drawable.bton);
-            sw.setChecked(true);
-            //textViewStatus.setText("藍牙開啟");
+            BtBtn.setBackgroundResource(R.drawable.bton);
         }else{
-            btbt.setBackgroundResource(R.drawable.btoff);
-            sw.setChecked(false);
-            //textViewStatus.setText("藍牙關閉");
+            BtBtn.setBackgroundResource(R.drawable.btoff);
         }
 
-        //Bluetooth On/Off
-        btbt.setOnClickListener(new View.OnClickListener()
+        //Bluetooth OnOff
+        BtBtn.setOnClickListener(new View.OnClickListener()
         {
             public void onClick(View v)
             {
-                btbt.setClickable(false);
+                BtBtn.setClickable(false);
                 if (mBluetoothAdapter.isEnabled()) {
-                    btbt.setBackgroundResource(R.drawable.btoff);
+                    BtBtn.setBackgroundResource(R.drawable.btoff);
                     mBluetoothAdapter.disable();
-                    //textViewStatus.setText("藍牙關閉");
                 } else {
-                    btbt.setBackgroundResource(R.drawable.bton);
+                    BtBtn.setBackgroundResource(R.drawable.bton);
                     mBluetoothAdapter.enable();
-                    //textViewStatus.setText("藍牙開啟");
                 }
             }
         });
 
-        //sw Changed Event
-        sw.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                sw.setClickable(false);
-                if (buttonView.isChecked()) {
-                    mBluetoothAdapter.enable();
-                    //textViewStatus.setText("藍牙開啟");
-                } else {
-                    mBluetoothAdapter.disable();
-                    //textViewStatus.setText("藍牙關閉");
-                }
-            }
-        });
-
-        //Bluetooth Search Button
-        buttonSearch.setOnClickListener(new View.OnClickListener()
+        //Bluetooth Connect Button
+        ConnectBtn.setOnClickListener(new View.OnClickListener()
         {
             public void onClick(View v)
             {
@@ -123,10 +100,16 @@ public class BluetoothConnectSetting extends Activity
                         Toast.makeText(BluetoothConnectSetting.this,"藍牙裝置已連線", Toast.LENGTH_SHORT).show();
                     }else{
                         findBT(Address.getText().toString());
+                        Toast.makeText(BluetoothConnectSetting.this,"藍牙裝置連線成功", Toast.LENGTH_SHORT).show();
                     }
-                    Intent callSub = new Intent();
-                    callSub.setClass(BluetoothConnectSetting.this, BluetoothTickets.class);
-                    startActivityForResult(callSub, 0);
+                    xmlHelper.WriteValue("BlueToothID",Address.getText().toString().trim());
+                    Intent intent = new Intent();
+                    intent.setClass(BluetoothConnectSetting.this, BluetoothTickets.class);
+                    startActivity(intent);
+                    BluetoothConnectSetting.this.finish();
+                    //Intent callSub = new Intent();
+                    //callSub.setClass(BluetoothConnectSetting.this, BluetoothTickets.class);
+                    //startActivityForResult(callSub, 0);
                 }catch(Exception ex){
                     Toast.makeText(BluetoothConnectSetting.this, "連接藍牙失敗", Toast.LENGTH_SHORT).show();
                 }
@@ -134,23 +117,32 @@ public class BluetoothConnectSetting extends Activity
         });
 
         this.cbMgr=(ClipboardManager)getSystemService(Context.CLIPBOARD_SERVICE);
-        cbMgr.addPrimaryClipChangedListener( new ClipboardManager.OnPrimaryClipChangedListener() {
+        mPrimaryClipChangedListener =new ClipboardManager.OnPrimaryClipChangedListener(){
             public void onPrimaryClipChanged() {
                 try{
-                    //Address.setText("");
-                    //setVibrate(100);
-                    /*if(connectedBluetoothDevices.size()>0){
+                    setVibrate(100);
+                    Address.setText("");
+                    if(connectedBluetoothDevices.size()>0){
                         Toast.makeText(BluetoothConnectSetting.this,"藍牙裝置已連線", Toast.LENGTH_SHORT).show();
                     }else{
-                        setVibrate(100);
                         address=cbMgr.getPrimaryClip().getItemAt(0).getText().toString();
                         findBT(address);
-                    }*/
+                        Toast.makeText(BluetoothConnectSetting.this,"藍牙裝置連線成功", Toast.LENGTH_SHORT).show();
+                    }
+                    xmlHelper.WriteValue("BlueToothID",address.trim());
+                    Intent intent = new Intent();
+                    intent.setClass(BluetoothConnectSetting.this, BluetoothTickets.class);
+                    startActivity(intent);
+                    BluetoothConnectSetting.this.finish();
+                    //Intent callSub = new Intent();
+                    //callSub.setClass(BluetoothConnectSetting.this, BluetoothTickets.class);
+                    //startActivityForResult(callSub, 0);
                 }catch(Exception ex){
                     Toast.makeText(BluetoothConnectSetting.this, "連接藍牙失敗", Toast.LENGTH_SHORT).show();
                 }
             }
-        });
+        };
+        cbMgr.addPrimaryClipChangedListener(mPrimaryClipChangedListener);
 
         ReturnBtn.setOnClickListener(new View.OnClickListener(){
             @Override
@@ -158,6 +150,19 @@ public class BluetoothConnectSetting extends Activity
                 finish();
             }
         });
+
+        HomeBtn.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
+    }//END ONCREATE
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        cbMgr.removePrimaryClipChangedListener(mPrimaryClipChangedListener);
     }
 
     @Override
@@ -189,10 +194,10 @@ public class BluetoothConnectSetting extends Activity
                 if(device.getAddress().equals(Address)){
                     mmDevice=device;
                     try{
-                        openBT();
+                        connectBT();
                         connectedBluetoothDevice=mmDevice;
                         connectedBluetoothDevices.add(device);
-                        Toast.makeText(BluetoothConnectSetting.this, "藍牙連線成功", Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(BluetoothConnectSetting.this, "藍牙連線成功", Toast.LENGTH_SHORT).show();
                     }catch (Exception e) {
 
                     }
@@ -204,7 +209,7 @@ public class BluetoothConnectSetting extends Activity
         }
     }
 
-    void openBT() throws IOException
+    void connectBT() throws IOException
     {
         UUID uuid = UUID.fromString("7A51FDC2-FDDF-4c9b-AFFC-98BCD91BF93B"); //Standard SerialPortService ID
         mmSocket = mmDevice.createRfcommSocketToServiceRecord(uuid);
@@ -245,35 +250,28 @@ public class BluetoothConnectSetting extends Activity
         }
     };
 
+    //藍牙狀態改變
     private final BroadcastReceiver mReceiver2 = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             final String action = intent.getAction();
             if (action.equals(BluetoothAdapter.ACTION_STATE_CHANGED)) {
-                final int state = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE,
-                        BluetoothAdapter.ERROR);
+                final int state = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, BluetoothAdapter.ERROR);
                 switch (state) {
                     case BluetoothAdapter.STATE_OFF:
-                        btbt.setBackgroundResource(R.drawable.btoff);
-                        sw.setChecked(false);
-                        //textViewStatus.setText("藍牙關閉");
-                        sw.setClickable(true);
-                        btbt.setClickable(true);
+                        BtBtn.setBackgroundResource(R.drawable.btoff);
+                        BtBtn.setClickable(true);
+                        connectedBluetoothDevices.clear();
                         break;
                     case BluetoothAdapter.STATE_TURNING_OFF:
-                        sw.setClickable(false);
-                        btbt.setClickable(false);
+                        BtBtn.setClickable(false);
                         break;
                     case BluetoothAdapter.STATE_ON:
-                        btbt.setBackgroundResource(R.drawable.bton);
-                        sw.setChecked(true);
-                        //textViewStatus.setText("藍牙開啟");
-                        sw.setClickable(true);
-                        btbt.setClickable(true);
+                        BtBtn.setBackgroundResource(R.drawable.bton);
+                        BtBtn.setClickable(true);
                         break;
                     case BluetoothAdapter.STATE_TURNING_ON:
-                        sw.setClickable(false);
-                        btbt.setClickable(false);
+                        BtBtn.setClickable(false);
                         break;
                 }
             }
