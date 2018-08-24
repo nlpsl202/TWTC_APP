@@ -24,22 +24,22 @@
     <autoscroll-from-editor value="true" />
     <show-object-properties value="true" />
     <loaded-nodes>
-      <connection connection-id="375896ef-6bfc-44f7-91a6-ec63611c14a9">
+      <connection connection-id="5f66601f-f041-4978-bb6b-dc7b5321bc1f">
         <schema name="main" object-types="column, constraint, index, table, dataset trigger, view" />
       </connection>
     </loaded-nodes>
   </component>
   <component name="DBNavigator.Project.DatabaseConsoleManager">
-    <connection id="375896ef-6bfc-44f7-91a6-ec63611c14a9">
+    <connection id="5f66601f-f041-4978-bb6b-dc7b5321bc1f">
       <console name="Connection" type="STANDARD" />
     </connection>
   </component>
   <component name="DBNavigator.Project.DatabaseSessionManager">
-    <connection id="375896ef-6bfc-44f7-91a6-ec63611c14a9" />
+    <connection id="5f66601f-f041-4978-bb6b-dc7b5321bc1f" />
   </component>
   <component name="DBNavigator.Project.DatasetFilterManager">
-    <filter-list connection-id="375896ef-6bfc-44f7-91a6-ec63611c14a9" dataset="main.BadgeType" active-filter-id="0c026ed2-dd5e-42cc-abd8-d79c14ea0440">
-      <filter id="0c026ed2-dd5e-42cc-abd8-d79c14ea0440" name="Filter 1" temporary="false" custom-name="false" type="basic" join-type="AND" />
+    <filter-list connection-id="5f66601f-f041-4978-bb6b-dc7b5321bc1f" dataset="main.WorkCardLog" active-filter-id="dc9be7f4-0fe0-4810-953f-bb9df325db52">
+      <filter id="dc9be7f4-0fe0-4810-953f-bb9df325db52" name="Filter 1" temporary="false" custom-name="false" type="basic" join-type="AND" />
     </filter-list>
   </component>
   <component name="DBNavigator.Project.EditorStateManager">
@@ -65,7 +65,7 @@
   </component>
   <component name="DBNavigator.Project.Settings">
     <connections>
-      <connection id="375896ef-6bfc-44f7-91a6-ec63611c14a9" active="true">
+      <connection id="5f66601f-f041-4978-bb6b-dc7b5321bc1f" active="true">
         <database>
           <name value="Connection" />
           <description value="" />

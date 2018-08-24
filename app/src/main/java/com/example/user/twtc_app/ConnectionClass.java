@@ -17,12 +17,11 @@ import java.sql.SQLException;
  */
 public class ConnectionClass {
 
-    static String ip;
-    //String ip="210.243.86.140";
+    static String ip="192.168.11.12";
     static String classs = "net.sourceforge.jtds.jdbc.Driver";
-    static String db = "TWFET_CDPS";
-    static String un = "sa";
-    static String password = "hokawaCdps";
+    static String db = "TWTC_CDPS";
+    static String un = "TWTC";
+    static String password = "A#UugHMh";
 
 
     @SuppressLint("NewApi")

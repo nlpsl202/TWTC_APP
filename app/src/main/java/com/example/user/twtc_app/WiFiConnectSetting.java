@@ -10,8 +10,6 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import java.io.File;
-import java.sql.CallableStatement;
-import java.sql.Connection;
 import java.sql.ResultSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -70,38 +68,10 @@ public class WiFiConnectSetting extends Activity {
             }
         });
 
-        rs=DownloadDeviceSetup();
         String a="";
-        try {
-            while (rs.next()) {
-                a= rs.getString("DL_IsInUse");
-            }
-        }
-        catch (Exception e) {
-        Log.d("MyDB.java/查詢館內人數SP", e.toString());
-        WriteLog.appendLog("MyDBHelper.java/查詢館內人數SP/Exception:" + e.toString());
-        }
     }
 
-    //更新手持所屬園區
-    public ResultSet DownloadDeviceSetup(){
-        ResultSet rs=null;
-        ConnectionClass.ip=ReadXML.ReadValue("ServerIP");
-        ConnectionClass.db="TWTC_CDPS";
-        ConnectionClass.un=ReadXML.ReadValue("sa");
-        ConnectionClass.password=ReadXML.ReadValue("SQLPassWord");
-        Connection con = ConnectionClass.CONN();
-        try {
-            CallableStatement cstmt = con.prepareCall("{ call dbo.SP_DownloadDeviceSetup(?)}");
-            cstmt.setString("DeviceID",ReadXML.ReadValue("MachineID"));
-            rs = cstmt.executeQuery();
-        }
-        catch (Exception e) {
-            Log.d("MyDB.java/查詢館內人數SP", e.toString());
-            WriteLog.appendLog("MyDBHelper.java/查詢館內人數SP/Exception:" + e.toString());
-        }
-        return rs;
-    }
+
 
     /**
           * 判斷IP格式和範圍

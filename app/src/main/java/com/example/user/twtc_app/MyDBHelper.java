@@ -46,8 +46,8 @@ public class MyDBHelper extends SQLiteOpenHelper {
                                                                                  "DirectionType text," +
                                                                                  "SensorCode text," +
                                                                                  "CodeNo text," +
-                                                                                 "Current_EL_Code Integer," +
-                                                                                 "EL_CODE Integer," +
+                                                                                 "Current_EL_Code text," +
+                                                                                 "EL_CODE text," +
                                                                                  "Result text," +
                                                                                  "SenseDT text," +
                                                                                  "Rec text," +
@@ -106,6 +106,51 @@ public class MyDBHelper extends SQLiteOpenHelper {
         }
         catch(Exception ex) {
             WriteLog.appendLog("MyDBHelper.java/InsertToBadgeType/Exception:" + ex.toString());
+        }
+    }
+
+    //插入離線驗票資料
+    public void InsertToOfflineTickets(String sql){
+        try {
+            super.getWritableDatabase().execSQL(sql);
+            super.close();
+        }
+        catch(Exception ex) {
+            WriteLog.appendLog("MyDBHelper.java/InsertToBadgeType/Exception:" + ex.toString());
+        }
+    }
+
+    public int GetLoginCount(String _id, String _date)
+    {
+        int count=0;
+        try
+        {
+            Cursor cursor = super.getReadableDatabase().rawQuery("Select count(*) From BarcodeLog where DirectionType='I' and SensorCode='" + _id + "' and SenseDT LIKE '" + _date + "%'", null);
+            if (cursor.moveToNext()) {
+                count = cursor.getInt(0);
+            }
+            return count;
+        }
+        catch (Exception ex)
+        {
+            return 0;
+        }
+    }
+
+    public String GetBadgeType(String code)
+    {
+        String strName = "";
+        try
+        {
+            Cursor cursor = super.getReadableDatabase().rawQuery("Select BT_TypeName From BadgeType where BT_TypeID='" + code + "'", null);
+            if (cursor.moveToNext()) {
+                strName = cursor.getString(0);
+            }
+            return strName;
+        }
+        catch (Exception ex)
+        {
+            return "";
         }
     }
 

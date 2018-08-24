@@ -52,34 +52,36 @@
     <RelativeLayout
         android:id="@+id/ReturnLayout"
         android:layout_width="match_parent"
-        android:layout_height="100dp"
+        android:layout_height="62dp"
         android:layout_alignParentBottom="true"
-        android:background="@drawable/offline_export_bottom_bar">
+        android:background="@drawable/bottom_background">
 
         <Button
             android:id="@+id/ReturnBtn"
-            android:layout_width="140dp"
-            android:layout_height="60dp"
-            android:background="@drawable/lastpage_btn_selector"
+            android:layout_width="208px"
+            android:layout_height="73px"
             android:layout_alignParentLeft="true"
-            android:layout_marginTop="35dp"/>
-
-        <Button
-            android:id="@+id/HomeBtn"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:background="@drawable/home_btn_selector"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="35dp"/>
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="30.5px"
+            android:background="@drawable/lastpage_btn_selector" />
 
         <Button
             android:id="@+id/NextBtn"
-            android:layout_width="140dp"
-            android:layout_height="60dp"
-            android:background="@drawable/nextpage_btn_selector"
+            android:layout_width="208px"
+            android:layout_height="73px"
             android:layout_alignParentRight="true"
-            android:layout_marginTop="35dp"/>
+            android:layout_centerVertical="true"
+            android:layout_marginRight="30.5px"
+            android:background="@drawable/nextpage_btn_selector" />
 
     </RelativeLayout>
+
+    <Button
+        android:id="@+id/HomeBtn"
+        android:layout_width="159px"
+        android:layout_height="159px"
+        android:background="@drawable/home_btn_selector"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentBottom="true"/>
 
 </RelativeLayout>

@@ -3,61 +3,52 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:weightSum="1"
     android:background="@drawable/after_login_background" >
 
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="140dp"
-        android:layout_marginTop="130dp">
+    <Button
+        android:id="@+id/BluetoothTicketBtn"
+        android:layout_width="631.5px"
+        android:layout_height="111.6px"
+        android:background="@drawable/bluetooth_ticket_btn_selector"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="122.6px"
+        android:layout_weight="1" />
 
-        <Button
-            android:id="@+id/BluetoothTicketBtn"
-            android:layout_width="150dp"
-            android:layout_height="140dp"
-            android:background="@drawable/bluetooth_ticket_btn_selector"
-            android:layout_marginLeft="25dp"
-            android:layout_alignParentLeft="true"/>
+    <Button
+        android:id="@+id/WifiTicketBtn"
+        android:layout_width="631.5px"
+        android:layout_height="111.6px"
+        android:background="@drawable/wifi_ticket_btn_selector"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="90px"
+        android:layout_weight="1"/>
 
-        <Button
-            android:id="@+id/WifiTicketBtn"
-            android:layout_width="150dp"
-            android:layout_height="140dp"
-            android:background="@drawable/wifi_ticket_btn_selector"
-            android:layout_marginRight="25dp"
-            android:layout_alignParentRight="true"/>
+    <Button
+        android:id="@+id/OffineTicketBtn"
+        android:layout_width="631.5px"
+        android:layout_height="111.6px"
+        android:background="@drawable/offline_ticket_btn_selector"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="90px"
+        android:layout_weight="1"/>
 
-    </RelativeLayout>
-
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="140dp"
-        android:layout_marginTop="10dp">
-
-        <Button
-            android:id="@+id/OffineTicketBtn"
-            android:layout_width="150dp"
-            android:layout_height="140dp"
-            android:background="@drawable/offline_ticket_btn_selector"
-            android:layout_marginLeft="25dp"
-            android:layout_alignParentLeft="true"/>
-
-        <Button
-            android:id="@+id/OfflineExportBtn"
-            android:layout_width="150dp"
-            android:layout_height="140dp"
-            android:background="@drawable/offline_export_btn_selector"
-            android:layout_marginRight="25dp"
-            android:layout_alignParentRight="true"/>
-
-    </RelativeLayout>
+    <Button
+        android:id="@+id/OfflineExportBtn"
+        android:layout_width="631.5px"
+        android:layout_height="111.6px"
+        android:background="@drawable/offline_export_btn_selector"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="90px"
+        android:layout_weight="1"/>
 
     <Button
         android:id="@+id/ConnectSettingBtn"
-        android:layout_width="310dp"
-        android:layout_height="140dp"
+        android:layout_width="631.5px"
+        android:layout_height="111.6px"
         android:background="@drawable/connect_setting_btn_selector"
-        android:layout_gravity="center|bottom"
-        android:layout_marginTop="10dp"/>
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="90px"
+        android:layout_marginBottom="115.3px"
+        android:layout_weight="1"/>
 
 </LinearLayout>

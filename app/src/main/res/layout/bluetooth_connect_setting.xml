@@ -6,79 +6,64 @@
 
     <Button
         android:id="@+id/BtBtn"
-        android:layout_width="200px"
-        android:layout_height="45dp"
-        android:background="@drawable/btoff"
+        android:layout_width="208px"
+        android:layout_height="66px"
+        android:background="@drawable/switch_on"
         android:layout_gravity="center_vertical"
-        android:layout_marginLeft="210dp"
-        android:layout_marginTop="165dp"/>
+        android:layout_marginLeft="461px"
+        android:layout_marginTop="195px"/>
 
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
+    <EditText
+        android:id="@+id/Address"
+        android:layout_width="772px"
+        android:layout_height="196px"
+        android:background="@drawable/bluetooth_connect_setting_edittext"
+        android:layout_marginTop="584.6px"
+        android:layout_centerHorizontal="true"
+        android:singleLine="true"
+        android:paddingLeft="40dp"/>
 
-        <LinearLayout
-            android:layout_width="280dp"
-            android:layout_height="280dp"
-            android:layout_marginTop="220dp"
-            android:orientation="vertical"
-            android:background="@drawable/bluetooth_connect_setting_data"
-            android:layout_gravity="center">
-
-            <EditText
-                android:id="@+id/Address"
-                android:layout_width="200dp"
-                android:layout_height="50dp"
-                android:layout_gravity="center"
-                android:background="@drawable/after_login_alert_edittext"
-                android:textColor="#ffffff"
-                android:layout_marginTop="50dp"
-                android:singleLine="true"/>
-
-            <Button
-            android:id="@+id/ConnectBtn"
-            android:layout_width="280dp"
-            android:layout_height="140dp"
-            android:layout_gravity="center"
-            android:layout_marginTop="40dp"
-            android:background="@drawable/bluetooth_connect_setting_yes_btn_selector"/>
-
-        </LinearLayout>
-
-    </LinearLayout>
+    <Button
+        android:id="@+id/ConnectBtn"
+        android:layout_width="896.4px"
+        android:layout_height="310.5px"
+        android:background="@drawable/bluetooth_connect_setting_yes_btn_selector"
+        android:layout_marginTop="718.4px"
+        android:layout_centerHorizontal="true"/>
 
     <RelativeLayout
         android:id="@+id/ReturnLayout"
         android:layout_width="match_parent"
-        android:layout_height="100dp"
+        android:layout_height="62dp"
         android:layout_alignParentBottom="true"
-        android:background="@drawable/bluetooth_connect_setting_bottom_bar">
+        android:background="@drawable/bottom_background">
 
         <Button
             android:id="@+id/ReturnBtn"
-            android:layout_width="140dp"
-            android:layout_height="60dp"
-            android:background="@drawable/lastpage_btn_selector"
+            android:layout_width="208px"
+            android:layout_height="73px"
             android:layout_alignParentLeft="true"
-            android:layout_marginTop="35dp"/>
-
-        <Button
-            android:id="@+id/HomeBtn"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:background="@drawable/home_btn_selector"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="35dp"/>
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="30.5px"
+            android:background="@drawable/lastpage_btn_selector" />
 
         <Button
             android:id="@+id/NextBtn"
-            android:layout_width="140dp"
-            android:layout_height="60dp"
-            android:background="@drawable/nextpage_btn_selector"
+            android:layout_width="208px"
+            android:layout_height="73px"
             android:layout_alignParentRight="true"
-            android:layout_marginTop="35dp"/>
+            android:layout_centerVertical="true"
+            android:layout_marginRight="30.5px"
+            android:background="@drawable/nextpage_btn_selector" />
 
     </RelativeLayout>
+
+    <Button
+        android:id="@+id/HomeBtn"
+        android:layout_width="159px"
+        android:layout_height="159px"
+        android:background="@drawable/home_btn_selector"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentBottom="true"/>
 
 </RelativeLayout>

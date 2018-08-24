@@ -54,6 +54,7 @@ public class BluetoothConnectSetting extends Activity
         ReturnBtn=(Button)findViewById(R.id.ReturnBtn);
         HomeBtn=(Button)findViewById(R.id.HomeBtn);
         Address=(EditText) findViewById(R.id.Address);
+        cbMgr=(ClipboardManager)getSystemService(Context.CLIPBOARD_SERVICE);
 
         xmlHelper=new XmlHelper(getFilesDir()+"//connectData.xml");
 
@@ -69,9 +70,9 @@ public class BluetoothConnectSetting extends Activity
         registerReceiver(mReceiver2, filter2);
 
         if(mBluetoothAdapter.isEnabled()) {
-            BtBtn.setBackgroundResource(R.drawable.bton);
+            BtBtn.setBackgroundResource(R.drawable.switch_on);
         }else{
-            BtBtn.setBackgroundResource(R.drawable.btoff);
+            BtBtn.setBackgroundResource(R.drawable.switch_off);
         }
 
         //Bluetooth OnOff
@@ -81,10 +82,10 @@ public class BluetoothConnectSetting extends Activity
             {
                 BtBtn.setClickable(false);
                 if (mBluetoothAdapter.isEnabled()) {
-                    BtBtn.setBackgroundResource(R.drawable.btoff);
+                    BtBtn.setBackgroundResource(R.drawable.switch_on);
                     mBluetoothAdapter.disable();
                 } else {
-                    BtBtn.setBackgroundResource(R.drawable.bton);
+                    BtBtn.setBackgroundResource(R.drawable.switch_on);
                     mBluetoothAdapter.enable();
                 }
             }
@@ -116,7 +117,6 @@ public class BluetoothConnectSetting extends Activity
             }
         });
 
-        this.cbMgr=(ClipboardManager)getSystemService(Context.CLIPBOARD_SERVICE);
         mPrimaryClipChangedListener =new ClipboardManager.OnPrimaryClipChangedListener(){
             public void onPrimaryClipChanged() {
                 try{
@@ -124,16 +124,22 @@ public class BluetoothConnectSetting extends Activity
                     Address.setText("");
                     if(connectedBluetoothDevices.size()>0){
                         Toast.makeText(BluetoothConnectSetting.this,"藍牙裝置已連線", Toast.LENGTH_SHORT).show();
+                        Intent intent = new Intent();
+                        intent.setClass(BluetoothConnectSetting.this, BluetoothTickets.class);
+                        startActivity(intent);
+                        BluetoothConnectSetting.this.finish();
                     }else{
                         address=cbMgr.getPrimaryClip().getItemAt(0).getText().toString();
                         findBT(address);
-                        Toast.makeText(BluetoothConnectSetting.this,"藍牙裝置連線成功", Toast.LENGTH_SHORT).show();
+                        if(connectedBluetoothDevices.size()>0){
+                            xmlHelper.WriteValue("BlueToothID",address.trim());
+                            Toast.makeText(BluetoothConnectSetting.this,"藍牙裝置連線成功", Toast.LENGTH_SHORT).show();
+                            Intent intent = new Intent();
+                            intent.setClass(BluetoothConnectSetting.this, BluetoothTickets.class);
+                            startActivity(intent);
+                            BluetoothConnectSetting.this.finish();
+                        }
                     }
-                    xmlHelper.WriteValue("BlueToothID",address.trim());
-                    Intent intent = new Intent();
-                    intent.setClass(BluetoothConnectSetting.this, BluetoothTickets.class);
-                    startActivity(intent);
-                    BluetoothConnectSetting.this.finish();
                     //Intent callSub = new Intent();
                     //callSub.setClass(BluetoothConnectSetting.this, BluetoothTickets.class);
                     //startActivityForResult(callSub, 0);
@@ -158,6 +164,13 @@ public class BluetoothConnectSetting extends Activity
             }
         });
     }//END ONCREATE
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        cbMgr.removePrimaryClipChangedListener(mPrimaryClipChangedListener);
+        cbMgr.addPrimaryClipChangedListener(mPrimaryClipChangedListener);
+    }
 
     @Override
     protected void onPause() {
@@ -259,7 +272,7 @@ public class BluetoothConnectSetting extends Activity
                 final int state = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, BluetoothAdapter.ERROR);
                 switch (state) {
                     case BluetoothAdapter.STATE_OFF:
-                        BtBtn.setBackgroundResource(R.drawable.btoff);
+                        BtBtn.setBackgroundResource(R.drawable.switch_off);
                         BtBtn.setClickable(true);
                         connectedBluetoothDevices.clear();
                         break;
@@ -267,7 +280,7 @@ public class BluetoothConnectSetting extends Activity
                         BtBtn.setClickable(false);
                         break;
                     case BluetoothAdapter.STATE_ON:
-                        BtBtn.setBackgroundResource(R.drawable.bton);
+                        BtBtn.setBackgroundResource(R.drawable.switch_on);
                         BtBtn.setClickable(true);
                         break;
                     case BluetoothAdapter.STATE_TURNING_ON:

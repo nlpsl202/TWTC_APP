@@ -2,39 +2,23 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@drawable/offline_export_alert_background">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_gravity="center"
-        android:background="@drawable/offline_export_alert_background"
-        android:orientation="vertical">
+    <Button
+        android:id="@+id/ConfirmBtn"
+        android:layout_width="650px"
+        android:layout_height="225px"
+        android:background="@drawable/offline_export_alert_yes_btn_selector"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="330dp"/>
 
-        <RelativeLayout
-            android:id="@+id/ReturnLayout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="500dp">
-
-            <Button
-                android:layout_width="150dp"
-                android:layout_height="60dp"
-                android:id="@+id/ConfirmBtn"
-                android:background="@drawable/offline_export_yes_btn_selector"
-                android:layout_alignParentLeft="true"
-                android:layout_marginLeft="20dp"/>
-
-            <Button
-                android:layout_width="150dp"
-                android:layout_height="60dp"
-                android:id="@+id/CancelBtn"
-                android:background="@drawable/offline_export_no_btn_selector"
-                android:layout_alignParentRight="true"
-                android:layout_marginRight="20dp"/>
-
-        </RelativeLayout>
-
-    </LinearLayout>
+    <Button
+        android:id="@+id/CancelBtn"
+        android:layout_width="230px"
+        android:layout_height="55px"
+        android:background="@drawable/offline_export_alert_no_btn_selector"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="20dp"/>
 
 </LinearLayout>

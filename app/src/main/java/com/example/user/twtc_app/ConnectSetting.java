@@ -9,6 +9,7 @@ import android.view.Window;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import org.xmlpull.v1.XmlSerializer;
 
@@ -162,7 +163,7 @@ public class ConnectSetting extends Activity {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
                 }*/
-
+                Toast.makeText(ConnectSetting.this, "存檔成功！", Toast.LENGTH_SHORT).show();
                 Intent callSub = new Intent();
                 callSub.setClass(ConnectSetting.this, AfterLogin.class);
                 startActivityForResult(callSub, 0);

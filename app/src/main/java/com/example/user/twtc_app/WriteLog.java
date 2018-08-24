@@ -8,13 +8,13 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
 /**
- * Created by USER on 2015/12/19.
+ * Created by Jeff.
  */
 public class WriteLog
 {
     public static void appendLog(String text)
     {
-        String logFilePath = "//data//user//0//com.example.user.twtc_app//files";
+        String logFilePath = "//storage//sdcard0";
         File logFile = new File(logFilePath, getDate()+".txt");
         if (!logFile.exists())
         {
@@ -24,7 +24,6 @@ public class WriteLog
             }
             catch (IOException e)
             {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
         }
@@ -38,7 +37,6 @@ public class WriteLog
         }
         catch (IOException e)
         {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }
