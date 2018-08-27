@@ -5,6 +5,9 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 
+/**
+ * Created by Jeff.
+ */
 public class Splash extends Activity {
 
     /** Duration of wait **/

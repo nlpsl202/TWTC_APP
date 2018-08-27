@@ -26,10 +26,9 @@ import java.sql.Connection;
 import java.util.UUID;
 
 /**
- * Created by USER on 2015/11/17.
+ * Created by Jeff.
  */
 public class AfterLogin  extends Activity {
-
     Button BluetoothTicketBtn,WifiTicketBtn,OffineTicketBtn,OfflineExportBtn,ConnectSettingBtn;
     XmlHelper xmlHelper;
     Dialog alertDialog;
@@ -79,16 +78,16 @@ public class AfterLogin  extends Activity {
         WifiTicketBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (CheckOnline())
-                {
+                //if (CheckOnline())
+                //{
                     Intent callSub = new Intent();
-                    callSub.setClass(AfterLogin.this, OnlineTickets.class);
+                    callSub.setClass(AfterLogin.this, WiFiConnectSetting.class);
                     startActivityForResult(callSub, 0);
-                }
-                else
-                {
-                    Toast.makeText(AfterLogin.this, "設備回報失敗，請確認IP及網路連線是否正確!", Toast.LENGTH_SHORT).show();
-                }
+                //}
+                //else
+                //{
+                //    Toast.makeText(AfterLogin.this, "設備回報失敗，請確認IP及網路連線是否正確!", Toast.LENGTH_SHORT).show();
+                //}
             }
         });
 
@@ -287,6 +286,7 @@ public class AfterLogin  extends Activity {
         WifiManager mWifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         mWifiManager.setWifiEnabled(true);
         int i=mWifiManager.getConnectionInfo().getNetworkId();
+        String name=mWifiManager.getConnectionInfo().getSSID();
         mWifiManager.enableNetwork(i,true);
     }//END ONCREATE
 

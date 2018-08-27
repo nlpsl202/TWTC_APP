@@ -1,9 +1,5 @@
 package com.example.user.twtc_app;
 
-/**
- * Created by USER on 2015/11/17.
- */
-
 import android.annotation.SuppressLint;
 import android.os.StrictMode;
 import android.util.Log;
@@ -13,10 +9,9 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 /**
- * Created by USER on 2015/11/2.
+ * Created by Jeff.
  */
 public class ConnectionClass {
-
     static String ip="192.168.11.12";
     static String classs = "net.sourceforge.jtds.jdbc.Driver";
     static String db = "TWTC_CDPS";

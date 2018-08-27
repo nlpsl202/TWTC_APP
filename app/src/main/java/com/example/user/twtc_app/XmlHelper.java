@@ -18,14 +18,18 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+/**
+ * Created by Jeff.
+ */
 public class XmlHelper {
     static File file;
-    String filePath="";
+    String filePath;
 
     public XmlHelper(String path){
         filePath=path;
         file= new File(path);
     }
+
     public void WriteValue(String Key,String Value){
         try {
             Boolean nodeExist=false;

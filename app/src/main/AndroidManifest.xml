@@ -44,15 +44,7 @@
             android:screenOrientation="portrait">
         </activity>
         <activity
-            android:name="com.example.user.twtc_app.OfflineImport"
-            android:screenOrientation="portrait">
-        </activity>
-        <activity
             android:name="com.example.user.twtc_app.OfflineExport"
-            android:screenOrientation="portrait">
-        </activity>
-        <activity
-            android:name="com.example.user.twtc_app.MainActivity"
             android:screenOrientation="portrait">
         </activity>
         <activity
@@ -65,10 +57,6 @@
         </activity>
         <activity
             android:name="com.example.user.twtc_app.BluetoothConnectSetting"
-            android:screenOrientation="portrait">
-        </activity>
-        <activity
-            android:name="com.example.user.twtc_app.OnlineTicketsCheck"
             android:screenOrientation="portrait">
         </activity>
     </application>

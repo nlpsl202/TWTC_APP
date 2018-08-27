@@ -26,16 +26,14 @@ import java.util.Set;
 import java.util.UUID;
 
 /**
- * Created by mds_userz on 2018/3/27.
+ * Created by Jeff.
  */
-
-public class BluetoothConnectSetting extends Activity
-{
+public class BluetoothConnectSetting extends Activity {
     public static List<BluetoothDevice> connectedBluetoothDevices=new ArrayList<BluetoothDevice>();
     public static BluetoothDevice connectedBluetoothDevice;
     public static BluetoothSocket mmSocket;
-    private ClipboardManager cbMgr;
-    private ClipboardManager.OnPrimaryClipChangedListener mPrimaryClipChangedListener;
+    ClipboardManager cbMgr;
+    ClipboardManager.OnPrimaryClipChangedListener mPrimaryClipChangedListener;
     EditText Address;
     Button BtBtn,ConnectBtn,ReturnBtn,HomeBtn;
     BluetoothAdapter mBluetoothAdapter;
@@ -82,7 +80,7 @@ public class BluetoothConnectSetting extends Activity
             {
                 BtBtn.setClickable(false);
                 if (mBluetoothAdapter.isEnabled()) {
-                    BtBtn.setBackgroundResource(R.drawable.switch_on);
+                    BtBtn.setBackgroundResource(R.drawable.switch_off);
                     mBluetoothAdapter.disable();
                 } else {
                     BtBtn.setBackgroundResource(R.drawable.switch_on);

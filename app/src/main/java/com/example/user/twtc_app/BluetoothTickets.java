@@ -34,7 +34,7 @@ import java.util.Calendar;
 import java.util.Date;
 
 /**
- * Created by USER on 2015/11/19.
+ * Created by Jeff.
  */
 public class BluetoothTickets extends Activity {
     private ImageView photoImage;

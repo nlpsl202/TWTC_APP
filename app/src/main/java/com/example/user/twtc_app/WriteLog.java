@@ -10,8 +10,7 @@ import java.util.Calendar;
 /**
  * Created by Jeff.
  */
-public class WriteLog
-{
+public class WriteLog {
     public static void appendLog(String text)
     {
         String logFilePath = "//storage//sdcard0";
@@ -29,7 +28,6 @@ public class WriteLog
         }
         try
         {
-            //BufferedWriter for performance, true to set append to file flag
             BufferedWriter buf = new BufferedWriter(new FileWriter(logFile, true));
             buf.append(getDateTime()+"  "+text);
             buf.newLine();
@@ -41,14 +39,15 @@ public class WriteLog
         }
     }
 
-    //取得現在時間
+    //取得現在時間yyyy-MM-dd HH:mm:ss.SSS
     public static String getDateTime(){
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
         Calendar c = Calendar.getInstance();
         String str = df.format(c.getTime());
         return str;
     }
-    //取得現在時間
+
+    //取得現在時間yyyy-MM-dd
     public static String getDate(){
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
         Calendar c = Calendar.getInstance();

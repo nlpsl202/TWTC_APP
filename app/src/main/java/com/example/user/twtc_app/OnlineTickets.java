@@ -12,6 +12,9 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.wifi.SupplicantState;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 import android.nfc.NfcAdapter;
 import android.nfc.Tag;
 import android.nfc.tech.MifareClassic;
@@ -50,14 +53,12 @@ import javax.crypto.spec.SecretKeySpec;
  * Created by Jeff.
  */
 public class OnlineTickets extends Activity {
-    private static final String key="SET31275691$00000000000000000000";//QRCODE解碼KEY
-
     private TextView ResultTxt,ResultTxt2,ResultTxt3;
     private Button ReturnBtn,HomeBtn;
     private ImageView photoImage;
     private RadioButton InRBtn,OutRBtn;
     private LinearLayout FailedLayout,wifiLayout,rfidLayout;
-    private String result="",strUserTicketName,reMsg;
+    private String result="",strUserTicketName,reMsg,previousMacAddress;
     private String[] ary;
     private int UDSTime = 30;
 
@@ -69,9 +70,13 @@ public class OnlineTickets extends Activity {
     private ClipboardManager.OnPrimaryClipChangedListener mPrimaryClipChangedListener;
 
     //RFID
-    NfcAdapter mNfcAdapter;
-    PendingIntent mPendingIntent;
-    Bitmap bitmap;
+    private NfcAdapter mNfcAdapter;
+    private PendingIntent mPendingIntent;
+    private Bitmap bitmap;
+
+    //wifi狀態監控
+    private WifiManager wifiManager;
+
     private class RFIDBlock4Info {
         public byte bCardType;
         public byte[] bStartDate;
@@ -132,11 +137,15 @@ public class OnlineTickets extends Activity {
         photoImage=(ImageView) findViewById(R.id.FtPhotoImage);
         wifiLayout=(LinearLayout) findViewById(R.id.wifiLayout);
         rfidLayout=(LinearLayout) findViewById(R.id.rfidLayout);
+        cbMgr=(ClipboardManager)getSystemService(Context.CLIPBOARD_SERVICE);
+        wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
 
         InRBtn.setChecked(true);
 
         mydbHelper = new MyDBHelper(this);
         xmlHelper=new XmlHelper(getFilesDir()+"//connectData.xml");
+
+        previousMacAddress=wifiManager.getConnectionInfo().getBSSID();
 
         ResultSet rs=DownloadDeviceSetup();
         try {
@@ -220,7 +229,6 @@ public class OnlineTickets extends Activity {
 
 
         //掃描事件
-        cbMgr=(ClipboardManager)getSystemService(Context.CLIPBOARD_SERVICE);
         mPrimaryClipChangedListener =new ClipboardManager.OnPrimaryClipChangedListener(){
             public void onPrimaryClipChanged() {
                 try{
@@ -320,6 +328,10 @@ public class OnlineTickets extends Activity {
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
         registerReceiver(connectionReceiver, intentFilter);
+
+        IntentFilter intentFilter2 = new IntentFilter();
+        intentFilter.addAction(WifiManager.SUPPLICANT_STATE_CHANGED_ACTION);
+        registerReceiver(broadcastReceiver, intentFilter);
     }//End ON CREATE
 
     @Override
@@ -1140,6 +1152,35 @@ public class OnlineTickets extends Activity {
         Calendar c = Calendar.getInstance();
         String str = df.format(c.getTime());
         return str;
+    }
+
+    //wifi連線切換
+    private final BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            if (WifiManager.SUPPLICANT_STATE_CHANGED_ACTION.equals(action)) {
+                SupplicantState state = intent.getParcelableExtra(WifiManager.EXTRA_NEW_STATE);
+                if (SupplicantState.isValidState(state) && state == SupplicantState.COMPLETED) {
+                    boolean changed = checkWifiChanged();
+                    if (changed) {
+                        Toast.makeText(OnlineTickets.this, "wifi change.", Toast.LENGTH_SHORT).show();
+                        finish();
+                    }
+                }
+            }
+        }
+    };
+
+    private boolean checkWifiChanged() {
+        boolean changed = false;
+        WifiInfo wifi = wifiManager.getConnectionInfo();
+        if (wifi != null) {
+            // Get current router MAC address
+            String bssid = wifi.getBSSID();
+            changed = !previousMacAddress.equals(bssid);
+        }
+        return changed;
     }
 
     //監控網路狀態

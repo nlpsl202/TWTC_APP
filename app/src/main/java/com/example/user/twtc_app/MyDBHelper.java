@@ -10,7 +10,7 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 
 /**
- * Created by USER on 2015/11/17.
+ * Created by Jeff.
  */
 public class MyDBHelper extends SQLiteOpenHelper {
     protected ArrayList<String[]> Result = null;

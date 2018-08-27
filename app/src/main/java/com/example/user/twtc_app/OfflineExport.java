@@ -23,7 +23,7 @@ import java.sql.Connection;
 import java.util.UUID;
 
 /**
- * Created by USER on 2015/11/20.
+ * Created by Jeff.
  */
 public class OfflineExport extends Activity {
     Button ImportBtn,ReturnBtn;

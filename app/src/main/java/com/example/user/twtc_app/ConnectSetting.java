@@ -20,7 +20,7 @@ import java.io.IOException;
 import java.io.StringWriter;
 
 /**
- * Created by USER on 2015/12/15.
+ * Created by Jeff.
  */
 public class ConnectSetting extends Activity {
     Button Confirm_btn,Return_btn;
