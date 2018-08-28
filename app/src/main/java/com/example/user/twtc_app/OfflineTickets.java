@@ -81,11 +81,11 @@ public class OfflineTickets extends Activity {
         xmlHelper = new XmlHelper(getFilesDir() + "//connectData.xml");
 
         //判斷是否當前為服務證以及關閉驗證狀態
-        if (xmlHelper.ReadValue("WorkType").toUpperCase().equals("W") && xmlHelper.ReadValue("IDCF").toUpperCase().equals("0")) {
+        /*if (xmlHelper.ReadValue("WorkType").toUpperCase().equals("W") && xmlHelper.ReadValue("IDCF").toUpperCase().equals("0")) {
             Toast.makeText(OfflineTickets.this, "當前作業狀態不允許服務證驗證", Toast.LENGTH_SHORT).show();
             finish();
             return;
-        }
+        }*/
 
         ReturnBtn = (Button) findViewById(R.id.ReturnBtn);
         ResultTxt = (TextView) findViewById(R.id.ResultTxt);
@@ -114,12 +114,12 @@ public class OfflineTickets extends Activity {
                     SimpleDateFormat df2 = new SimpleDateFormat("HHmm");
 
                     //QRCode 狀態下不驗證服務證與工作證
-                    if (xmlHelper.ReadValue("WorkType").toUpperCase().equals("W")) {
+                    /*if (xmlHelper.ReadValue("WorkType").toUpperCase().equals("W")) {
                         FailedLayout.setVisibility(View.VISIBLE);
                         setResultText(result = "票券狀態    ");
                         setResultText2(result = "票劵錯誤，無效票卡");
                         return;
-                    }
+                    }*/
 
                     if (qr.length() < 30) {
                         FailedLayout.setVisibility(View.VISIBLE);
@@ -145,7 +145,7 @@ public class OfflineTickets extends Activity {
                         if (!ary[1].trim().contains(EL)) {
                             FailedLayout.setVisibility(View.VISIBLE);
                             setResultText(result = "票券狀態    ");
-                            setResultText2(result = "無效票卡\n\n展覽代號不符合");
+                            setResultText2(result = "無效票卡\n展覽代號不符合");
                             savedate(ary[0].trim(), true, ary, "C");
                         } else {
                             //離線狀態下出場規則

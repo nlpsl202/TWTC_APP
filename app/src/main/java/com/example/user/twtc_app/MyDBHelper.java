@@ -15,43 +15,41 @@ import java.util.ArrayList;
 public class MyDBHelper extends SQLiteOpenHelper {
     protected ArrayList<String[]> Result = null;
     protected String CREATE_BADGETYPE = "create table if not exists BadgeType(BT_TypeID text NOT NULL," +
-                                                                             "BT_TypeName text ," +
-                                                                             "BT_MaterialType text," +
-                                                                             "BT_Memo text," +
-                                                                             "PRIMARY KEY (BT_TypeID))";
+            "BT_TypeName text ," +
+            "BT_MaterialType text," +
+            "BT_Memo text," +
+            "PRIMARY KEY (BT_TypeID))";
     protected String CREATE_BARCODELOG = "create table if not exists BarcodeLog(DeviceID text," +
-                                                                               "DirectionType text," +
-                                                                               "SensorCode text," +
-                                                                               "SysCode BLOB," +
-                                                                               "Current_EL_Code text," +
-                                                                               "EL_Code text," +
-                                                                               "BT_TypeID text," +
-                                                                               "VP_ValidDateRule text," +
-                                                                               "VP_ValidDateBegin text," +
-                                                                               "VP_ValidDateEnd text," +
-                                                                               "VP_ValidTimeRule text," +
-                                                                               "VP_ValidTimeBegin text," +
-                                                                               "VP_ValidTimeEnd text," +
-                                                                               "VP_UseAreaAssign text," +
-                                                                               "VP_UsageTimeType text," +
-                                                                               "VP_UsageTimeTotal Integer," +
-                                                                               "VP_UsageTimePerDay Integer," +
-                                                                               "IV_CheckCode text," +
-                                                                               "IV_CheckCode2 text," +
-                                                                               "Result text," +
-                                                                               "SenseDT text," +
-                                                                               "Rec text," +
-                                                                               "PRIMARY KEY (Rec))";
+            "DirectionType text," +
+            "SensorCode text," +
+            "SysCode BLOB," +
+            "Current_EL_Code text," +
+            "EL_Code text," +
+            "BT_TypeID text," +
+            "VP_ValidDateRule text," +
+            "VP_ValidDateBegin text," +
+            "VP_ValidDateEnd text," +
+            "VP_ValidTimeRule text," +
+            "VP_ValidTimeBegin text," +
+            "VP_ValidTimeEnd text," +
+            "VP_UseAreaAssign text," +
+            "VP_UsageTimeType text," +
+            "VP_UsageTimeTotal Integer," +
+            "VP_UsageTimePerDay Integer," +
+            "IV_CheckCode text," +
+            "IV_CheckCode2 text," +
+            "Result text," +
+            "SenseDT text," +
+            "Rec INTEGER PRIMARY KEY AUTOINCREMENT)";
     protected String CREATE_WORKCARDLOG = "create table if not exists WorkCardLog(DeviceID text," +
-                                                                                 "DirectionType text," +
-                                                                                 "SensorCode text," +
-                                                                                 "CodeNo text," +
-                                                                                 "Current_EL_Code text," +
-                                                                                 "EL_CODE text," +
-                                                                                 "Result text," +
-                                                                                 "SenseDT text," +
-                                                                                 "Rec text," +
-                                                                                 "PRIMARY KEY (Rec))";
+            "DirectionType text," +
+            "SensorCode text," +
+            "CodeNo text," +
+            "Current_EL_Code text," +
+            "EL_CODE text," +
+            "Result text," +
+            "SenseDT text," +
+            "Rec INTEGER PRIMARY KEY AUTOINCREMENT)";
 
     private final static String DATABASE_NAME = "mydata.db";
     private final static int DATABASE_VERSION = 1;
@@ -79,23 +77,23 @@ public class MyDBHelper extends SQLiteOpenHelper {
     }
 
     //刪除存在的票劵狀態名稱
-    public void DeleteBadgeType(){
+    public void DeleteBadgeType() {
         super.getWritableDatabase().execSQL("Delete From BadgeType");
         super.getWritableDatabase().execSQL("VACUUM");
         super.close();
     }
 
-    public void DeleteOfflineData(String sql){
+    public void DeleteOfflineData(String sql) {
         super.getWritableDatabase().execSQL(sql);
         super.getWritableDatabase().execSQL("VACUUM");
         super.close();
     }
 
     //插入當前票劵狀態名稱
-    public void InsertToBadgeType(ResultSet rs){
+    public void InsertToBadgeType(ResultSet rs) {
         StringBuilder sb = new StringBuilder();
         try {
-            while (rs.next()){
+            while (rs.next()) {
                 sb.append("Insert into BadgeType(BT_TypeID,BT_TypeName,BT_MaterialType,BT_Memo)Values");
                 sb.append("('" + rs.getString("BT_TypeID") + "','" + rs.getString("BT_TypeName") + "'");
                 sb.append(",'" + rs.getString("BT_MaterialType") + "','" + rs.getString("BT_Memo") + "')");
@@ -103,68 +101,71 @@ public class MyDBHelper extends SQLiteOpenHelper {
                 super.close();
                 sb.delete(0, sb.length());
             }
-        }
-        catch(Exception ex) {
+        } catch (Exception ex) {
             WriteLog.appendLog("MyDBHelper.java/InsertToBadgeType/Exception:" + ex.toString());
         }
     }
 
     //插入離線驗票資料
-    public void InsertToOfflineTickets(String sql){
+    public void InsertToOfflineTickets(String sql) {
         try {
             super.getWritableDatabase().execSQL(sql);
             super.close();
-        }
-        catch(Exception ex) {
+        } catch (Exception ex) {
             WriteLog.appendLog("MyDBHelper.java/InsertToBadgeType/Exception:" + ex.toString());
         }
     }
 
-    public int GetLoginCount(String _id, String _date)
-    {
-        int count=0;
-        try
-        {
+    public int GetLoginCount(String _id, String _date) {
+        int count = 0;
+        try {
             Cursor cursor = super.getReadableDatabase().rawQuery("Select count(*) From BarcodeLog where DirectionType='I' and SensorCode='" + _id + "' and SenseDT LIKE '" + _date + "%'", null);
             if (cursor.moveToNext()) {
                 count = cursor.getInt(0);
             }
             return count;
-        }
-        catch (Exception ex)
-        {
+        } catch (Exception ex) {
             return 0;
         }
     }
 
-    public String GetBadgeType(String code)
-    {
+    public String GetBadgeType(String code) {
         String strName = "";
-        try
-        {
+        try {
             Cursor cursor = super.getReadableDatabase().rawQuery("Select BT_TypeName From BadgeType where BT_TypeID='" + code + "'", null);
             if (cursor.moveToNext()) {
                 strName = cursor.getString(0);
             }
             return strName;
-        }
-        catch (Exception ex)
-        {
+        } catch (Exception ex) {
             return "";
         }
     }
 
+    public boolean DeleteOfflineData(String _table, String _rev) {
+        boolean bRec = true;
+        try {
+            super.getWritableDatabase().execSQL("Delete From " + _table + " where Rec='" + _rev + "'");
+            super.close();
+        } catch (Exception ex) {
+            WriteLog.appendLog("MyDBHelper.java/DeleteOfflineData/" + ex.toString());
+            return false;
+        }
+
+        return bRec;
+    }
+
     //取得離線驗票資料
-    public Cursor SelectFromBarcodeLog(){
+    public Cursor SelectFromBarcodeLog() {
         Cursor cursor = super.getReadableDatabase().rawQuery("Select * From BarcodeLog", null);
-        super.close();
+        //super.close();
         return cursor;
     }
 
     //取得離線工作證驗票資料
-    public Cursor SelectFromWorkCardLog(){
+    public Cursor SelectFromWorkCardLog() {
         Cursor cursor = super.getReadableDatabase().rawQuery("Select * From WorkCardLog", null);
-        super.close();
+        //super.close();
         return cursor;
     }
 }

@@ -2,7 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/bluetooth_connect_setting_background">
+    android:background="@drawable/wifi_connect_setting_background">
 
     <Button
         android:id="@+id/WifiBtn"

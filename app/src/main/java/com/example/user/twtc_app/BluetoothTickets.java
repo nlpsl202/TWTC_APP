@@ -245,7 +245,7 @@ public class BluetoothTickets extends Activity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        unregisterReceiver(mReceiver);
+        //unregisterReceiver(mReceiver);
     }
 
     //RFID感應事件

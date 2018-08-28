@@ -6,7 +6,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.ConnectivityManager;
@@ -18,6 +17,7 @@ import android.view.View;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.File;
@@ -28,18 +28,30 @@ import java.util.UUID;
 /**
  * Created by Jeff.
  */
-public class AfterLogin  extends Activity {
-    Button BluetoothTicketBtn,WifiTicketBtn,OffineTicketBtn,OfflineExportBtn,ConnectSettingBtn;
-    XmlHelper xmlHelper;
-    Dialog alertDialog;
-    UUID u = UUID.randomUUID();
+public class AfterLogin extends Activity {
+    private Button BluetoothTicketBtn, WifiTicketBtn, OffineTicketBtn, OfflineExportBtn, ConnectSettingBtn;
+    private XmlHelper xmlHelper;
+    private Dialog alertDialog;
+    private TextView ResultTxt,ResultTxt2;
+    private UUID uu = UUID.randomUUID();
+    private MyDBHelper mydbHelper;
 
-    private Connection DBCDPSConnection()
-    {
-        ConnectionClass.ip=xmlHelper.ReadValue("ServerIP");
-        ConnectionClass.db="TWTC_CDPS";
-        ConnectionClass.un=xmlHelper.ReadValue("sa");
-        ConnectionClass.password=xmlHelper.ReadValue("SQLPassWord");
+    //連接中央SQL
+    private Connection DBCDPSConnection() {
+        ConnectionClass.ip = xmlHelper.ReadValue("ServerIP");
+        ConnectionClass.db = "TWTC_CDPS";
+        ConnectionClass.un = xmlHelper.ReadValue("sa");
+        ConnectionClass.password = xmlHelper.ReadValue("SQLPassWord");
+        Connection con = ConnectionClass.CONN();
+        return con;
+    }
+
+    //連接展覽VMSQL
+    private Connection DBExhibitConnection() {
+        ConnectionClass.ip = xmlHelper.ReadValue("VMSQlIP");
+        ConnectionClass.db = "TWTC_Exhibit";
+        ConnectionClass.un = xmlHelper.ReadValue("VMSQlsa");
+        ConnectionClass.password = xmlHelper.ReadValue("VMSQlpass");
         Connection con = ConnectionClass.CONN();
         return con;
     }
@@ -49,23 +61,23 @@ public class AfterLogin  extends Activity {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.after_login);
 
-        BluetoothTicketBtn=(Button)findViewById(R.id.BluetoothTicketBtn);
-        WifiTicketBtn=(Button)findViewById(R.id.WifiTicketBtn);
-        OffineTicketBtn=(Button)findViewById(R.id.OffineTicketBtn);
-        OfflineExportBtn=(Button)findViewById(R.id.OfflineExportBtn);
-        ConnectSettingBtn=(Button)findViewById(R.id.ConnectSettingBtn);
+        BluetoothTicketBtn = (Button) findViewById(R.id.BluetoothTicketBtn);
+        WifiTicketBtn = (Button) findViewById(R.id.WifiTicketBtn);
+        OffineTicketBtn = (Button) findViewById(R.id.OffineTicketBtn);
+        OfflineExportBtn = (Button) findViewById(R.id.OfflineExportBtn);
+        ConnectSettingBtn = (Button) findViewById(R.id.ConnectSettingBtn);
 
-        xmlHelper=new XmlHelper(getFilesDir()+"//connectData.xml");
+        xmlHelper = new XmlHelper(getFilesDir() + "//connectData.xml");
 
         //切換至藍牙驗票
         BluetoothTicketBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(BluetoothConnectSetting.connectedBluetoothDevices.size()>0){
+                if (BluetoothConnectSetting.connectedBluetoothDevices.size() > 0) {
                     Intent callSub = new Intent();
                     callSub.setClass(AfterLogin.this, BluetoothTickets.class);
                     startActivityForResult(callSub, 0);
-                }else{
+                } else {
                     Intent callSub = new Intent();
                     callSub.setClass(AfterLogin.this, BluetoothConnectSetting.class);
                     startActivityForResult(callSub, 0);
@@ -78,16 +90,16 @@ public class AfterLogin  extends Activity {
         WifiTicketBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //if (CheckOnline())
-                //{
+                if (CheckOnline()) {
                     Intent callSub = new Intent();
-                    callSub.setClass(AfterLogin.this, WiFiConnectSetting.class);
+                    callSub.setClass(AfterLogin.this, OnlineTickets.class);
                     startActivityForResult(callSub, 0);
-                //}
-                //else
-                //{
-                //    Toast.makeText(AfterLogin.this, "設備回報失敗，請確認IP及網路連線是否正確!", Toast.LENGTH_SHORT).show();
-                //}
+                } else {
+                    Toast.makeText(AfterLogin.this, "設備回報失敗，請確認IP及網路連線是否正確!", Toast.LENGTH_SHORT).show();
+                }
+                /*Intent callSub = new Intent();
+                callSub.setClass(AfterLogin.this, WiFiConnectSetting.class);
+                startActivityForResult(callSub, 0);*/
             }
         });
 
@@ -105,124 +117,9 @@ public class AfterLogin  extends Activity {
         OfflineExportBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //Intent callSub = new Intent();
-                //callSub.setClass(AfterLogin.this, OfflineExport.class);
-                //startActivityForResult(callSub, 0);
-                alertDialog = new Dialog(AfterLogin.this);
-                alertDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-                alertDialog.setContentView(R.layout.offline_export_alert);
-                alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-                Button a =(Button)alertDialog.findViewById(R.id.ConfirmBtn);
-                a.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        String EL = xmlHelper.ReadValue("NameCode");
-                        Cursor c = null;
-                        Cursor c2 = null;
-                        int iTotalCount = 0;
-                        try
-                        {
-                            //取得對應資料表
-                            //c = mydbHelper.SelectFromBarcodeLog();
-                            //c2 = mydbHelper.SelectFromWorkCardLog();
-                            iTotalCount = (c.getCount() + c2.getCount());
-                            if (iTotalCount > 0)
-                            {
-                                //上傳參觀離線資料
-                                if (c.getCount() > 0 && c != null)
-                                {
-                                    //if (UpdateOfflineRecord(c, EL) == false)
-                                    //{
-                                    //    ResultTxt.setText("無法上傳！");
-                                    //    ResultTxt2.setText("上傳失敗，請再次嘗試。" + iTotalCount + " 筆！");
-                                    //    return;
-                                    //}
-                                }
-
-                                //上傳服務離線資料
-                                if (c2.getCount() > 0 && c2 != null)
-                                {
-                                    //if (UpdateOfflineCardPassRecord(dtWorkSql, EL) == false)
-                                    //{
-                                    //ResultTxt.setText("無法上傳！");
-                                    //ResultTxt2.setText("上傳失敗，請再次嘗試。" + iTotalCount + " 筆！");
-                                    //return;
-                                    //}
-                                }
-
-                                //ResultTxt.setText("上傳成功！");
-                                //ResultTxt2.setText("成功上傳離線驗票資料 " + iTotalCount + " 筆！");
-                            }
-                            else
-                            {
-                                //ResultTxt.setText("無法上傳！");
-                                //ResultTxt2.setText("目前無離線驗票資料！");
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            //ResultTxt.setText("無法匯出！");
-                        }
-                                /*int getNumber=0;
-                                mydbHelper.SelectFromUltraLight03();
-                                getNumber=mydbHelper.GetUltraLight03ExpNmber();
-                                ResultTxt.setText("成功匯出！");
-                                ResultTxt2.setText("成功上傳離線驗票資料 " + getNumber + " 筆！");
-                                //AlertDialog.Builder alertad = new AlertDialog.Builder(OfflineExport.this);
-                                //alertad.setTitle("離線資料上傳");
-                                //alertad.setMessage("成功上傳離線驗票資料" + getNumber + "筆！");
-                                WriteLog.appendLog("OfflineExport.java/成功上傳離線驗票資料" + getNumber + "筆！");
-                                //alertad.setPositiveButton("關閉", new DialogInterface.OnClickListener() {
-                                //    public void onClick(DialogInterface dialog, int i) { }
-                                //});
-                                //alertad.show();//顯示對話框
-                                mydbHelper.DeleteUltraLight03Exp();//清除已顯示過的匯出紀錄
-                                alertDialog.cancel();*/
-                    }
-                });
-                Button b =(Button)alertDialog.findViewById(R.id.CancelBtn);
-                b.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        alertDialog.cancel();
-                    }
-                });
-                alertDialog.show();
-
-                        /*AlertDialog.Builder alertad = new AlertDialog.Builder(OfflineExport.this);
-                        alertad.setTitle("離線資料上傳");
-                        alertad.setMessage("是否將離線資料上傳，上傳後將清除出入館紀錄！");
-                        alertad.setPositiveButton("是", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int i) {
-                                int getNumber=0;
-                                mydbHelper.SelectFromUltraLight03();
-                                getNumber=mydbHelper.GetUltraLight03ExpNmber();
-                                AlertDialog.Builder alertad = new AlertDialog.Builder(OfflineExport.this);
-                                alertad.setTitle("離線資料上傳");
-                                alertad.setMessage("成功上傳離線驗票資料" + getNumber + "筆！");
-                                WriteLog.appendLog("OfflineExport.java/成功上傳離線驗票資料" + getNumber + "筆！");
-                                alertad.setPositiveButton("關閉", new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int i) { }
-                                });
-                                alertad.show();//顯示對話框
-                                mydbHelper.DeleteUltraLight03Exp();//請除已顯示過的匯出紀錄
-                            }
-                        });
-                        alertad.setNegativeButton("否", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int i) { }
-                        });
-                        alertad.show();//顯示對話框*/
-                //}else{
-                //    ResultTxt.setText("無法匯出！");
-                //    ResultTxt2.setText("目前無離線驗票資料！");
-                        /*AlertDialog.Builder alertad = new AlertDialog.Builder(OfflineExport.this);
-                        alertad.setTitle("離線資料上傳");
-                        alertad.setMessage("目前無離線驗票資料！");
-                        alertad.setPositiveButton("關閉", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int i) { }
-                        });
-                        alertad.show();//顯示對話框*/
-                //}
+                Intent callSub = new Intent();
+                callSub.setClass(AfterLogin.this, OfflineExport.class);
+                startActivity(callSub);
             }
         });
 
@@ -230,31 +127,31 @@ public class AfterLogin  extends Activity {
         ConnectSettingBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                try{
+                try {
                     final EditText pass_et;
-                    final File file = new File(getFilesDir()+"//connectData.xml");
+                    final File file = new File(getFilesDir() + "//connectData.xml");
                     alertDialog = new Dialog(AfterLogin.this);
                     alertDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
                     alertDialog.setContentView(R.layout.connect_setting_alert);
                     alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-                    pass_et =(EditText)alertDialog.findViewById(R.id.pass_et);
-                    Button a =(Button)alertDialog.findViewById(R.id.ConfirmBtn);
+                    pass_et = (EditText) alertDialog.findViewById(R.id.pass_et);
+                    Button a = (Button) alertDialog.findViewById(R.id.ConfirmBtn);
                     a.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            if(file.exists()){
-                                if(!pass_et.getText().toString().equals(xmlHelper.ReadValue("SetupPassWord"))&&xmlHelper.ReadValue("SetupPassWord")!=""){
+                            if (file.exists()) {
+                                if (!pass_et.getText().toString().equals(xmlHelper.ReadValue("SetupPassWord")) && xmlHelper.ReadValue("SetupPassWord") != "") {
                                     Toast.makeText(AfterLogin.this, "密碼錯誤", Toast.LENGTH_SHORT).show();
-                                }else{
+                                } else {
                                     alertDialog.cancel();
                                     Intent callSub = new Intent();
                                     callSub.setClass(AfterLogin.this, ConnectSetting.class);
                                     startActivityForResult(callSub, 0);
                                 }
-                            }else{
-                                if(!pass_et.getText().toString().equals("0000")){
+                            } else {
+                                if (!pass_et.getText().toString().equals("0000")) {
                                     Toast.makeText(AfterLogin.this, "密碼錯誤", Toast.LENGTH_SHORT).show();
-                                }else{
+                                } else {
                                     alertDialog.cancel();
                                     Intent callSub = new Intent();
                                     callSub.setClass(AfterLogin.this, ConnectSetting.class);
@@ -263,7 +160,7 @@ public class AfterLogin  extends Activity {
                             }
                         }
                     });
-                    Button b =(Button)alertDialog.findViewById(R.id.CancelBtn);
+                    Button b = (Button) alertDialog.findViewById(R.id.CancelBtn);
                     b.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
@@ -271,7 +168,7 @@ public class AfterLogin  extends Activity {
                         }
                     });
                     alertDialog.show();
-                }catch (Exception ex){
+                } catch (Exception ex) {
 
                 }
             }
@@ -281,13 +178,13 @@ public class AfterLogin  extends Activity {
         intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
         registerReceiver(connectionReceiver, intentFilter);
 
-        u = UUID.fromString("65A93582-9737-47A4-9288-DEAA9415F03C");
-        String a = u.toString();
+        uu = UUID.fromString("65A93582-9737-47A4-9288-DEAA9415F03C");
+        String a = uu.toString();
         WifiManager mWifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         mWifiManager.setWifiEnabled(true);
-        int i=mWifiManager.getConnectionInfo().getNetworkId();
-        String name=mWifiManager.getConnectionInfo().getSSID();
-        mWifiManager.enableNetwork(i,true);
+        int i = mWifiManager.getConnectionInfo().getNetworkId();
+        String name = mWifiManager.getConnectionInfo().getSSID();
+        mWifiManager.enableNetwork(i, true);
     }//END ONCREATE
 
     @Override
@@ -297,29 +194,27 @@ public class AfterLogin  extends Activity {
         NetworkInfo mWifi = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
 
         if (mWifi.isConnected()) {
-            WifiTicketBtn.setEnabled(true);
+            //WifiTicketBtn.setEnabled(true);
             OfflineExportBtn.setEnabled(true);
-        }else{
-            WifiTicketBtn.setEnabled(false);
+        } else {
+            //WifiTicketBtn.setEnabled(false);
             OfflineExportBtn.setEnabled(false);
         }
     }
 
     //設備回報
-    private Boolean CheckOnline()
-    {
+    private Boolean CheckOnline() {
         Connection con = DBCDPSConnection();
         try {
             CallableStatement cstmt = con.prepareCall("{ call dbo.SP_UpdateDeviceStatus(?,?,?)}");
-            cstmt.setString("DeviceID",xmlHelper.ReadValue("MachineID"));
-            cstmt.setString("ServiceType","0001");
-            cstmt.registerOutParameter("ReturnMsg",java.sql.Types.VARCHAR);
+            cstmt.setString("DeviceID", xmlHelper.ReadValue("MachineID"));
+            cstmt.setString("ServiceType", "0001");
+            cstmt.registerOutParameter("ReturnMsg", java.sql.Types.VARCHAR);
             cstmt.execute();
 
             Boolean Revc = false;
 
-            if (cstmt.getString(3).length() != 0)
-            {
+            if (cstmt.getString(3).length() != 0) {
                 String SourceText = "";
                 String ComText = "";
 
@@ -329,13 +224,10 @@ public class AfterLogin  extends Activity {
                 Revc = SourceText.contains(ComText);
 
                 return Revc;
-            }
-            else
-            {
+            } else {
                 return false;
             }
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             Log.d("AL.java/CheckOnline", e.toString());
             WriteLog.appendLog("AfterLogin.java/CheckOnline/Exception:" + e.toString());
             return false;
@@ -348,11 +240,11 @@ public class AfterLogin  extends Activity {
             ConnectivityManager connectMgr = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
             NetworkInfo mNetworkInfo = connectMgr.getActiveNetworkInfo();
             if (mNetworkInfo != null) {
-                WifiTicketBtn.setEnabled(true);
+                //WifiTicketBtn.setEnabled(true);
                 OfflineExportBtn.setEnabled(true);
                 //Toast.makeText(AfterLogin.this, "已連線", Toast.LENGTH_SHORT).show();
-            }else{
-                WifiTicketBtn.setEnabled(false);
+            } else {
+                //WifiTicketBtn.setEnabled(false);
                 OfflineExportBtn.setEnabled(false);
                 //Toast.makeText(AfterLogin.this, "連線中斷", Toast.LENGTH_SHORT).show();
             }

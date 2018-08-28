@@ -7,18 +7,17 @@ import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.net.ConnectivityManager;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.Vibrator;
-import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.util.List;
 
@@ -95,15 +94,11 @@ public class WiFiConnectSetting extends Activity {
                             if (i.SSID != null && i.SSID.equals("\"" + networkSSID + "\"")) {
                                 wifiManager.disconnect();
                                 wifiManager.enableNetwork(i.networkId, true);
-                                wifiManager.reconnect();
-                                if (CheckOnline()) {
-                                    Intent callSub = new Intent();
-                                    callSub.setClass(WiFiConnectSetting.this, OnlineTickets.class);
-                                    startActivity(callSub);
-                                    finish();
-                                } else {
-                                    Toast.makeText(WiFiConnectSetting.this, "設備回報失敗，請確認IP及網路連線是否正確!", Toast.LENGTH_SHORT).show();
-                                }
+                                Intent callSub = new Intent();
+                                callSub.setClass(WiFiConnectSetting.this, OnlineTickets.class);
+                                callSub.putExtra("BSSID",i.BSSID);//傳遞DEVICE_ID給登入後的頁面
+                                startActivityForResult(callSub,0);
+                                finish();
                             }
                         }
                     } else {
@@ -126,19 +121,14 @@ public class WiFiConnectSetting extends Activity {
                         for (WifiConfiguration i : connectedWifiDevices) {
                             if (i.SSID != null && i.SSID.equals("\"" + networkSSID + "\"")) {
                                 wifiManager.disconnect();
+                                Thread.sleep(1000);
                                 wifiManager.enableNetwork(i.networkId, true);
-                                wifiManager.reconnect();
-                                if (CheckOnline())
-                                {
-                                    Intent callSub = new Intent();
-                                    callSub.setClass(WiFiConnectSetting.this, OnlineTickets.class);
-                                    startActivity(callSub);
-                                    finish();
-                                }
-                                else
-                                {
-                                    Toast.makeText(WiFiConnectSetting.this, "設備回報失敗，請確認IP及網路連線是否正確!", Toast.LENGTH_SHORT).show();
-                                }
+                                while(!checkInternetConnect()){ }//wait wifi connect
+                                Intent callSub = new Intent();
+                                callSub.setClass(WiFiConnectSetting.this, OnlineTickets.class);
+                                callSub.putExtra("BSSID",wifiManager.getConnectionInfo().getBSSID());//傳遞DEVICE_ID給登入後的頁面
+                                startActivityForResult(callSub,0);
+                                finish();
                             }
                         }
                     } else {
@@ -189,41 +179,10 @@ public class WiFiConnectSetting extends Activity {
         unregisterReceiver(mReceiver);
     }
 
-    //設備回報
-    private Boolean CheckOnline()
-    {
-        Connection con = DBCDPSConnection();
-        try {
-            CallableStatement cstmt = con.prepareCall("{ call dbo.SP_UpdateDeviceStatus(?,?,?)}");
-            cstmt.setString("DeviceID",xmlHelper.ReadValue("MachineID"));
-            cstmt.setString("ServiceType","0001");
-            cstmt.registerOutParameter("ReturnMsg",java.sql.Types.VARCHAR);
-            cstmt.execute();
-
-            Boolean Revc = false;
-
-            if (cstmt.getString(3).length() != 0)
-            {
-                String SourceText = "";
-                String ComText = "";
-
-                SourceText = cstmt.getString(3).trim();
-                ComText = "成功";
-
-                Revc = SourceText.contains(ComText);
-
-                return Revc;
-            }
-            else
-            {
-                return false;
-            }
-        }
-        catch (Exception e) {
-            Log.d("AL.java/CheckOnline", e.toString());
-            WriteLog.appendLog("AfterLogin.java/CheckOnline/Exception:" + e.toString());
-            return false;
-        }
+    //檢查網路是否連線
+    public boolean checkInternetConnect() {
+        ConnectivityManager cManager = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
+        return cManager.getActiveNetworkInfo() != null;
     }
 
     //震動
