@@ -46,7 +46,7 @@ public class MyDBHelper extends SQLiteOpenHelper {
             "SensorCode text," +
             "CodeNo text," +
             "Current_EL_Code text," +
-            "EL_CODE text," +
+            "EL_Code text," +
             "Result text," +
             "SenseDT text," +
             "Rec INTEGER PRIMARY KEY AUTOINCREMENT)";

@@ -4,12 +4,22 @@
     android:layout_height="match_parent"
     android:background="@drawable/bluetooth_connect_setting_background">
 
+    <TextView
+        android:id="@+id/btStatusTxt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="藍芽已開啟"
+        android:textSize="30dp"
+        android:textColor="#5E5C54"
+        android:gravity="center_vertical"
+        android:layout_marginLeft="100px"
+        android:layout_marginTop="187px"/>
+
     <Button
         android:id="@+id/BtBtn"
         android:layout_width="208px"
         android:layout_height="66px"
         android:background="@drawable/switch_on"
-        android:layout_gravity="center_vertical"
         android:layout_marginLeft="461px"
         android:layout_marginTop="195px"/>
 

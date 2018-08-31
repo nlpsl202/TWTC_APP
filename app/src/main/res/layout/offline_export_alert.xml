@@ -7,16 +7,16 @@
 
     <Button
         android:id="@+id/ConfirmBtn"
-        android:layout_width="650px"
-        android:layout_height="225px"
+        android:layout_width="280dp"
+        android:layout_height="60dp"
         android:background="@drawable/offline_export_alert_yes_btn_selector"
         android:layout_gravity="center_horizontal"
-        android:layout_marginTop="330dp"/>
+        android:layout_marginTop="350dp"/>
 
     <Button
         android:id="@+id/CancelBtn"
-        android:layout_width="230px"
-        android:layout_height="55px"
+        android:layout_width="280dp"
+        android:layout_height="60dp"
         android:background="@drawable/offline_export_alert_no_btn_selector"
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="20dp"/>

@@ -2,6 +2,7 @@ package com.example.user.twtc_app;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -9,21 +10,20 @@ import android.content.IntentFilter;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
-import android.net.wifi.WifiManager;
 import android.os.Bundle;
-import android.util.Log;
+import android.os.Environment;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.nio.channels.FileChannel;
 import java.sql.CallableStatement;
 import java.sql.Connection;
-import java.util.UUID;
 
 /**
  * Created by Jeff.
@@ -32,9 +32,6 @@ public class AfterLogin extends Activity {
     private Button BluetoothTicketBtn, WifiTicketBtn, OffineTicketBtn, OfflineExportBtn, ConnectSettingBtn;
     private XmlHelper xmlHelper;
     private Dialog alertDialog;
-    private TextView ResultTxt,ResultTxt2;
-    private UUID uu = UUID.randomUUID();
-    private MyDBHelper mydbHelper;
 
     //連接中央SQL
     private Connection DBCDPSConnection() {
@@ -42,16 +39,6 @@ public class AfterLogin extends Activity {
         ConnectionClass.db = "TWTC_CDPS";
         ConnectionClass.un = xmlHelper.ReadValue("sa");
         ConnectionClass.password = xmlHelper.ReadValue("SQLPassWord");
-        Connection con = ConnectionClass.CONN();
-        return con;
-    }
-
-    //連接展覽VMSQL
-    private Connection DBExhibitConnection() {
-        ConnectionClass.ip = xmlHelper.ReadValue("VMSQlIP");
-        ConnectionClass.db = "TWTC_Exhibit";
-        ConnectionClass.un = xmlHelper.ReadValue("VMSQlsa");
-        ConnectionClass.password = xmlHelper.ReadValue("VMSQlpass");
         Connection con = ConnectionClass.CONN();
         return con;
     }
@@ -76,11 +63,11 @@ public class AfterLogin extends Activity {
                 if (BluetoothConnectSetting.connectedBluetoothDevices.size() > 0) {
                     Intent callSub = new Intent();
                     callSub.setClass(AfterLogin.this, BluetoothTickets.class);
-                    startActivityForResult(callSub, 0);
+                    startActivity(callSub);
                 } else {
                     Intent callSub = new Intent();
                     callSub.setClass(AfterLogin.this, BluetoothConnectSetting.class);
-                    startActivityForResult(callSub, 0);
+                    startActivity(callSub);
                 }
             }
 
@@ -92,14 +79,11 @@ public class AfterLogin extends Activity {
             public void onClick(View v) {
                 if (CheckOnline()) {
                     Intent callSub = new Intent();
-                    callSub.setClass(AfterLogin.this, OnlineTickets.class);
-                    startActivityForResult(callSub, 0);
+                    callSub.setClass(AfterLogin.this, WiFiConnectSetting.class);
+                    startActivity(callSub);
                 } else {
                     Toast.makeText(AfterLogin.this, "設備回報失敗，請確認IP及網路連線是否正確!", Toast.LENGTH_SHORT).show();
                 }
-                /*Intent callSub = new Intent();
-                callSub.setClass(AfterLogin.this, WiFiConnectSetting.class);
-                startActivityForResult(callSub, 0);*/
             }
         });
 
@@ -109,7 +93,7 @@ public class AfterLogin extends Activity {
             public void onClick(View v) {
                 Intent callSub = new Intent();
                 callSub.setClass(AfterLogin.this, OfflineTickets.class);
-                startActivityForResult(callSub, 0);
+                startActivity(callSub);
             }
         });
 
@@ -140,13 +124,13 @@ public class AfterLogin extends Activity {
                         @Override
                         public void onClick(View v) {
                             if (file.exists()) {
-                                if (!pass_et.getText().toString().equals(xmlHelper.ReadValue("SetupPassWord")) && xmlHelper.ReadValue("SetupPassWord") != "") {
+                                if (!pass_et.getText().toString().equals(xmlHelper.ReadValue("SetupPassWord"))) {
                                     Toast.makeText(AfterLogin.this, "密碼錯誤", Toast.LENGTH_SHORT).show();
                                 } else {
                                     alertDialog.cancel();
                                     Intent callSub = new Intent();
                                     callSub.setClass(AfterLogin.this, ConnectSetting.class);
-                                    startActivityForResult(callSub, 0);
+                                    startActivity(callSub);
                                 }
                             } else {
                                 if (!pass_et.getText().toString().equals("0000")) {
@@ -155,7 +139,7 @@ public class AfterLogin extends Activity {
                                     alertDialog.cancel();
                                     Intent callSub = new Intent();
                                     callSub.setClass(AfterLogin.this, ConnectSetting.class);
-                                    startActivityForResult(callSub, 0);
+                                    startActivity(callSub);
                                 }
                             }
                         }
@@ -169,41 +153,44 @@ public class AfterLogin extends Activity {
                     });
                     alertDialog.show();
                 } catch (Exception ex) {
-
+                    ex.printStackTrace();
+                    WriteLog.appendLog("AfterLogin.java/ConnectSettingBtn/Exception:" + ex.toString());
                 }
             }
         });
 
+        //監聽網路狀態
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
         registerReceiver(connectionReceiver, intentFilter);
 
-        uu = UUID.fromString("65A93582-9737-47A4-9288-DEAA9415F03C");
-        String a = uu.toString();
-        WifiManager mWifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        //監聽藍芽狀態
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(BluetoothDevice.ACTION_ACL_DISCONNECTED);
+        registerReceiver(mReceiver, filter);
+
+        /*WifiManager mWifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         mWifiManager.setWifiEnabled(true);
         int i = mWifiManager.getConnectionInfo().getNetworkId();
         String name = mWifiManager.getConnectionInfo().getSSID();
         mWifiManager.enableNetwork(i, true);
+        copyDbToExternal(this);*/
     }//END ONCREATE
 
     @Override
     protected void onResume() {
         super.onResume();
-        ConnectivityManager connManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo mWifi = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
-
-        if (mWifi.isConnected()) {
-            //WifiTicketBtn.setEnabled(true);
+        if (checkInternetConnect()) {
+            WifiTicketBtn.setEnabled(true);
             OfflineExportBtn.setEnabled(true);
         } else {
-            //WifiTicketBtn.setEnabled(false);
+            WifiTicketBtn.setEnabled(false);
             OfflineExportBtn.setEnabled(false);
         }
     }
 
     //設備回報
-    private Boolean CheckOnline() {
+    private boolean CheckOnline() {
         Connection con = DBCDPSConnection();
         try {
             CallableStatement cstmt = con.prepareCall("{ call dbo.SP_UpdateDeviceStatus(?,?,?)}");
@@ -212,43 +199,98 @@ public class AfterLogin extends Activity {
             cstmt.registerOutParameter("ReturnMsg", java.sql.Types.VARCHAR);
             cstmt.execute();
 
-            Boolean Revc = false;
-
             if (cstmt.getString(3).length() != 0) {
-                String SourceText = "";
-                String ComText = "";
-
-                SourceText = cstmt.getString(3).trim();
-                ComText = "成功";
-
-                Revc = SourceText.contains(ComText);
-
-                return Revc;
+                return cstmt.getString(3).trim().contains("成功");
             } else {
                 return false;
             }
-        } catch (Exception e) {
-            Log.d("AL.java/CheckOnline", e.toString());
-            WriteLog.appendLog("AfterLogin.java/CheckOnline/Exception:" + e.toString());
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            WriteLog.appendLog("AfterLogin.java/CheckOnline/Exception:" + ex.toString());
             return false;
         }
+    }
+
+    /*private boolean pingIP() {
+        try {
+            Process process = new ProcessBuilder().command("/system/bin/ping", "-c 2", xmlHelper.ReadValue("ServerIP").trim())
+                    .redirectErrorStream(true)
+                    .start();
+            try {
+                int status = process.waitFor();
+                if (status == 0) {
+                    //ping的通就繼續
+                    return true;
+                } else {
+                    return false;
+                }
+            } catch (Exception e) {
+                WriteLog.appendLog("AfterLogin.java/ping/Exception:" + e.toString());
+                return false;
+            } finally {
+                // 記得要釋放掉 process
+                process.destroy();
+            }
+        } catch (Exception e) {
+            WriteLog.appendLog("AfterLogin.java/ping/Exception:" + e.toString());
+            return false;
+        }
+    }*/
+
+    //檢查網路是否連線
+    public boolean checkInternetConnect() {
+        ConnectivityManager cManager = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
+        return cManager.getActiveNetworkInfo() != null;
     }
 
     private final BroadcastReceiver connectionReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            ConnectivityManager connectMgr = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
-            NetworkInfo mNetworkInfo = connectMgr.getActiveNetworkInfo();
-            if (mNetworkInfo != null) {
-                //WifiTicketBtn.setEnabled(true);
+            if (checkInternetConnect()) {
+                WifiTicketBtn.setEnabled(true);
                 OfflineExportBtn.setEnabled(true);
-                //Toast.makeText(AfterLogin.this, "已連線", Toast.LENGTH_SHORT).show();
+                Toast.makeText(AfterLogin.this, "已連線", Toast.LENGTH_SHORT).show();
             } else {
-                //WifiTicketBtn.setEnabled(false);
+                WifiTicketBtn.setEnabled(false);
                 OfflineExportBtn.setEnabled(false);
-                //Toast.makeText(AfterLogin.this, "連線中斷", Toast.LENGTH_SHORT).show();
+                Toast.makeText(AfterLogin.this, "連線中斷", Toast.LENGTH_SHORT).show();
             }
         }
     };
+
+    //監聽藍芽連接狀態的廣播
+    private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            if (BluetoothDevice.ACTION_ACL_DISCONNECTED.equals(action)) {
+                BluetoothConnectSetting.connectedBluetoothDevices.clear();
+            }
+        }
+    };
+
+    //複製db到電腦檢查資料用
+    private void copyDbToExternal(Context context) {
+        try {
+            File sd = Environment.getExternalStorageDirectory();
+            File data = Environment.getDataDirectory();
+
+            if (sd.canWrite()) {
+                String currentDBPath = "//data//" + context.getApplicationContext().getPackageName() + "//databases//"
+                        + "mydata.db";
+                String backupDBPath = "mydata.db";
+                File currentDB = new File(data, currentDBPath);
+                File backupDB = new File(sd, backupDBPath);
+
+                FileChannel src = new FileInputStream(currentDB).getChannel();
+                FileChannel dst = new FileOutputStream(backupDB).getChannel();
+                dst.transferFrom(src, 0, src.size());
+                src.close();
+                dst.close();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }
 

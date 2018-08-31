@@ -16,6 +16,7 @@ import android.view.View;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.IOException;
@@ -32,6 +33,7 @@ public class BluetoothConnectSetting extends Activity {
     public static List<BluetoothDevice> connectedBluetoothDevices=new ArrayList<BluetoothDevice>();
     public static BluetoothDevice connectedBluetoothDevice;
     public static BluetoothSocket mmSocket;
+    private TextView btStatusTxt;
     ClipboardManager cbMgr;
     ClipboardManager.OnPrimaryClipChangedListener mPrimaryClipChangedListener;
     EditText Address;
@@ -52,6 +54,7 @@ public class BluetoothConnectSetting extends Activity {
         ReturnBtn=(Button)findViewById(R.id.ReturnBtn);
         HomeBtn=(Button)findViewById(R.id.HomeBtn);
         Address=(EditText) findViewById(R.id.Address);
+        btStatusTxt=(TextView) findViewById(R.id.btStatusTxt);
         cbMgr=(ClipboardManager)getSystemService(Context.CLIPBOARD_SERVICE);
 
         xmlHelper=new XmlHelper(getFilesDir()+"//connectData.xml");
@@ -69,8 +72,10 @@ public class BluetoothConnectSetting extends Activity {
 
         if(mBluetoothAdapter.isEnabled()) {
             BtBtn.setBackgroundResource(R.drawable.switch_on);
+            btStatusTxt.setText("藍芽已開啟");
         }else{
             BtBtn.setBackgroundResource(R.drawable.switch_off);
+            btStatusTxt.setText("藍芽已關閉");
         }
 
         //Bluetooth OnOff
@@ -80,9 +85,11 @@ public class BluetoothConnectSetting extends Activity {
             {
                 BtBtn.setClickable(false);
                 if (mBluetoothAdapter.isEnabled()) {
+                    btStatusTxt.setText("藍芽已關閉");
                     BtBtn.setBackgroundResource(R.drawable.switch_off);
                     mBluetoothAdapter.disable();
                 } else {
+                    btStatusTxt.setText("藍芽已開啟");
                     BtBtn.setBackgroundResource(R.drawable.switch_on);
                     mBluetoothAdapter.enable();
                 }
@@ -108,7 +115,7 @@ public class BluetoothConnectSetting extends Activity {
                     BluetoothConnectSetting.this.finish();
                     //Intent callSub = new Intent();
                     //callSub.setClass(BluetoothConnectSetting.this, BluetoothTickets.class);
-                    //startActivityForResult(callSub, 0);
+                    //startActivity(callSub);
                 }catch(Exception ex){
                     Toast.makeText(BluetoothConnectSetting.this, "連接藍牙失敗", Toast.LENGTH_SHORT).show();
                 }
@@ -140,7 +147,7 @@ public class BluetoothConnectSetting extends Activity {
                     }
                     //Intent callSub = new Intent();
                     //callSub.setClass(BluetoothConnectSetting.this, BluetoothTickets.class);
-                    //startActivityForResult(callSub, 0);
+                    //startActivity(callSub);
                 }catch(Exception ex){
                     Toast.makeText(BluetoothConnectSetting.this, "連接藍牙失敗", Toast.LENGTH_SHORT).show();
                 }
@@ -151,14 +158,14 @@ public class BluetoothConnectSetting extends Activity {
         ReturnBtn.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
-                finish();
+                BluetoothConnectSetting.this.finish();
             }
         });
 
         HomeBtn.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
-                finish();
+                BluetoothConnectSetting.this.finish();
             }
         });
     }//END ONCREATE
@@ -194,7 +201,7 @@ public class BluetoothConnectSetting extends Activity {
         if(!mBluetoothAdapter.isEnabled())
         {
             Intent enableBluetooth = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            startActivityForResult(enableBluetooth, 0);
+            startActivity(enableBluetooth);
         }
 
         Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();
@@ -270,6 +277,7 @@ public class BluetoothConnectSetting extends Activity {
                 final int state = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, BluetoothAdapter.ERROR);
                 switch (state) {
                     case BluetoothAdapter.STATE_OFF:
+                        btStatusTxt.setText("藍芽已關閉");
                         BtBtn.setBackgroundResource(R.drawable.switch_off);
                         BtBtn.setClickable(true);
                         connectedBluetoothDevices.clear();
@@ -278,6 +286,7 @@ public class BluetoothConnectSetting extends Activity {
                         BtBtn.setClickable(false);
                         break;
                     case BluetoothAdapter.STATE_ON:
+                        btStatusTxt.setText("藍芽已開啟");
                         BtBtn.setBackgroundResource(R.drawable.switch_on);
                         BtBtn.setClickable(true);
                         break;

@@ -18,7 +18,7 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="20dp"
             android:text="入場"
-            android:textColor="#000000" />
+            android:textColor="#ffffff" />
 
         <RadioButton
             android:id="@+id/OutRBtn"
@@ -26,7 +26,7 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="90dp"
             android:text="出場"
-            android:textColor="#000000" />
+            android:textColor="#ffffff" />
 
     </RadioGroup>
 
@@ -42,40 +42,37 @@
             android:id="@+id/wifiLayout"
             android:layout_width="280dp"
             android:layout_height="280dp"
-            android:layout_marginTop="50dp"
-            android:orientation="horizontal"
+            android:layout_marginTop="25dp"
+            android:orientation="vertical"
             android:layout_gravity="center">
 
+            <ImageView
+                android:id="@+id/resultImage"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:layout_gravity="center_horizontal"
+                android:src="@drawable/ticket_success"/>
+
             <TextView
-                android:id="@+id/ResultTxt"
+                android:id="@+id/succeedResultTxt"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="#000000"
-                android:layout_marginLeft="20dp"
-                android:textSize="25dp" />
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="10dp"
+                android:textSize="20dp"
+                android:lineSpacingExtra="10dp" />
 
-            <LinearLayout
-                android:id="@+id/FailedLayout"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical"
-                android:visibility="visible">
-
-                <ImageView
-                    android:id="@+id/failedImage"
-                    android:layout_width="245.7px"
-                    android:layout_height="66.4px"
-                    android:src="@drawable/ticket_failed" />
-
-                <TextView
-                    android:id="@+id/ResultTxt2"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="#000000"
-                    android:layout_marginTop="10dp"
-                    android:textSize="23dp" />
-
-            </LinearLayout>
+            <TextView
+                android:id="@+id/failedResultTxt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#ff0000"
+                android:layout_gravity="center_horizontal"
+                android:gravity="center"
+                android:layout_marginTop="40dp"
+                android:textSize="20dp"
+                android:lineSpacingExtra="10dp" />
 
         </LinearLayout>
 

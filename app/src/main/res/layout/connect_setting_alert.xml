@@ -7,7 +7,7 @@
 
     <EditText
         android:id="@+id/pass_et"
-        android:layout_width="wrap_content"
+        android:layout_width="300dp"
         android:layout_height="70dp"
         android:layout_gravity="center"
         android:textColor="#000000"
@@ -19,16 +19,16 @@
 
     <Button
         android:id="@+id/ConfirmBtn"
-        android:layout_width="300dp"
-        android:layout_height="120dp"
+        android:layout_width="280dp"
+        android:layout_height="60dp"
         android:background="@drawable/connect_setting_alert_yes_btn_selector"
         android:layout_gravity="center_horizontal"
-        android:layout_marginTop="20dp"/>
+        android:layout_marginTop="50dp"/>
 
     <Button
         android:id="@+id/CancelBtn"
-        android:layout_width="100dp"
-        android:layout_height="30dp"
+        android:layout_width="280dp"
+        android:layout_height="60dp"
         android:background="@drawable/connect_setting_alert_no_btn_selector"
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="20dp"/>

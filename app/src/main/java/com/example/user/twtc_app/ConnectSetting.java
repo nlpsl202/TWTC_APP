@@ -1,14 +1,15 @@
 package com.example.user.twtc_app;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.os.Bundle;
 import android.util.Xml;
 import android.view.View;
 import android.view.Window;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import org.xmlpull.v1.XmlSerializer;
@@ -28,6 +29,8 @@ public class ConnectSetting extends Activity {
     CheckBox RFID_cb;
     File file;
     XmlHelper xmlHelper;
+    //get the spinner from the xml.
+    Spinner dropdown;
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
@@ -44,8 +47,12 @@ public class ConnectSetting extends Activity {
         SqlAccount_et=(EditText)findViewById(R.id.SqlAccount_et);
         SqlPassword_et=(EditText)findViewById(R.id.SqlPassword_et);
         Password_et=(EditText)findViewById(R.id.Password_et);
-        URL_et=(EditText)findViewById(R.id.URL_et);
+        //URL_et=(EditText)findViewById(R.id.URL_et);
         RFID_cb=(CheckBox) findViewById(R.id.RFID_cb);
+        dropdown= (Spinner) findViewById(R.id.spinner1);
+        String[] items = new String[]{"強制出館", "強制入館", "不限制"};
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, items);
+        dropdown.setAdapter(adapter);
 
         file = new File(getFilesDir()+"//connectData.xml");
 
@@ -55,7 +62,7 @@ public class ConnectSetting extends Activity {
             SqlAccount_et.setText(xmlHelper.ReadValue("sa"));
             SqlPassword_et.setText(xmlHelper.ReadValue("SQLPassWord"));
             Password_et.setText(xmlHelper.ReadValue("SetupPassWord"));
-            URL_et.setText(xmlHelper.ReadValue("WebServiceUrl"));
+            //URL_et.setText(xmlHelper.ReadValue("WebServiceUrl"));
             RFID_cb.setChecked(xmlHelper.ReadValue("RFID") .equals("OPEN")  ? true : false);
         }
 
@@ -101,7 +108,7 @@ public class ConnectSetting extends Activity {
                 xmlHelper.WriteValue("sa",SqlAccount_et.getText().toString());
                 xmlHelper.WriteValue("SQLPassWord",SqlPassword_et.getText().toString());
                 xmlHelper.WriteValue("SetupPassWord",Password_et.getText().toString());
-                xmlHelper.WriteValue("WebServiceUrl",URL_et.getText().toString());
+                //xmlHelper.WriteValue("WebServiceUrl",URL_et.getText().toString());
                 xmlHelper.WriteValue("RFID",RFID_cb.isChecked() ? "OPEN":"CLOSE");
                 /*try {
                     FileOutputStream fos = new FileOutputStream(new File(getFilesDir(), "connectData.xml"));
@@ -164,16 +171,14 @@ public class ConnectSetting extends Activity {
                     e.printStackTrace();
                 }*/
                 Toast.makeText(ConnectSetting.this, "存檔成功！", Toast.LENGTH_SHORT).show();
-                Intent callSub = new Intent();
-                callSub.setClass(ConnectSetting.this, AfterLogin.class);
-                startActivityForResult(callSub, 0);
+                ConnectSetting.this.finish();
             }
         });
 
         Return_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                finish();
+                ConnectSetting.this.finish();
             }
         });
     }

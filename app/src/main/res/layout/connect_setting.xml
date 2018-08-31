@@ -19,8 +19,8 @@
 
             <ImageView
                 android:id="@+id/textView"
-                android:layout_width="153px"
-                android:layout_height="64px"
+                android:layout_width="wrap_content"
+                android:layout_height="100px"
                 android:background="@drawable/connect_setting_machineid_text" />
 
         </LinearLayout>
@@ -49,8 +49,8 @@
 
             <ImageView
                 android:id="@+id/textView2"
-                android:layout_width="153px"
-                android:layout_height="64px"
+                android:layout_width="wrap_content"
+                android:layout_height="100px"
                 android:background="@drawable/connect_setting_ip_text" />
 
         </LinearLayout>
@@ -79,8 +79,8 @@
 
             <ImageView
                 android:id="@+id/textView3"
-                android:layout_width="153px"
-                android:layout_height="64px"
+                android:layout_width="wrap_content"
+                android:layout_height="100px"
                 android:background="@drawable/connect_setting_sqlaccount_text"/>
 
         </LinearLayout>
@@ -109,8 +109,8 @@
 
             <ImageView
                 android:id="@+id/textView4"
-                android:layout_width="153px"
-                android:layout_height="64px"
+                android:layout_width="wrap_content"
+                android:layout_height="100px"
                 android:background="@drawable/connect_setting_sqlpassword_text"/>
 
         </LinearLayout>
@@ -139,8 +139,8 @@
 
             <ImageView
                 android:id="@+id/textView5"
-                android:layout_width="153px"
-                android:layout_height="64px"
+                android:layout_width="wrap_content"
+                android:layout_height="100px"
                 android:background="@drawable/connect_setting_password_text"/>
 
         </LinearLayout>
@@ -169,19 +169,16 @@
 
             <ImageView
                 android:id="@+id/textView6"
-                android:layout_width="153px"
-                android:layout_height="64px"
+                android:layout_width="wrap_content"
+                android:layout_height="100px"
                 android:background="@drawable/connect_setting_url_text"/>
 
         </LinearLayout>
 
-        <EditText
-            android:id="@+id/URL_et"
-            android:layout_width="502px"
-            android:layout_height="117px"
-            android:background="@drawable/connect_setting_edittext"
-            android:paddingLeft="20dp"
-            android:singleLine="true"/>
+        <Spinner
+            android:id="@+id/spinner1"
+            android:layout_width="300px"
+            android:layout_height="117px" />
 
     </LinearLayout>
 
@@ -199,8 +196,8 @@
 
             <ImageView
                 android:id="@+id/textView7"
-                android:layout_width="153px"
-                android:layout_height="64px"
+                android:layout_width="wrap_content"
+                android:layout_height="100px"
                 android:background="@drawable/connect_setting_rfid_text" />
 
         </LinearLayout>

@@ -32,12 +32,15 @@ public class ConnectionClass {
                     + "databaseName=" + db + ";charset=utf8;user=" + un + ";password="
                     + password + ";";
             conn = DriverManager.getConnection(ConnURL);
-        } catch (SQLException se) {
-            Log.e("ERRO", se.getMessage());
-        } catch (ClassNotFoundException e) {
-            Log.e("ERRO", e.getMessage());
-        } catch (Exception e) {
-            Log.e("ERRO", e.getMessage());
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            WriteLog.appendLog("ConnectionClass.java/CONN/Exception:" + ex.toString());
+        } catch (ClassNotFoundException ex) {
+            ex.printStackTrace();
+            WriteLog.appendLog("ConnectionClass.java/CONN/Exception:" + ex.toString());
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            WriteLog.appendLog("ConnectionClass.java/CONN/Exception:" + ex.toString());
         }
         return conn;
     }
