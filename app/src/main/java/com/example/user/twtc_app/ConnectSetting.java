@@ -51,7 +51,9 @@ public class ConnectSetting extends Activity {
         RFID_cb=(CheckBox) findViewById(R.id.RFID_cb);
         dropdown= (Spinner) findViewById(R.id.spinner1);
         String[] items = new String[]{"強制出館", "強制入館", "不限制"};
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, items);
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
+                R.layout.simple_spinner_item, items);
+        adapter.setDropDownViewResource(R.layout.my_drop_down_item);
         dropdown.setAdapter(adapter);
 
         file = new File(getFilesDir()+"//connectData.xml");

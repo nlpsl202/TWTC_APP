@@ -178,7 +178,8 @@
         <Spinner
             android:id="@+id/spinner1"
             android:layout_width="300px"
-            android:layout_height="117px" />
+            android:layout_height="117px"
+            android:background="@drawable/spinner_selector" />
 
     </LinearLayout>
 
