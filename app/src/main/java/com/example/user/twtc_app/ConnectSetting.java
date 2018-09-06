@@ -30,7 +30,7 @@ public class ConnectSetting extends Activity {
     File file;
     XmlHelper xmlHelper;
     //get the spinner from the xml.
-    Spinner dropdown;
+    Spinner spinner;
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
@@ -49,12 +49,13 @@ public class ConnectSetting extends Activity {
         Password_et=(EditText)findViewById(R.id.Password_et);
         //URL_et=(EditText)findViewById(R.id.URL_et);
         RFID_cb=(CheckBox) findViewById(R.id.RFID_cb);
-        dropdown= (Spinner) findViewById(R.id.spinner1);
-        String[] items = new String[]{"強制出館", "強制入館", "不限制"};
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
-                R.layout.simple_spinner_item, items);
-        adapter.setDropDownViewResource(R.layout.my_drop_down_item);
-        dropdown.setAdapter(adapter);
+        spinner= (Spinner) findViewById(R.id.spinner);
+
+        ArrayAdapter<CharSequence> nAdapter = ArrayAdapter.createFromResource(
+                this, R.array.ticket_type_array, android.R.layout.simple_spinner_item );
+        nAdapter.setDropDownViewResource(
+                android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(nAdapter);
 
         file = new File(getFilesDir()+"//connectData.xml");
 

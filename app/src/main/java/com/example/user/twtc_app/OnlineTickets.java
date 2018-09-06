@@ -18,7 +18,6 @@ import android.net.wifi.WifiManager;
 import android.nfc.NfcAdapter;
 import android.nfc.Tag;
 import android.nfc.tech.MifareClassic;
-import android.nfc.tech.MifareUltralight;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Vibrator;
@@ -73,6 +72,7 @@ public class OnlineTickets extends Activity {
     private NfcAdapter mNfcAdapter;
     private PendingIntent mPendingIntent;
     private Bitmap bitmap;
+    boolean reading =false;
 
     //wifi狀態監控
     private WifiManager wifiManager;
@@ -352,6 +352,10 @@ public class OnlineTickets extends Activity {
 
     //RFID驗票
     private void getTagInfo(Intent intent) {
+        if(reading){
+            return;
+        }
+        reading=true;
         String RFData = "";
         String tagNo = "";
         String strCardID = "", strStartDate = "", strEndDate = "", strCardName = "";
@@ -366,7 +370,7 @@ public class OnlineTickets extends Activity {
             }
             tagNo += Integer.toHexString(tagId[i] & 0xFF).toUpperCase();
         }
-        MifareUltralight mifare = MifareUltralight.get(tag);
+        /*MifareUltralight mifare = MifareUltralight.get(tag);
         try {
             mifare.connect();
             byte[] payload = mifare.readPages(1);
@@ -380,16 +384,28 @@ public class OnlineTickets extends Activity {
                 catch (IOException e) {
                 }
             }
-        }
+        }*/
         MifareClassic mfc = MifareClassic.get(tag);
 
         try {
             mfc.connect();
-
-            boolean auth = mfc.authenticateSectorWithKeyA(0, MifareClassic.KEY_DEFAULT);
-            if (auth) {
+            byte[][] pDatas=new byte[64][16];
+            int block;
+            for(int i=0;i<16;i++){
+                if(mfc.authenticateSectorWithKeyA(i, MifareClassic.KEY_DEFAULT)){
+                    for(int j=0;j<4;j++){
+                        block=i*4+j;
+                        if(block==0 || block==7 || block==11 || block==15 || block==19){
+                            continue;
+                        }
+                        pDatas[block]=mfc.readBlock(block);
+                    }
+                }
+            }
+            //boolean auth = mfc.authenticateSectorWithKeyA(0, MifareClassic.KEY_DEFAULT);
+            //if (auth) {
                 //讀取卡別資訊
-                pData = mfc.readBlock(1);
+                pData = pDatas[1];
                 BlockInfo.bCardType = pData[0];
                 if (pData[0] == (byte) 0xFC || pData[0] == (byte) 0xFD) { //服務證與臨時證
                     iBlockCount = 1; //僅讀取Block4
@@ -414,8 +430,8 @@ public class OnlineTickets extends Activity {
                         iBlockCount++;
                         continue;
                     }
-                    if (mfc.authenticateSectorWithKeyA(iBlock / 4, MifareClassic.KEY_DEFAULT)) {
-                        pData = mfc.readBlock(iBlock);
+                    //if (mfc.authenticateSectorWithKeyA(iBlock / 4, MifareClassic.KEY_DEFAULT)) {
+                        pData = pDatas[iBlock];
                         RFData = RFData + getHexToString(byte2hex(pData));
 
                         if (BlockInfo.bCardType == (byte) 0xFC || BlockInfo.bCardType == (byte) 0xFD) //定義第四區格式
@@ -428,7 +444,7 @@ public class OnlineTickets extends Activity {
                                 WriteLog.appendLog("OnlineTickets.java/DownloadDeviceSetup/Exception:" + e.toString());
                             }
                         }
-                    }
+                    //}
                 }
 
                 ary = RFData.split("@",-1);
@@ -508,6 +524,7 @@ public class OnlineTickets extends Activity {
                             bitmap = null;
                             photoImage.setImageBitmap(bitmap);
                             setResultText3("票券狀態    票劵錯誤\r\n(異常)請重新確認");
+                            reading=false;
                         }
                     }
                 } else {
@@ -532,9 +549,9 @@ public class OnlineTickets extends Activity {
                         setResultText2("票劵錯誤\r\n(格式)無效票卡");
                     }
                 }
-            } else { // Authentication failed - Handle it
-
-            }
+            //} else { // Authentication failed - Handle it
+            reading=false;
+            //}
         } catch (IOException ex) {
             WriteLog.appendLog("OnlineTicket.java/DownloadDeviceType/Exception:" + ex.toString());
         }

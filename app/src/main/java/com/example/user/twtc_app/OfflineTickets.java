@@ -361,9 +361,29 @@ public class OfflineTickets extends Activity {
 
         try {
             mfc.connect();
-            if (mfc.authenticateSectorWithKeyA(0, MifareClassic.KEY_DEFAULT)) {
+            byte[][] pDatas=new byte[20][16];
+            int block;
+            for(int i=0;i<5;i++){
+                if(mfc.authenticateSectorWithKeyA(i, MifareClassic.KEY_DEFAULT)){
+
+                }else{
+                setFailedResultText("票劵錯誤\n票卡讀取失敗!");
+                reading=false;
+                return;
+                }
+            }
+            for(int i=0;i<5;i++){
+                    for(int j=0;j<4;j++){
+                        block=i*4+j;
+                        if(block==0 || block==7 || block==11 || block==15 || block==19){
+                            continue;
+                        }
+                        pDatas[block]=mfc.readBlock(block);
+                    }
+            }
+            //if (mfc.authenticateSectorWithKeyA(0, MifareClassic.KEY_DEFAULT)) {
                 //讀取卡別資訊
-                pData = mfc.readBlock(1);
+                pData = pDatas[1];
                 BlockInfo.bCardType = pData[0];
 
                 if (pData[0] == (byte) 0xFC || pData[0] == (byte) 0xFD) { //服務證與臨時證
@@ -375,7 +395,7 @@ public class OfflineTickets extends Activity {
                     }
                 }
 
-                for (int iBlock = 4; iBlock < iBlockCount + 4; iBlock++) {
+                /*for (int iBlock = 4; iBlock < iBlockCount + 4; iBlock++) {
                     //避開 security block
                     if (iBlock == 7 || iBlock == 11 || iBlock == 15 || iBlock == 19) {
                         iBlockCount++;
@@ -413,6 +433,29 @@ public class OfflineTickets extends Activity {
                             }
                         }
                     }
+                }*/
+
+                for (int iBlock = 4; iBlock < iBlockCount + 4; iBlock++) {
+                    //避開 security block
+                    if (iBlock == 7 || iBlock == 11 || iBlock == 15 || iBlock == 19) {
+                        iBlockCount++;
+                        continue;
+                    }
+                    //if (mfc.authenticateSectorWithKeyA(iBlock / 4, MifareClassic.KEY_DEFAULT)) {
+                    pData = pDatas[iBlock];
+                    RFData = RFData + getHexToString(byte2hex(pData));
+
+                    if (BlockInfo.bCardType == (byte) 0xFC || BlockInfo.bCardType == (byte) 0xFD) //定義第四區格式
+                    {
+                        try {
+                            System.arraycopy(pData, 0, BlockInfo.bStartDate, 0, 3);
+                            System.arraycopy(pData, 3, BlockInfo.bEndDate, 0, 3);
+                            System.arraycopy(pData, 6, BlockInfo.bCardID, 0, 8);
+                        } catch (Exception e) {
+                            WriteLog.appendLog("OnlineTickets.java/DownloadDeviceSetup/Exception:" + e.toString());
+                        }
+                    }
+                    //}
                 }
 
                 ary = RFData.split("@",-1);
@@ -621,10 +664,10 @@ public class OfflineTickets extends Activity {
                     }
                 }
                 reading=false;
-            } else { // Authentication failed - Handle it
-                setFailedResultText("票劵錯誤\n票卡讀取失敗!");
-                reading=false;
-            }
+            //} else { // Authentication failed - Handle it
+            //    setFailedResultText("票劵錯誤\n票卡讀取失敗!");
+            //    reading=false;
+            //}
         } catch (IOException ex) {
             if(ex.toString().contains("lost")){
                 setFailedResultText("票劵錯誤\n請重新感應!");

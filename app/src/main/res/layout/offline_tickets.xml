@@ -15,10 +15,11 @@
         <RadioButton
             android:id="@+id/InRBtn"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="50dp"
             android:layout_marginLeft="20dp"
             android:text="入場"
-            android:textColor="#ffffff" />
+            android:textColor="#ffffff"
+            android:textSize="20dp"/>
 
         <RadioButton
             android:id="@+id/OutRBtn"
@@ -26,7 +27,8 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="90dp"
             android:text="出場"
-            android:textColor="#ffffff" />
+            android:textColor="#ffffff"
+            android:textSize="20dp"/>
 
     </RadioGroup>
 

@@ -12,7 +12,7 @@
         android:layout_marginTop="139.3px">
 
         <LinearLayout
-            android:layout_width="190.9px"
+            android:layout_width="180px"
             android:layout_height="60dp"
             android:orientation="horizontal"
             android:gravity="center">
@@ -20,7 +20,7 @@
             <ImageView
                 android:id="@+id/textView"
                 android:layout_width="wrap_content"
-                android:layout_height="100px"
+                android:layout_height="80px"
                 android:background="@drawable/connect_setting_machineid_text" />
 
         </LinearLayout>
@@ -42,7 +42,7 @@
         android:layout_marginTop="5dp">
 
         <LinearLayout
-            android:layout_width="190.9px"
+            android:layout_width="180px"
             android:layout_height="60dp"
             android:orientation="horizontal"
             android:gravity="center">
@@ -50,7 +50,7 @@
             <ImageView
                 android:id="@+id/textView2"
                 android:layout_width="wrap_content"
-                android:layout_height="100px"
+                android:layout_height="80px"
                 android:background="@drawable/connect_setting_ip_text" />
 
         </LinearLayout>
@@ -72,7 +72,7 @@
         android:layout_marginTop="5dp">
 
         <LinearLayout
-            android:layout_width="190.9px"
+            android:layout_width="180px"
             android:layout_height="60dp"
             android:orientation="horizontal"
             android:gravity="center">
@@ -80,7 +80,7 @@
             <ImageView
                 android:id="@+id/textView3"
                 android:layout_width="wrap_content"
-                android:layout_height="100px"
+                android:layout_height="80px"
                 android:background="@drawable/connect_setting_sqlaccount_text"/>
 
         </LinearLayout>
@@ -102,7 +102,7 @@
         android:layout_marginTop="5dp">
 
         <LinearLayout
-            android:layout_width="190.9px"
+            android:layout_width="180px"
             android:layout_height="60dp"
             android:orientation="horizontal"
             android:gravity="center">
@@ -110,7 +110,7 @@
             <ImageView
                 android:id="@+id/textView4"
                 android:layout_width="wrap_content"
-                android:layout_height="100px"
+                android:layout_height="80px"
                 android:background="@drawable/connect_setting_sqlpassword_text"/>
 
         </LinearLayout>
@@ -132,7 +132,7 @@
         android:layout_marginTop="5dp">
 
         <LinearLayout
-            android:layout_width="190.9px"
+            android:layout_width="180px"
             android:layout_height="60dp"
             android:orientation="horizontal"
             android:gravity="center">
@@ -140,7 +140,7 @@
             <ImageView
                 android:id="@+id/textView5"
                 android:layout_width="wrap_content"
-                android:layout_height="100px"
+                android:layout_height="80px"
                 android:background="@drawable/connect_setting_password_text"/>
 
         </LinearLayout>
@@ -162,7 +162,7 @@
         android:layout_marginTop="5dp">
 
         <LinearLayout
-            android:layout_width="190.9px"
+            android:layout_width="180px"
             android:layout_height="60dp"
             android:orientation="horizontal"
             android:gravity="center">
@@ -170,16 +170,17 @@
             <ImageView
                 android:id="@+id/textView6"
                 android:layout_width="wrap_content"
-                android:layout_height="100px"
+                android:layout_height="80px"
                 android:background="@drawable/connect_setting_url_text"/>
 
         </LinearLayout>
 
         <Spinner
-            android:id="@+id/spinner1"
-            android:layout_width="300px"
-            android:layout_height="117px"
-            android:background="@drawable/spinner_selector" />
+            android:id="@+id/spinner"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_gravity="center_vertical" />
 
     </LinearLayout>
 
@@ -190,7 +191,7 @@
         android:layout_marginTop="5dp">
 
         <LinearLayout
-            android:layout_width="190.9px"
+            android:layout_width="180px"
             android:layout_height="60dp"
             android:gravity="center"
             android:orientation="horizontal">
@@ -198,7 +199,7 @@
             <ImageView
                 android:id="@+id/textView7"
                 android:layout_width="wrap_content"
-                android:layout_height="100px"
+                android:layout_height="80px"
                 android:background="@drawable/connect_setting_rfid_text" />
 
         </LinearLayout>
