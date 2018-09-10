@@ -36,16 +36,16 @@ import java.util.Date;
  * Created by Jeff.
  */
 public class BluetoothTickets extends Activity {
-    private String result, qr, PCReturnData, restr = "", sWorkCardNo;
-    private ImageView photoImage;
-    private TextView resultTxt, resultTxt2, resultTxt3;
+    private String PCReturnData, restr = "", sWorkCardNo;
+    private TextView succeedResultTxt, failedResultTxt, photoTxt;
+    private ImageView resultImage, photoImage;
     private Button returnBtn, homeBtn;
     private RadioButton inRBtn, outRBtn;
-    private LinearLayout wifiLayout, rfidLayout, failedLayout;
+    private LinearLayout wifiLayout, rfidLayout;
 
     //圖片
     private byte[] bPicBuff = new byte[20480];
-    private Boolean bFinishPic = false, Rec = false, bWaitPic = false;
+    private boolean bFinishPic = false, Rec = false, bWaitPic = false;
 
     //剪貼簿
     private ClipboardManager cbMgr;
@@ -93,19 +93,20 @@ public class BluetoothTickets extends Activity {
             BluetoothTickets.this.finish();
         }
 
-        returnBtn = (Button) findViewById(R.id.ReturnBtn);
-        homeBtn = (Button) findViewById(R.id.HomeBtn);
-        inRBtn = (RadioButton) findViewById(R.id.InRBtn);
-        outRBtn = (RadioButton) findViewById(R.id.OutRBtn);
-        resultTxt = (TextView) findViewById(R.id.ResultTxt);
-        resultTxt2 = (TextView) findViewById(R.id.ResultTxt2);
-        resultTxt3 = (TextView) findViewById(R.id.ResultTxt3);
-        photoImage = (ImageView) findViewById(R.id.FtPhotoImage);
+        resultImage = (ImageView) findViewById(R.id.resultImage);
+        photoImage = (ImageView) findViewById(R.id.photoImage);
+        succeedResultTxt = (TextView) findViewById(R.id.succeedResultTxt);
+        failedResultTxt = (TextView) findViewById(R.id.failedResultTxt);
+        photoTxt = (TextView) findViewById(R.id.photoTxt);
+        returnBtn = (Button) findViewById(R.id.returnBtn);
+        homeBtn = (Button) findViewById(R.id.homeBtn);
+        inRBtn = (RadioButton) findViewById(R.id.inRBtn);
+        outRBtn = (RadioButton) findViewById(R.id.outRBtn);
         wifiLayout = (LinearLayout) findViewById(R.id.wifiLayout);
         rfidLayout = (LinearLayout) findViewById(R.id.rfidLayout);
-        failedLayout = (LinearLayout) findViewById(R.id.FailedLayout);
         cbMgr = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
 
+        resultImage.setVisibility(View.GONE);
         inRBtn.setChecked(true);
 
         xmlHelper = new XmlHelper(getFilesDir() + "//connectData.xml");
@@ -122,16 +123,17 @@ public class BluetoothTickets extends Activity {
         mPrimaryClipChangedListener = new ClipboardManager.OnPrimaryClipChangedListener() {
             public void onPrimaryClipChanged() {
                 try {
+                    setVibrate(100);
+                    wifiLayout.setVisibility(View.VISIBLE);
+                    rfidLayout.setVisibility(View.GONE);
+                    resultImage.setVisibility(View.VISIBLE);
                     String retMsg = "";//回傳訊息
                     String strCardName = "";//回傳訊息
                     String strCardType = "";
 
-                    failedLayout.setVisibility(View.GONE);
-                    wifiLayout.setVisibility(View.VISIBLE);
-                    rfidLayout.setVisibility(View.GONE);
 
-                    setVibrate(100);
-                    qr = cbMgr.getPrimaryClip().getItemAt(0).getText().toString();
+
+                    String qr = cbMgr.getPrimaryClip().getItemAt(0).getText().toString();
                     restr = sendData("Q|" + (inRBtn.isChecked() ? "I|" : "O|") + qr);
                     if (!restr.equals("ERROR") && restr.length() != 0) {
                         //接收格式如下
@@ -148,27 +150,20 @@ public class BluetoothTickets extends Activity {
                                 retMsg = "無法取得回傳訊息-請重新確認";
                             }
                         } else {
-                            failedLayout.setVisibility(View.VISIBLE);
-                            setResultText("票券狀態    ");
-                            setResultText2("回傳訊息解析錯誤-V");
+                            setFailedResultText("票劵錯誤\n回傳訊息解析錯誤-V!");
                         }
                     } else {
                         retMsg = "無法取得回傳訊息-請重新確認";
                     }
 
                     if (retMsg.contains("成功")) {
-                        failedLayout.setVisibility(View.GONE);
-                        setResultText("票券狀態    " + retMsg + "\n\n票券身分    " + strCardType + "\n\n票券名稱    " + strCardName + (inRBtn.isChecked() ? "\n\n票券入場紀錄\n\n" : "\n\n票券出場紀錄\n\n") + getDateTime());
+                        setSucceedResultText("票券狀態    " + retMsg + "\n票券身分    " + strCardType + "\n票券名稱    " + strCardName + (inRBtn.isChecked() ? "\n票券入場紀錄\n" : "\n票券出場紀錄\n") + getDateTime());
                     } else {
-                        failedLayout.setVisibility(View.VISIBLE);
-                        setResultText("票券狀態    ");
-                        setResultText2(retMsg);
+                        setFailedResultText("票劵錯誤\n"+retMsg);
                     }
                 } catch (Exception ex) {
                     ex.printStackTrace();
-                    failedLayout.setVisibility(View.VISIBLE);
-                    setResultText("票券狀態    ");
-                    setResultText2("票劵錯誤\r\n(異常)請重新確認");
+                    setFailedResultText("票劵錯誤\n(異常)請重新確認!");
                     WriteLog.appendLog("BluetoothTickets.java/ticket/Exception:" + ex.toString());
                 }
             }
@@ -245,6 +240,7 @@ public class BluetoothTickets extends Activity {
 
     //RFID驗票
     private void getTagInfo(Intent intent) {
+        resultImage.setVisibility(View.VISIBLE);
         //清空圖像資訊
         bitmap = null;
         photoImage.setImageBitmap(bitmap);
@@ -275,6 +271,7 @@ public class BluetoothTickets extends Activity {
                 pData = mfc.readBlock(1);
                 BlockInfo.bCardType = pData[0];
                 if (pData[0] == (byte) 0xFC || pData[0] == (byte) 0xFD) { //服務證與臨時證
+                    resultImage.setVisibility(View.GONE);
                     iBlockCount = 1; //僅讀取Block4
                 } else if (pData[0] >= (byte) 0x01 && pData[0] <= (byte) 0x0F) { //一般證別
                     iBlockCount = pData[0];
@@ -319,7 +316,7 @@ public class BluetoothTickets extends Activity {
                             //清空圖像資訊
                             bitmap = null;
                             photoImage.setImageBitmap(bitmap);
-                            setResultText3("票券狀態    \n票劵錯誤\n\n(格式)無效服務證");
+                            photoTxt.setText("票券狀態    \n票劵錯誤\n\n(格式)無效服務證");
                         }
                     }
                     if (BlockInfo.bCardType == (byte) 0xFC) { //臨時證
@@ -330,7 +327,7 @@ public class BluetoothTickets extends Activity {
                         } else {
                             bitmap = null;
                             photoImage.setImageBitmap(bitmap);
-                            setResultText3("票券狀態    \n票劵錯誤\n\n(格式)無效臨時證");
+                            photoTxt.setText("票券狀態    \n票劵錯誤\n\n(格式)無效臨時證");
                         }
                     }
 
@@ -347,7 +344,7 @@ public class BluetoothTickets extends Activity {
                             //清空圖像資訊
                             bitmap = null;
                             photoImage.setImageBitmap(bitmap);
-                            setResultText3("票券狀態    \n票劵錯誤\n\n(逾期)無效票卡");
+                            photoTxt.setText("票券狀態    \n票劵錯誤\n\n(逾期)無效票卡");
                         } else {//向中央取得權限
                             restr = sendData("R!" + (inRBtn.isChecked() ? "I" : "O") + "!" + String.valueOf(BlockInfo.bCardType < 0 ? BlockInfo.bCardType + 256 : BlockInfo.bCardType) + "!" + tagNo + "!" + strCardID); //CardNo
                             if (!restr.equals("ERROR") && restr.length() != 0) {
@@ -389,20 +386,20 @@ public class BluetoothTickets extends Activity {
                                         photoImage.setImageBitmap(bitmap);
                                         retMsg = "訊息錯誤\r\n(異常)無法接收訊息";
                                     }
-                                    setResultText3("票券狀態    \n" + retMsg + "\n\n票券身分    " + strCardName + (inRBtn.isChecked() ? "\n\n票券入場紀錄\n\n" : "\n\n票券出場紀錄\n\n") + getDateTime());
+                                    photoTxt.setText("票券狀態    \n" + retMsg + "\n\n票券身分    " + strCardName + (inRBtn.isChecked() ? "\n\n票券入場紀錄\n\n" : "\n\n票券出場紀錄\n\n") + getDateTime());
                                 } else {
                                     bWaitPic = false;//結束取圖
                                     //清空圖像資訊
                                     bitmap = null;
                                     photoImage.setImageBitmap(bitmap);
-                                    setResultText3("票券狀態    \n訊息錯誤\r\n接收資料解析錯誤(S)");
+                                    photoTxt.setText("票券狀態    \n訊息錯誤\r\n接收資料解析錯誤(S)");
                                 }
                             } else if (restr.equals("ERROR")) {//ERROR
                                 bWaitPic = false;//結束取圖
                                 //清空圖像資訊
                                 bitmap = null;
                                 photoImage.setImageBitmap(bitmap);
-                                setResultText3("票券狀態    \n訊息錯誤\r\n接收資料逾時(T)");
+                                photoTxt.setText("票券狀態    \n訊息錯誤\r\n接收資料逾時(T)");
                             }
                             RFData = "";
                         }
@@ -411,7 +408,7 @@ public class BluetoothTickets extends Activity {
                         //清空圖像資訊
                         bitmap = null;
                         photoImage.setImageBitmap(bitmap);
-                        setResultText3("票券狀態    \n票劵錯誤\r\n(異常)請重新確認");
+                        photoTxt.setText("票券狀態    \n票劵錯誤\r\n(異常)請重新確認");
                         WriteLog.appendLog("BluetoothTickets.java/getTagInfo/Exception:" + ex.toString());
                     }
                 } else {
@@ -438,29 +435,20 @@ public class BluetoothTickets extends Activity {
                                     retMsg = "訊息錯誤\r\n(異常)無法接收訊息";
                                 }
                                 if (retMsg.contains("成功")) {
-                                    failedLayout.setVisibility(View.GONE);
-                                    setResultText("票券狀態    " + retMsg + "\n\n票券身分    " + strCardType + "\n\n票券名稱    " + strCardName + (inRBtn.isChecked() ? "\n\n票券入場紀錄\n\n" : "\n\n票券出場紀錄\n\n") + getDateTime());
+                                    setSucceedResultText("票券狀態    " + retMsg + "\n票券身分    " + strCardType + "\n票券名稱    " + strCardName + (inRBtn.isChecked() ? "\n票券入場紀錄\n" : "\n票券出場紀錄\n") + getDateTime());
                                 } else {
-                                    failedLayout.setVisibility(View.VISIBLE);
-                                    setResultText("票券狀態    ");
-                                    setResultText2(retMsg);
+                                    setFailedResultText("票劵錯誤\n"+retMsg);
                                 }
                             } else {
-                                failedLayout.setVisibility(View.VISIBLE);
-                                setResultText("票券狀態    ");
-                                setResultText2("訊息錯誤\r\n接收資料解析錯誤(V)");
+                                setFailedResultText("訊息錯誤\n接收資料解析錯誤(V)");
                             }
                         } else if (restr.equals("ERROR")) {
-                            failedLayout.setVisibility(View.VISIBLE);
-                            setResultText("票券狀態    ");
-                            setResultText2("訊息錯誤\r\n接收資料逾時(T)");
+                            setFailedResultText("票劵錯誤\n接收資料逾時(T)");
                         }
                     } catch (Exception ex) {
                         ex.printStackTrace();
                         WriteLog.appendLog("BluetoothTickets.java/getTagInfo/Exception:" + ex.toString());
-                        failedLayout.setVisibility(View.VISIBLE);
-                        setResultText("票券狀態    ");
-                        setResultText2("票劵錯誤\r\n(異常)請重新確認");
+                        setFailedResultText("票劵錯誤\n(異常)請重新確認");
                     }
                     RFData = "";
                     bFinishPic = false;
@@ -673,19 +661,20 @@ public class BluetoothTickets extends Activity {
         return strReturn;
     }
 
-    //驗票結果訊息
-    private void setResultText(String text) {
-        resultTxt.setText(text);
+    //票券狀態文字
+    private void setSucceedResultText(String text) {
+        succeedResultTxt.setVisibility(View.VISIBLE);
+        failedResultTxt.setVisibility(View.GONE);
+        succeedResultTxt.setText(text);
+        resultImage.setImageResource(R.drawable.ticket_success);
     }
 
-    //驗票結果訊息
-    private void setResultText2(String text) {
-        resultTxt2.setText(text);
-    }
-
-    //驗票結果訊息
-    private void setResultText3(String text) {
-        resultTxt3.setText(text);
+    //票券狀態文字
+    private void setFailedResultText(String text) {
+        failedResultTxt.setVisibility(View.VISIBLE);
+        succeedResultTxt.setVisibility(View.GONE);
+        failedResultTxt.setText(text);
+        resultImage.setImageResource(R.drawable.ticket_failed);
     }
 
     //取得現在時間 yyyy-MM-dd HH:mm:ss

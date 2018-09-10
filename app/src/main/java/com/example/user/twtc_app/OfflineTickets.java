@@ -16,7 +16,6 @@ import android.view.View;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -38,13 +37,12 @@ import javax.crypto.spec.SecretKeySpec;
 public class OfflineTickets extends Activity {
     ImageView resultImage;
     TextView succeedResultTxt, failedResultTxt;
-    RadioButton inRBtn,outRBtn;
-    Button returnBtn,homeBtn;
-    LinearLayout failedLayout;
+    RadioButton inRBtn, outRBtn;
+    Button returnBtn, homeBtn;
     String result, DeviceID, strSQL, EL;
     String[] ary;
     String[] sQRPWDItem = new String[2];
-    boolean reading =false;
+    boolean reading = false;
 
     //剪貼簿
     ClipboardManager cbMgr;
@@ -89,12 +87,11 @@ public class OfflineTickets extends Activity {
             return;
         }*/
 
-        resultImage=(ImageView) findViewById(R.id.resultImage);
+        resultImage = (ImageView) findViewById(R.id.resultImage);
         returnBtn = (Button) findViewById(R.id.ReturnBtn);
         homeBtn = (Button) findViewById(R.id.HomeBtn);
         succeedResultTxt = (TextView) findViewById(R.id.succeedResultTxt);
         failedResultTxt = (TextView) findViewById(R.id.failedResultTxt);
-        failedLayout = (LinearLayout) findViewById(R.id.FailedLayout);
         inRBtn = (RadioButton) findViewById(R.id.InRBtn);
         outRBtn = (RadioButton) findViewById(R.id.InRBtn);
         cbMgr = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
@@ -142,11 +139,11 @@ public class OfflineTickets extends Activity {
                         return;
                     }
 
-                    ary = QRDecod(value, iv).split("@",-1);
+                    ary = QRDecod(value, iv).split("@", -1);
                     String a = ary[5];
                     if (ary.length == 17) {
                         //檢查UUID 8-4-4-4-12
-                        String[] sUUID = ary[0].split("-",-1);
+                        String[] sUUID = ary[0].split("-", -1);
                         if (sUUID.length == 5) {
                             if (sUUID[0].length() != 8 || sUUID[1].length() != 4 || sUUID[2].length() != 4 || sUUID[3].length() != 4 || sUUID[4].length() != 12) {
                                 setFailedResultText("票劵錯誤\n無效票卡!");
@@ -333,10 +330,10 @@ public class OfflineTickets extends Activity {
 
     //RFID驗票
     private void getTagInfo(Intent intent) {
-        if(reading){
+        if (reading) {
             return;
         }
-        reading=true;
+        reading = true;
         resultImage.setVisibility(View.VISIBLE);
         String RFData = "";
         String tagNo = "";
@@ -357,43 +354,39 @@ public class OfflineTickets extends Activity {
             }
             tagNo += Integer.toHexString(tagId[i] & 0xFF).toUpperCase();
         }
+
         MifareClassic mfc = MifareClassic.get(tag);
 
         try {
             mfc.connect();
-            byte[][] pDatas=new byte[20][16];
+            byte[][] pDatas = new byte[20][16];
             int block;
-            for(int i=0;i<5;i++){
-                if(mfc.authenticateSectorWithKeyA(i, MifareClassic.KEY_DEFAULT)){
-
-                }else{
-                setFailedResultText("票劵錯誤\n票卡讀取失敗!");
-                reading=false;
-                return;
-                }
-            }
-            for(int i=0;i<5;i++){
-                    for(int j=0;j<4;j++){
-                        block=i*4+j;
-                        if(block==0 || block==7 || block==11 || block==15 || block==19){
+            for (int i = 0; i < 5; i++) {
+                if (mfc.authenticateSectorWithKeyA(i, MifareClassic.KEY_DEFAULT)) {
+                    for (int j = 0; j < 4; j++) {
+                        block = i * 4 + j;
+                        if (block == 0 || block == 7 || block == 11 || block == 15 || block == 19) {
                             continue;
                         }
-                        pDatas[block]=mfc.readBlock(block);
+                        pDatas[block] = mfc.readBlock(block);
                     }
+                } else {
+
+                }
             }
             //if (mfc.authenticateSectorWithKeyA(0, MifareClassic.KEY_DEFAULT)) {
-                //讀取卡別資訊
-                pData = pDatas[1];
-                BlockInfo.bCardType = pData[0];
+            //讀取卡別資訊
+            pData = pDatas[1];
+            BlockInfo.bCardType = pData[0];
 
-                if (pData[0] == (byte) 0xFC || pData[0] == (byte) 0xFD) { //服務證與臨時證
-                    iBlockCount = 1; //僅讀取Block4
-                } else if (pData[0] >= 0x01 && pData[0] <= 0x0F) { //參觀證或其他
-                    iBlockCount = pData[0];
-                    if (iBlockCount > 15 || iBlockCount == 0) {//區塊超出範圍
-                        setFailedResultText("票劵錯誤\n無效票卡!");
-                    }
+            if (pData[0] == (byte) 0xFC || pData[0] == (byte) 0xFD) { //服務證與臨時證
+                iBlockCount = 1; //僅讀取Block4
+            } else if (pData[0] >= 0x01 && pData[0] <= 0x0F) { //參觀證或其他
+                iBlockCount = pData[0];
+                if (iBlockCount > 15 || iBlockCount == 0) {//區塊超出範圍
+                    setFailedResultText("票劵錯誤\n無效票卡!");
                 }
+            }
 
                 /*for (int iBlock = 4; iBlock < iBlockCount + 4; iBlock++) {
                     //避開 security block
@@ -435,247 +428,247 @@ public class OfflineTickets extends Activity {
                     }
                 }*/
 
-                for (int iBlock = 4; iBlock < iBlockCount + 4; iBlock++) {
-                    //避開 security block
-                    if (iBlock == 7 || iBlock == 11 || iBlock == 15 || iBlock == 19) {
-                        iBlockCount++;
-                        continue;
-                    }
-                    //if (mfc.authenticateSectorWithKeyA(iBlock / 4, MifareClassic.KEY_DEFAULT)) {
-                    pData = pDatas[iBlock];
-                    RFData = RFData + getHexToString(byte2hex(pData));
-
-                    if (BlockInfo.bCardType == (byte) 0xFC || BlockInfo.bCardType == (byte) 0xFD) //定義第四區格式
-                    {
-                        try {
-                            System.arraycopy(pData, 0, BlockInfo.bStartDate, 0, 3);
-                            System.arraycopy(pData, 3, BlockInfo.bEndDate, 0, 3);
-                            System.arraycopy(pData, 6, BlockInfo.bCardID, 0, 8);
-                        } catch (Exception e) {
-                            WriteLog.appendLog("OnlineTickets.java/DownloadDeviceSetup/Exception:" + e.toString());
-                        }
-                    }
-                    //}
+            for (int iBlock = 4; iBlock < iBlockCount + 4; iBlock++) {
+                //避開 security block
+                if (iBlock == 7 || iBlock == 11 || iBlock == 15 || iBlock == 19) {
+                    iBlockCount++;
+                    continue;
                 }
+                //if (mfc.authenticateSectorWithKeyA(iBlock / 4, MifareClassic.KEY_DEFAULT)) {
+                pData = pDatas[iBlock];
+                RFData = RFData + getHexToString(byte2hex(pData));
 
-                ary = RFData.split("@",-1);
+                if (BlockInfo.bCardType == (byte) 0xFC || BlockInfo.bCardType == (byte) 0xFD) //定義第四區格式
+                {
+                    try {
+                        System.arraycopy(pData, 0, BlockInfo.bStartDate, 0, 3);
+                        System.arraycopy(pData, 3, BlockInfo.bEndDate, 0, 3);
+                        System.arraycopy(pData, 6, BlockInfo.bCardID, 0, 8);
+                    } catch (Exception e) {
+                        WriteLog.appendLog("OnlineTickets.java/DownloadDeviceSetup/Exception:" + e.toString());
+                    }
+                }
+                //}
+            }
 
-                if (BlockInfo.bCardType == (byte) 0xFC || BlockInfo.bCardType == (byte) 0xFD) {
-                    //判斷當前是否允許服務證驗證
-                    //if (!xmlHelper.ReadValue("WorkType").equals("W")) {
-                    if (!(1 == 1)) {
-                        setFailedResultText("票劵錯誤\n不允許服務證驗證!");
-                    } else {
-                        if (BlockInfo.bCardType == (byte) 0xFD) { //服務證
-                            if (BlockInfo.bCardID[0] == 'A' || BlockInfo.bCardID[0] == 'G' || BlockInfo.bCardID[0] == 'N') {
-                                strCardName = "服務證";
-                            } else {
-                                setFailedResultText("票劵錯誤\n無效服務證!");
-                            }
-                        }
-                        if (BlockInfo.bCardType == (byte) 0xFC) { //臨時證
-                            if ((BlockInfo.bCardID[0] == 'A' || BlockInfo.bCardID[0] == 'G' || BlockInfo.bCardID[0] == 'N') &&
-                                    (BlockInfo.bCardID[1] == 'D' || BlockInfo.bCardID[1] == 'D' || BlockInfo.bCardID[1] == 'D')) {
-                                strCardName = "臨時證";
-                            } else {
-                                setFailedResultText("票劵錯誤\n無效臨時證!");
-                            }
-                        }
-                        try {
-                            //轉換ASCII to ANSI
-                            strCardID = new String(BlockInfo.bCardID, "UTF-8");
-                            strStartDate = String.format("%04d", 2000 + (BlockInfo.bStartDate[0] & 0xFF)) + String.format("%02d", BlockInfo.bStartDate[1] & 0xFF) + String.format("%02d", BlockInfo.bStartDate[2] & 0xFF);
-                            strEndDate = String.format("%04d", 2000 + (BlockInfo.bEndDate[0] & 0xFF)) + String.format("%02d", BlockInfo.bEndDate[1] & 0xFF) + String.format("%02d", BlockInfo.bEndDate[2] & 0xFF);
-                            int iStartDay, iEndDay;
-                            iStartDay = Integer.parseInt(strNowDate) - Integer.parseInt(strStartDate);
-                            iEndDay = Integer.parseInt(strNowDate) - Integer.parseInt(strEndDate);
-                            //判斷當前時間與有效時間
-                            if ((iStartDay < 0 || iEndDay > 0) && (inRBtn.isChecked() ? "I" : "O").equals("I")) {
-                                setFailedResultText("票劵錯誤\n逾期票卡!");
-                                saveworkdate(tagNo, (inRBtn.isChecked() ? "I" : "O"), strCardID, xmlHelper.ReadValue("NameCode"), "C");
-                            } else {//證別有效時間正確即可
-                                setSucceedResultText("票券狀態    驗票成功\n票券身分    " + strCardName + (inRBtn.isChecked() ? "\n票券入場紀錄\n" : "\n票券出場紀錄\n") + getDateTime3());
-                                saveworkdate(tagNo, (inRBtn.isChecked() ? "I" : "O"), strCardID, xmlHelper.ReadValue("NameCode"), "A");
-                                RFData = "";
-                            }
-                        } catch (Exception ex) {
-                            setFailedResultText("票劵錯誤\n請重新確認!");
+            ary = RFData.split("@", -1);
+
+            if (BlockInfo.bCardType == (byte) 0xFC || BlockInfo.bCardType == (byte) 0xFD) {
+                //判斷當前是否允許服務證驗證
+                //if (!xmlHelper.ReadValue("WorkType").equals("W")) {
+                if (!(1 == 1)) {
+                    setFailedResultText("票劵錯誤\n不允許服務證驗證!");
+                } else {
+                    if (BlockInfo.bCardType == (byte) 0xFD) { //服務證
+                        if (BlockInfo.bCardID[0] == 'A' || BlockInfo.bCardID[0] == 'G' || BlockInfo.bCardID[0] == 'N') {
+                            strCardName = "服務證";
+                        } else {
+                            setFailedResultText("票劵錯誤\n無效服務證!");
                         }
                     }
-                } else {
-                    if (ary.length == 17) {
-                        if (!ary[1].trim().contains(EL)) {
-                            setFailedResultText("票劵錯誤\n展覽代號不符合!");
-                            savedate(tagNo.trim(), false, ary, "C");
+                    if (BlockInfo.bCardType == (byte) 0xFC) { //臨時證
+                        if ((BlockInfo.bCardID[0] == 'A' || BlockInfo.bCardID[0] == 'G' || BlockInfo.bCardID[0] == 'N') &&
+                                (BlockInfo.bCardID[1] == 'D' || BlockInfo.bCardID[1] == 'D' || BlockInfo.bCardID[1] == 'D')) {
+                            strCardName = "臨時證";
                         } else {
-                            //離線狀態下出場規則
-                            if ((inRBtn.isChecked() ? "I" : "O").equals("O")) {
-                                savedate(tagNo.trim(), false, ary, "A");
-                                tickCheck();
-                                reading=false;
-                                return;
-                            }
-
-                            int iTotalINTime = 0, iTotalToDayINTime = 0;
-
-                            //入場日期判斷
-                            if (ary[3].trim().equals("A")) {//不限制入場日期
-                                //直接進入下一回合
-                            } else if (ary[3].trim().equals("B")) {//起始日期與截止日期相同(與系統日期)
-                                if (ary[4].trim().equals("") || ary[5].trim().equals("")) {
-                                    setFailedResultText("票劵錯誤\n無效票卡!");
-                                    savedate(tagNo.trim(), false, ary, "C");
-                                    reading=false;
-                                    return;
-                                }
-
-                                if (!ary[4].trim().equals(ary[5].trim())) {
-                                    setFailedResultText("票劵錯誤\n票券已過期!");
-                                    savedate(tagNo.trim(), false, ary, "C");
-                                    reading=false;
-                                    return;
-                                } else {
-                                    if (!ary[4].trim().equals(strNowDate)) {
-                                        setFailedResultText("票劵錯誤\n票券已過期!");
-                                        savedate(tagNo.trim(), false, ary, "C");
-                                        reading=false;
-                                        return;
-                                    }
-                                }
-                            } else if (ary[3].trim().equals("C")) {//依據起始日期與截止日期判斷
-                                if (ary[4].trim().equals("") || ary[5].trim().equals("")) {
-                                    setFailedResultText("票劵錯誤\n無效票卡!");
-                                    savedate(tagNo.trim(), false, ary, "C");
-                                    reading=false;
-                                    return;
-                                }
-
-                                int iStartDay = 0, iEndDay = 0;
-                                iStartDay = Integer.parseInt(strNowDate) - Integer.parseInt(ary[4]);
-                                iEndDay = Integer.parseInt(strNowDate) - Integer.parseInt(ary[5]);
-
-                                if (iStartDay < 0) {
-                                    setFailedResultText("票劵錯誤\n未到入場時間!");
-                                    savedate(tagNo.trim(), false, ary, "C");
-                                    reading=false;
-                                    return;
-                                } else if (iEndDay > 0) {
-                                    setFailedResultText("票劵錯誤\n票券已過期!");
-                                    savedate(tagNo.trim(), false, ary, "C");
-                                    reading=false;
-                                    return;
-                                }
-                            } else {
-                                setFailedResultText("票劵錯誤\n無效票卡!");
-                                savedate(tagNo.trim(), false, ary, "C");
-                                reading=false;
-                                return;
-                            }
-                            //入場時段判斷
-                            if (ary[6].trim().equals("A")) {
-                                //直接再進入下一回合
-                            } else if (ary[6].trim().equals("B")) {
-                                //判斷是否為空值
-                                if (ary[7].trim().equals("") || ary[8].trim().equals("")) {
-                                    setFailedResultText("票劵錯誤\n無效票卡!");
-                                    savedate(tagNo.trim(), false, ary, "C");
-                                    reading=false;
-                                    return;
-                                }
-                                if ((Integer.parseInt(ary[7].substring(0, 2)) > Integer.parseInt(strNowTime.substring(0, 2))) ||
-                                        (Integer.parseInt(ary[7].substring(0, 2)) == Integer.parseInt(strNowTime.substring(0, 2)) &&
-                                                Integer.parseInt(ary[7].substring(2)) > Integer.parseInt(strNowTime.substring(2)))) {
-                                    setFailedResultText("票劵錯誤\n未到入場時間!");
-                                    savedate(tagNo.trim(), false, ary, "C");
-                                    reading=false;
-                                    return;
-                                } else if ((Integer.parseInt(ary[8].substring(0, 2)) < Integer.parseInt(strNowTime.substring(0, 2))) ||
-                                        (Integer.parseInt(ary[8].substring(0, 2)) == Integer.parseInt(strNowTime.substring(0, 2)) &&
-                                                Integer.parseInt(ary[8].substring(2)) < Integer.parseInt(strNowTime.substring(2)))) {
-                                    setFailedResultText("票劵錯誤\n票券已過期!");
-                                    savedate(tagNo.trim(), false, ary, "C");
-                                    reading=false;
-                                    return;
-                                }
-                            } else {
-                                setFailedResultText("票劵錯誤\n無效票卡!");
-                                savedate(tagNo.trim(), false, ary, "C");
-                                reading=false;
-                                return;
-                            }
-
-                            if (ary[9].length() % 2 != 0) //入場展區必為偶數
-                            {
-                                setFailedResultText("票劵錯誤\n無效票卡!");
-                                savedate(tagNo.trim(), false, ary, "C");
-                                reading=false;
-                                return;
-                            }
-
-                            //先取得相關資料
-                            iTotalINTime = mydbHelper.GetLoginCount(ary[0].trim(), "");
-                            iTotalToDayINTime = mydbHelper.GetLoginCount(ary[0].trim(), strNowDate);
-
-                            if (ary[10].trim().equals("0")) {//入場次數不限制
-                                //直接再進入下一回合
-                            } else if (ary[10].trim().equals("1") || ary[10].trim().equals("3")) { //限制總入場次數
-
-                                if (Integer.parseInt(ary[11].trim()) < iTotalINTime) {
-                                    setFailedResultText("票劵錯誤\n票劵已達使用上限!");
-                                    savedate(tagNo.trim(), false, ary, "C");
-                                    reading=false;
-                                    return;
-                                }
-                            } else if (ary[10].trim().equals("2") || ary[10].trim().equals("3")) { //限制當日入場次數
-
-                                if (Integer.parseInt(ary[12].trim()) < iTotalToDayINTime) {
-                                    setFailedResultText("票劵錯誤\n票劵已達使用上限!");
-                                    savedate(tagNo.trim(), false, ary, "C");
-                                    reading=false;
-                                    return;
-                                }
-                            } else {//入場時間型態錯誤
-                                setFailedResultText("票劵錯誤\n無效票卡!");
-                                savedate(tagNo.trim(), false, ary, "C");
-                                reading=false;
-                                return;
-                            }
-
-                            if (ary[14].trim().equals("Y"))//判斷是否已停用
-                            {
-                                setFailedResultText("票劵錯誤\n票劵已停用!");
-                                savedate(tagNo.trim(), false, ary, "C");
-                                reading=false;
-                                return;
-                            } else if (ary[14].trim().equals("")) {
-                                setFailedResultText("票劵錯誤\n無效票卡!");
-                                savedate(tagNo.trim(), false, ary, "C");
-                                reading=false;
-                                return;
-                            }
-
-                            //進場
+                            setFailedResultText("票劵錯誤\n無效臨時證!");
+                        }
+                    }
+                    try {
+                        //轉換ASCII to ANSI
+                        strCardID = new String(BlockInfo.bCardID, "UTF-8");
+                        strStartDate = String.format("%04d", 2000 + (BlockInfo.bStartDate[0] & 0xFF)) + String.format("%02d", BlockInfo.bStartDate[1] & 0xFF) + String.format("%02d", BlockInfo.bStartDate[2] & 0xFF);
+                        strEndDate = String.format("%04d", 2000 + (BlockInfo.bEndDate[0] & 0xFF)) + String.format("%02d", BlockInfo.bEndDate[1] & 0xFF) + String.format("%02d", BlockInfo.bEndDate[2] & 0xFF);
+                        int iStartDay, iEndDay;
+                        iStartDay = Integer.parseInt(strNowDate) - Integer.parseInt(strStartDate);
+                        iEndDay = Integer.parseInt(strNowDate) - Integer.parseInt(strEndDate);
+                        //判斷當前時間與有效時間
+                        if ((iStartDay < 0 || iEndDay > 0) && (inRBtn.isChecked() ? "I" : "O").equals("I")) {
+                            setFailedResultText("票劵錯誤\n逾期票卡!");
+                            saveworkdate(tagNo, (inRBtn.isChecked() ? "I" : "O"), strCardID, xmlHelper.ReadValue("NameCode"), "C");
+                        } else {//證別有效時間正確即可
+                            setSucceedResultText("票券狀態    驗票成功\n票券身分    " + strCardName + (inRBtn.isChecked() ? "\n票券入場紀錄\n" : "\n票券出場紀錄\n") + getDateTime3());
+                            saveworkdate(tagNo, (inRBtn.isChecked() ? "I" : "O"), strCardID, xmlHelper.ReadValue("NameCode"), "A");
+                            RFData = "";
+                        }
+                    } catch (Exception ex) {
+                        setFailedResultText("票劵錯誤\n請重新確認!");
+                    }
+                }
+            } else {
+                if (ary.length == 17) {
+                    if (!ary[1].trim().contains(EL)) {
+                        setFailedResultText("票劵錯誤\n展覽代號不符合!");
+                        savedate(tagNo.trim(), false, ary, "C");
+                    } else {
+                        //離線狀態下出場規則
+                        if ((inRBtn.isChecked() ? "I" : "O").equals("O")) {
                             savedate(tagNo.trim(), false, ary, "A");
                             tickCheck();
+                            reading = false;
+                            return;
                         }
-                        RFData = "";
-                    } else {
-                        setFailedResultText("票劵錯誤\n無效票卡!"+ary.length);
+
+                        int iTotalINTime = 0, iTotalToDayINTime = 0;
+
+                        //入場日期判斷
+                        if (ary[3].trim().equals("A")) {//不限制入場日期
+                            //直接進入下一回合
+                        } else if (ary[3].trim().equals("B")) {//起始日期與截止日期相同(與系統日期)
+                            if (ary[4].trim().equals("") || ary[5].trim().equals("")) {
+                                setFailedResultText("票劵錯誤\n無效票卡!");
+                                savedate(tagNo.trim(), false, ary, "C");
+                                reading = false;
+                                return;
+                            }
+
+                            if (!ary[4].trim().equals(ary[5].trim())) {
+                                setFailedResultText("票劵錯誤\n票券已過期!");
+                                savedate(tagNo.trim(), false, ary, "C");
+                                reading = false;
+                                return;
+                            } else {
+                                if (!ary[4].trim().equals(strNowDate)) {
+                                    setFailedResultText("票劵錯誤\n票券已過期!");
+                                    savedate(tagNo.trim(), false, ary, "C");
+                                    reading = false;
+                                    return;
+                                }
+                            }
+                        } else if (ary[3].trim().equals("C")) {//依據起始日期與截止日期判斷
+                            if (ary[4].trim().equals("") || ary[5].trim().equals("")) {
+                                setFailedResultText("票劵錯誤\n無效票卡!");
+                                savedate(tagNo.trim(), false, ary, "C");
+                                reading = false;
+                                return;
+                            }
+
+                            int iStartDay = 0, iEndDay = 0;
+                            iStartDay = Integer.parseInt(strNowDate) - Integer.parseInt(ary[4]);
+                            iEndDay = Integer.parseInt(strNowDate) - Integer.parseInt(ary[5]);
+
+                            if (iStartDay < 0) {
+                                setFailedResultText("票劵錯誤\n未到入場時間!");
+                                savedate(tagNo.trim(), false, ary, "C");
+                                reading = false;
+                                return;
+                            } else if (iEndDay > 0) {
+                                setFailedResultText("票劵錯誤\n票券已過期!");
+                                savedate(tagNo.trim(), false, ary, "C");
+                                reading = false;
+                                return;
+                            }
+                        } else {
+                            setFailedResultText("票劵錯誤\n無效票卡!");
+                            savedate(tagNo.trim(), false, ary, "C");
+                            reading = false;
+                            return;
+                        }
+                        //入場時段判斷
+                        if (ary[6].trim().equals("A")) {
+                            //直接再進入下一回合
+                        } else if (ary[6].trim().equals("B")) {
+                            //判斷是否為空值
+                            if (ary[7].trim().equals("") || ary[8].trim().equals("")) {
+                                setFailedResultText("票劵錯誤\n無效票卡!");
+                                savedate(tagNo.trim(), false, ary, "C");
+                                reading = false;
+                                return;
+                            }
+                            if ((Integer.parseInt(ary[7].substring(0, 2)) > Integer.parseInt(strNowTime.substring(0, 2))) ||
+                                    (Integer.parseInt(ary[7].substring(0, 2)) == Integer.parseInt(strNowTime.substring(0, 2)) &&
+                                            Integer.parseInt(ary[7].substring(2)) > Integer.parseInt(strNowTime.substring(2)))) {
+                                setFailedResultText("票劵錯誤\n未到入場時間!");
+                                savedate(tagNo.trim(), false, ary, "C");
+                                reading = false;
+                                return;
+                            } else if ((Integer.parseInt(ary[8].substring(0, 2)) < Integer.parseInt(strNowTime.substring(0, 2))) ||
+                                    (Integer.parseInt(ary[8].substring(0, 2)) == Integer.parseInt(strNowTime.substring(0, 2)) &&
+                                            Integer.parseInt(ary[8].substring(2)) < Integer.parseInt(strNowTime.substring(2)))) {
+                                setFailedResultText("票劵錯誤\n票券已過期!");
+                                savedate(tagNo.trim(), false, ary, "C");
+                                reading = false;
+                                return;
+                            }
+                        } else {
+                            setFailedResultText("票劵錯誤\n無效票卡!");
+                            savedate(tagNo.trim(), false, ary, "C");
+                            reading = false;
+                            return;
+                        }
+
+                        if (ary[9].length() % 2 != 0) //入場展區必為偶數
+                        {
+                            setFailedResultText("票劵錯誤\n無效票卡!");
+                            savedate(tagNo.trim(), false, ary, "C");
+                            reading = false;
+                            return;
+                        }
+
+                        //先取得相關資料
+                        iTotalINTime = mydbHelper.GetLoginCount(ary[0].trim(), "");
+                        iTotalToDayINTime = mydbHelper.GetLoginCount(ary[0].trim(), strNowDate);
+
+                        if (ary[10].trim().equals("0")) {//入場次數不限制
+                            //直接再進入下一回合
+                        } else if (ary[10].trim().equals("1") || ary[10].trim().equals("3")) { //限制總入場次數
+
+                            if (Integer.parseInt(ary[11].trim()) < iTotalINTime) {
+                                setFailedResultText("票劵錯誤\n票劵已達使用上限!");
+                                savedate(tagNo.trim(), false, ary, "C");
+                                reading = false;
+                                return;
+                            }
+                        } else if (ary[10].trim().equals("2") || ary[10].trim().equals("3")) { //限制當日入場次數
+
+                            if (Integer.parseInt(ary[12].trim()) < iTotalToDayINTime) {
+                                setFailedResultText("票劵錯誤\n票劵已達使用上限!");
+                                savedate(tagNo.trim(), false, ary, "C");
+                                reading = false;
+                                return;
+                            }
+                        } else {//入場時間型態錯誤
+                            setFailedResultText("票劵錯誤\n無效票卡!");
+                            savedate(tagNo.trim(), false, ary, "C");
+                            reading = false;
+                            return;
+                        }
+
+                        if (ary[14].trim().equals("Y"))//判斷是否已停用
+                        {
+                            setFailedResultText("票劵錯誤\n票劵已停用!");
+                            savedate(tagNo.trim(), false, ary, "C");
+                            reading = false;
+                            return;
+                        } else if (ary[14].trim().equals("")) {
+                            setFailedResultText("票劵錯誤\n無效票卡!");
+                            savedate(tagNo.trim(), false, ary, "C");
+                            reading = false;
+                            return;
+                        }
+
+                        //進場
+                        savedate(tagNo.trim(), false, ary, "A");
+                        tickCheck();
                     }
+                    RFData = "";
+                } else {
+                    setFailedResultText("票劵錯誤\n無效票卡!" + ary.length);
                 }
-                reading=false;
+            }
+            reading = false;
             //} else { // Authentication failed - Handle it
             //    setFailedResultText("票劵錯誤\n票卡讀取失敗!");
             //    reading=false;
             //}
         } catch (IOException ex) {
-            if(ex.toString().contains("lost")){
+            if (ex.toString().contains("lost")) {
                 setFailedResultText("票劵錯誤\n請重新感應!");
-            }else{
+            } else {
                 setFailedResultText("票劵錯誤\n無效票卡!");
             }
             WriteLog.appendLog("OfflineTickets.java/ticket/Exception:" + ex.toString());
-            reading=false;
+            reading = false;
         }
     }
 
@@ -736,9 +729,9 @@ public class OfflineTickets extends Activity {
             for (String strKey : sQRPWDItem) {
                 newKey = MakeKeyLen32(strKey);
                 byte[] descryptBytes = DecryptAES256(newKey.getBytes("UTF-8"), iv.getBytes("UTF-8"), Base64.decode(_PacketData, Base64.DEFAULT));
-                if(descryptBytes!=null){
+                if (descryptBytes != null) {
                     String descryptResult = new String(descryptBytes);
-                    if(descryptResult.contains("@")){
+                    if (descryptResult.contains("@")) {
                         if (descryptResult.split("@", -1).length == 17) {
                             strDecod = descryptResult;
                             break;
@@ -831,15 +824,14 @@ public class OfflineTickets extends Activity {
     }
 
 
-
     //票券狀態文字
     private void setResultText(String text) {
-    //    resultTxt.setText(text);
+        //    resultTxt.setText(text);
     }
 
     //票券狀態文字
     private void setResultText2(String text) {
-    //    resultTxt2.setText(text);
+        //    resultTxt2.setText(text);
     }
 
     //取得現在時間

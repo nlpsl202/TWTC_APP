@@ -13,7 +13,7 @@
         android:orientation="horizontal">
 
         <RadioButton
-            android:id="@+id/InRBtn"
+            android:id="@+id/inRBtn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="20dp"
@@ -22,7 +22,7 @@
             android:textSize="20dp"/>
 
         <RadioButton
-            android:id="@+id/OutRBtn"
+            android:id="@+id/outRBtn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="90dp"
@@ -44,40 +44,37 @@
             android:id="@+id/wifiLayout"
             android:layout_width="280dp"
             android:layout_height="280dp"
-            android:layout_marginTop="50dp"
-            android:orientation="horizontal"
+            android:layout_marginTop="25dp"
+            android:orientation="vertical"
             android:layout_gravity="center">
 
+            <ImageView
+                android:id="@+id/resultImage"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:layout_gravity="center_horizontal"
+                android:src="@drawable/ticket_success"/>
+
             <TextView
-                android:id="@+id/ResultTxt"
+                android:id="@+id/succeedResultTxt"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="20dp"
                 android:textColor="#000000"
-                android:textSize="25dp" />
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="10dp"
+                android:textSize="20dp"
+                android:lineSpacingExtra="10dp" />
 
-            <LinearLayout
-                android:id="@+id/FailedLayout"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical"
-                android:visibility="gone">
-
-                <ImageView
-                    android:id="@+id/failedImage"
-                    android:layout_width="245.7px"
-                    android:layout_height="66.4px"
-                    android:src="@drawable/ticket_failed" />
-
-                <TextView
-                    android:id="@+id/ResultTxt2"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="#FF0000"
-                    android:layout_marginTop="10dp"
-                    android:textSize="23dp" />
-
-            </LinearLayout>
+            <TextView
+                android:id="@+id/failedResultTxt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#ff0000"
+                android:layout_gravity="center_horizontal"
+                android:gravity="center"
+                android:layout_marginTop="40dp"
+                android:textSize="20dp"
+                android:lineSpacingExtra="10dp" />
 
         </LinearLayout>
 
@@ -88,7 +85,7 @@
             android:orientation="horizontal">
 
             <ImageView
-                android:id="@+id/FtPhotoImage"
+                android:id="@+id/photoImage"
                 android:layout_width="130dp"
                 android:layout_height="150dp"
                 android:layout_marginLeft="40dp"
@@ -97,27 +94,27 @@
                 android:background="@drawable/image_border"/>
 
             <TextView
-                android:id="@+id/ResultTxt3"
+                android:id="@+id/photoTxt"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="10dp"
+                android:layout_marginLeft="12dp"
                 android:layout_gravity="right|center"
                 android:textColor="#000000"
-                android:textSize="15dp" />
+                android:textSize="17dp" />
 
         </LinearLayout>
 
     </LinearLayout>
 
     <RelativeLayout
-        android:id="@+id/ReturnLayout"
+        android:id="@+id/returnLayout"
         android:layout_width="match_parent"
         android:layout_height="62dp"
         android:layout_alignParentBottom="true"
         android:background="@drawable/bottom_background">
 
         <Button
-            android:id="@+id/ReturnBtn"
+            android:id="@+id/returnBtn"
             android:layout_width="208px"
             android:layout_height="73px"
             android:layout_alignParentLeft="true"
@@ -126,7 +123,7 @@
             android:background="@drawable/lastpage_btn_selector" />
 
         <Button
-            android:id="@+id/NextBtn"
+            android:id="@+id/nextBtn"
             android:layout_width="208px"
             android:layout_height="73px"
             android:layout_alignParentRight="true"
@@ -137,7 +134,7 @@
     </RelativeLayout>
 
     <Button
-        android:id="@+id/HomeBtn"
+        android:id="@+id/homeBtn"
         android:layout_width="159px"
         android:layout_height="159px"
         android:background="@drawable/home_btn_selector"
