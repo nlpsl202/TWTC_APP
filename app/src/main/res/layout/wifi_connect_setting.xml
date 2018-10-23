@@ -5,7 +5,7 @@
     android:background="@drawable/wifi_connect_setting_background">
 
     <EditText
-        android:id="@+id/SSID"
+        android:id="@+id/deviceID"
         android:layout_width="772px"
         android:layout_height="196px"
         android:background="@drawable/bluetooth_connect_setting_edittext"
@@ -14,16 +14,40 @@
         android:singleLine="true"
         android:paddingLeft="40dp"/>
 
-    <Button
-        android:id="@+id/ConnectBtn"
-        android:layout_width="896.4px"
-        android:layout_height="310.5px"
-        android:background="@drawable/bluetooth_connect_setting_yes_btn_selector"
-        android:layout_marginTop="450px"
-        android:layout_centerHorizontal="true"/>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="600px"
+        android:orientation="vertical">
+
+        <Button
+            android:id="@+id/ConnectBtn"
+            android:layout_width="568px"
+            android:layout_height="117px"
+            android:background="@drawable/wifi_connect_setting_btn_1_selector"
+            android:layout_gravity="center_horizontal"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="25px"
+            android:text="or"
+            android:textSize="30dp"
+            android:textColor="#02426d"
+            android:gravity="center"
+            android:layout_gravity="center_horizontal"/>
+
+        <Button
+            android:id="@+id/ConnectBtn2"
+            android:layout_width="568px"
+            android:layout_height="117px"
+            android:background="@drawable/wifi_connect_setting_btn_2_selector"
+            android:layout_marginTop="25px"
+            android:layout_gravity="center_horizontal"/>
+
+    </LinearLayout>
 
     <RelativeLayout
-        android:id="@+id/ReturnLayout"
         android:layout_width="match_parent"
         android:layout_height="62dp"
         android:layout_alignParentBottom="true"
@@ -50,8 +74,8 @@
     </RelativeLayout>
 
     <Button
-        android:id="@+id/HomeBtn"
-        android:layout_width="159px"
+        android:id="@+id/homeBtn"
+        android:layout_width="180px"
         android:layout_height="159px"
         android:background="@drawable/home_btn_selector"
         android:layout_centerHorizontal="true"

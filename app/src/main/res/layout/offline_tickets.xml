@@ -13,7 +13,7 @@
         android:orientation="horizontal">
 
         <RadioButton
-            android:id="@+id/InRBtn"
+            android:id="@+id/inRBtn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="20dp"
@@ -22,7 +22,7 @@
             android:textSize="20dp"/>
 
         <RadioButton
-            android:id="@+id/OutRBtn"
+            android:id="@+id/outRBtn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="90dp"
@@ -41,7 +41,7 @@
         android:layout_marginTop="220dp">
 
         <LinearLayout
-            android:id="@+id/wifiLayout"
+            android:id="@+id/resultLayout"
             android:layout_width="280dp"
             android:layout_height="280dp"
             android:layout_marginTop="25dp"
@@ -50,12 +50,115 @@
 
             <ImageView
                 android:id="@+id/resultImage"
-                android:layout_width="100dp"
-                android:layout_height="100dp"
+                android:layout_width="120dp"
+                android:layout_height="120dp"
                 android:layout_gravity="center_horizontal"
                 android:src="@drawable/ticket_success"/>
 
-            <TextView
+            <LinearLayout
+                android:id="@+id/succeedLayout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/textView1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="票券狀態"
+                        android:textColor="#000000"
+                        android:layout_marginLeft="45dp"
+                        android:textSize="20dp" />
+
+                    <TextView
+                        android:id="@+id/stateTxt"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="#000000"
+                        android:layout_marginLeft="20dp"
+                        android:textSize="20dp" />
+
+                </LinearLayout>
+
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="5dp">
+
+                    <TextView
+                        android:id="@+id/textView2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="票券身分"
+                        android:textColor="#000000"
+                        android:layout_marginLeft="45dp"
+                        android:textSize="20dp" />
+
+                    <TextView
+                        android:id="@+id/allowTxt"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="#000000"
+                        android:layout_marginLeft="20dp"
+                        android:textSize="20dp" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/nameLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="5dp">
+
+                    <TextView
+                        android:id="@+id/textView3"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="票券名稱"
+                        android:textColor="#000000"
+                        android:layout_marginLeft="45dp"
+                        android:textSize="20dp" />
+
+
+                    <TextView
+                        android:id="@+id/nameTxt"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="#000000"
+                        android:layout_marginLeft="20dp"
+                        android:textSize="20dp" />
+
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/inoutTxt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="票券入場紀錄"
+                    android:textColor="#000000"
+                    android:textSize="20dp"
+                    android:layout_marginLeft="45dp"
+                    android:layout_marginTop="5dp" />
+
+                <TextView
+                    android:id="@+id/datetimeTxt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="#000000"
+                    android:textSize="20dp"
+                    android:layout_marginLeft="45dp" />
+
+            </LinearLayout>
+
+            <!--<TextView
                 android:id="@+id/succeedResultTxt"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -63,7 +166,7 @@
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="10dp"
                 android:textSize="20dp"
-                android:lineSpacingExtra="10dp" />
+                android:lineSpacingExtra="10dp" />-->
 
             <TextView
                 android:id="@+id/failedResultTxt"
@@ -81,14 +184,13 @@
     </LinearLayout>
 
     <RelativeLayout
-        android:id="@+id/ReturnLayout"
         android:layout_width="match_parent"
         android:layout_height="62dp"
         android:layout_alignParentBottom="true"
         android:background="@drawable/bottom_background">
 
         <Button
-            android:id="@+id/ReturnBtn"
+            android:id="@+id/returnBtn"
             android:layout_width="208px"
             android:layout_height="73px"
             android:layout_alignParentLeft="true"
@@ -97,7 +199,7 @@
             android:background="@drawable/lastpage_btn_selector" />
 
         <Button
-            android:id="@+id/NextBtn"
+            android:id="@+id/nextBtn"
             android:layout_width="208px"
             android:layout_height="73px"
             android:layout_alignParentRight="true"
@@ -108,8 +210,8 @@
     </RelativeLayout>
 
     <Button
-        android:id="@+id/HomeBtn"
-        android:layout_width="159px"
+        android:id="@+id/homeBtn"
+        android:layout_width="180px"
         android:layout_height="159px"
         android:background="@drawable/home_btn_selector"
         android:layout_centerHorizontal="true"

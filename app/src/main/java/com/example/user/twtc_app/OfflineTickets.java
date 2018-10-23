@@ -10,13 +10,17 @@ import android.nfc.NfcAdapter;
 import android.nfc.Tag;
 import android.nfc.tech.MifareClassic;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.HandlerThread;
 import android.os.Vibrator;
 import android.util.Base64;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -35,14 +39,18 @@ import javax.crypto.spec.SecretKeySpec;
  * Created by Jeff.
  */
 public class OfflineTickets extends Activity {
-    ImageView resultImage;
-    TextView succeedResultTxt, failedResultTxt;
-    RadioButton inRBtn, outRBtn;
-    Button returnBtn, homeBtn;
-    String result, DeviceID, strSQL, EL;
-    String[] ary;
-    String[] sQRPWDItem = new String[2];
+    private String DeviceID, strSQL, EL, IO;
+    private TextView stateTxt, allowTxt, nameTxt, datetimeTxt, inoutTxt, failedResultTxt, textView1, textView2, textView3;
+    private ImageView resultImage;
+    private RadioGroup radioGroup;
+    private RadioButton inRBtn, outRBtn;
+    private Button returnBtn, homeBtn;
+    private LinearLayout resultLayout, succeedLayout, nameLayout;
+    private String[] ary;
+    private String[] sQRPWDItem = new String[2];
     boolean reading = false;
+
+    int testi = 0;
 
     //剪貼簿
     ClipboardManager cbMgr;
@@ -55,6 +63,9 @@ public class OfflineTickets extends Activity {
     //RFID
     NfcAdapter mNfcAdapter;
     PendingIntent mPendingIntent;
+
+    private Handler mThreadHandler;
+    private HandlerThread mThread;
 
     private class RFIDBlock4Info {
         public byte bCardType;
@@ -88,49 +99,67 @@ public class OfflineTickets extends Activity {
         }*/
 
         resultImage = (ImageView) findViewById(R.id.resultImage);
-        returnBtn = (Button) findViewById(R.id.ReturnBtn);
-        homeBtn = (Button) findViewById(R.id.HomeBtn);
-        succeedResultTxt = (TextView) findViewById(R.id.succeedResultTxt);
+        inoutTxt = (TextView) findViewById(R.id.inoutTxt);
+        stateTxt = (TextView) findViewById(R.id.stateTxt);
+        allowTxt = (TextView) findViewById(R.id.allowTxt);
+        nameTxt = (TextView) findViewById(R.id.nameTxt);
+        datetimeTxt = (TextView) findViewById(R.id.datetimeTxt);
         failedResultTxt = (TextView) findViewById(R.id.failedResultTxt);
-        inRBtn = (RadioButton) findViewById(R.id.InRBtn);
-        outRBtn = (RadioButton) findViewById(R.id.InRBtn);
+        returnBtn = (Button) findViewById(R.id.returnBtn);
+        homeBtn = (Button) findViewById(R.id.homeBtn);
+        radioGroup = (RadioGroup) findViewById(R.id.InOutRG);
+        inRBtn = (RadioButton) findViewById(R.id.inRBtn);
+        outRBtn = (RadioButton) findViewById(R.id.outRBtn);
+        resultLayout = (LinearLayout) findViewById(R.id.resultLayout);
+        succeedLayout = (LinearLayout) findViewById(R.id.succeedLayout);
+        nameLayout = (LinearLayout) findViewById(R.id.nameLayout);
         cbMgr = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+        textView1 = (TextView) findViewById(R.id.textView1);
+        textView2 = (TextView) findViewById(R.id.textView2);
+        textView3 = (TextView) findViewById(R.id.textView3);
 
-        resultImage.setVisibility(View.GONE);
+        resultLayout.setVisibility(View.GONE);
         inRBtn.setChecked(true);
+        IO="I";
 
         sQRPWDItem[0] = xmlHelper.ReadValue("Key1");
         sQRPWDItem[1] = xmlHelper.ReadValue("Key2");
         EL = xmlHelper.ReadValue("NameCode");
         DeviceID = xmlHelper.ReadValue("MachineID");
 
+        mThread = new HandlerThread("connectWifi");
+        mThread.start();
+        mThreadHandler = new Handler(mThread.getLooper());
+
+        radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                if (checkedId == R.id.inRBtn) {
+                    IO = "I";
+                } else {
+                    IO = "O";
+                }
+            }
+        });
+
         //region 掃描事件
         mPrimaryClipChangedListener = new ClipboardManager.OnPrimaryClipChangedListener() {
             public void onPrimaryClipChanged() {
                 try {
                     setVibrate(100);
-                    resultImage.setVisibility(View.VISIBLE);
+                    if (resultLayout.getVisibility() == View.GONE) {
+                        resultLayout.setVisibility(View.VISIBLE);
+                    }
                     String qr = cbMgr.getPrimaryClip().getItemAt(0).getText().toString();
-                    /*if (qr.length() < 30) {
-                        resultImage.setImageResource(R.drawable.ticket_failed);
-                        setFailedResultText("票劵錯誤\n無效票卡!");
-                        return;
-                    }else{
-                        resultImage.setImageResource(R.drawable.ticket_success);
-                        setSucceedResultText("票券狀態    驗票成功\n票券身分    參觀證\n票券名稱    國外買主\n票券入場紀錄\n" + getDateTime3());
-                        return;
-                    }*/
                     String value = qr.substring(0, qr.length() - 16);
                     String iv = qr.substring(qr.length() - 16);
                     Calendar c = Calendar.getInstance();
                     SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd");
                     SimpleDateFormat df2 = new SimpleDateFormat("HHmm");
 
-                    //QRCode 狀態下不驗證服務證與工作證
+                    //服務證狀態下不驗證QRCODE
                     /*if (xmlHelper.ReadValue("WorkType").toUpperCase().equals("W")) {
-                        failedLayout.setVisibility(View.VISIBLE);
-                        setResultText(result = "票券狀態    ");
-                        setResultText2(result = "票劵錯誤，無效票卡!");
+                        setFailedResultText("票劵錯誤\n無效票卡!");
                         return;
                     }*/
 
@@ -157,8 +186,8 @@ public class OfflineTickets extends Activity {
                         } else {
                             //離線狀態下出場規則
                             if ((inRBtn.isChecked() ? "I" : "O").equals("O")) {
-                                savedate(ary[0].trim(), true, ary, "A");
                                 tickCheck();
+                                savedate(ary[0].trim(), true, ary, "A");
                                 return;
                             }
 
@@ -254,8 +283,8 @@ public class OfflineTickets extends Activity {
                             }
 
                             //進場
-                            savedate(ary[0].trim(), true, ary, "A");
                             tickCheck();
+                            savedate(ary[0].trim(), true, ary, "A");
                         }
                     } else {
                         setFailedResultText("票劵錯誤\n無效票卡!");
@@ -326,6 +355,18 @@ public class OfflineTickets extends Activity {
     @Override
     protected void onNewIntent(Intent intent) {
         getTagInfo(intent);
+        //testgetTagInfo(intent);
+    }
+
+    private void testgetTagInfo(Intent intent) {
+        resultLayout.setVisibility(View.VISIBLE);
+        if (testi == 0) {
+            setFailedResultText("票劵錯誤\n無效臨時證!");
+            testi = 1;
+        } else {
+            setSucceedResultText(true, "123");
+            testi = 0;
+        }
     }
 
     //RFID驗票
@@ -334,7 +375,11 @@ public class OfflineTickets extends Activity {
             return;
         }
         reading = true;
-        resultImage.setVisibility(View.VISIBLE);
+
+        if (resultLayout.getVisibility() == View.GONE) {
+            resultLayout.setVisibility(View.VISIBLE);
+        }
+
         String RFData = "";
         String tagNo = "";
         String strCardID = "", strStartDate = "", strEndDate = "", strCardName = "";
@@ -345,110 +390,63 @@ public class OfflineTickets extends Activity {
         String strNowTime = sdf2.format(date);
         int iBlockCount = 0;
         byte[] pData;
-
-        Tag tag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
-        byte[] tagId = tag.getId();
-        for (int i = 0; i < tagId.length; i++) {
-            if (Integer.toHexString(tagId[i] & 0xFF).length() < 2) {
-                tagNo += "0";
-            }
-            tagNo += Integer.toHexString(tagId[i] & 0xFF).toUpperCase();
-        }
-
-        MifareClassic mfc = MifareClassic.get(tag);
+        byte[] tagId;
+        int block;
 
         try {
+            Tag tag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
+            tagId = tag.getId();
+            for (int i = 0; i < tagId.length; i++) {
+                if (Integer.toHexString(tagId[i] & 0xFF).length() < 2) {
+                    tagNo += "0";
+                }
+                tagNo += Integer.toHexString(tagId[i] & 0xFF).toUpperCase();
+            }
+
+            MifareClassic mfc = MifareClassic.get(tag);
             mfc.connect();
-            byte[][] pDatas = new byte[20][16];
-            int block;
-            for (int i = 0; i < 5; i++) {
-                if (mfc.authenticateSectorWithKeyA(i, MifareClassic.KEY_DEFAULT)) {
-                    for (int j = 0; j < 4; j++) {
-                        block = i * 4 + j;
-                        if (block == 0 || block == 7 || block == 11 || block == 15 || block == 19) {
-                            continue;
-                        }
-                        pDatas[block] = mfc.readBlock(block);
-                    }
-                } else {
-
-                }
-            }
-            //if (mfc.authenticateSectorWithKeyA(0, MifareClassic.KEY_DEFAULT)) {
-            //讀取卡別資訊
-            pData = pDatas[1];
-            BlockInfo.bCardType = pData[0];
-
-            if (pData[0] == (byte) 0xFC || pData[0] == (byte) 0xFD) { //服務證與臨時證
-                iBlockCount = 1; //僅讀取Block4
-            } else if (pData[0] >= 0x01 && pData[0] <= 0x0F) { //參觀證或其他
-                iBlockCount = pData[0];
-                if (iBlockCount > 15 || iBlockCount == 0) {//區塊超出範圍
-                    setFailedResultText("票劵錯誤\n無效票卡!");
-                }
-            }
-
-                /*for (int iBlock = 4; iBlock < iBlockCount + 4; iBlock++) {
-                    //避開 security block
-                    if (iBlock == 7 || iBlock == 11 || iBlock == 15 || iBlock == 19) {
-                        iBlockCount++;
-                        continue;
-                    }
-
-                    if(iBlockCount==1 && (BlockInfo.bCardType == (byte) 0xFC || BlockInfo.bCardType == (byte) 0xFD)){
-                        if (mfc.authenticateSectorWithKeyA(iBlock / 4, MifareClassic.KEY_DEFAULT)) {
-                            pData = mfc.readBlock(iBlock);
-
-                            try {
-                                System.arraycopy(pData, 0, BlockInfo.bStartDate, 0, 3);
-                                System.arraycopy(pData, 3, BlockInfo.bEndDate, 0, 3);
-                                System.arraycopy(pData, 6, BlockInfo.bCardID, 0, 8);
-                            } catch (Exception e) {
-                                WriteLog.appendLog("OnlineTickets.java/DownloadDeviceSetup/Exception:" + e.toString());
+            if (mfc.authenticateSectorWithKeyA(0, MifareClassic.KEY_DEFAULT)) {
+                BlockInfo.bCardType = mfc.readBlock(1)[0];
+                if (BlockInfo.bCardType >= 0x01 && BlockInfo.bCardType <= 0x0F) {
+                    iBlockCount = BlockInfo.bCardType; //讀取會用到的Block數，從第Block4開始起算
+                    for (int i = 1; i <= (iBlockCount + 4 + (iBlockCount + 4) / 4) / 4; i++) {
+                        if (mfc.authenticateSectorWithKeyA(i, MifareClassic.KEY_DEFAULT)) {
+                            for (int j = 0; j < 4; j++) {
+                                block = i * 4 + j;
+                                if (block > iBlockCount + 4 + (iBlockCount + 4) / 4 - 1) {
+                                    break;
+                                }
+                                if (block == 0 || block == 7 || block == 11 || block == 15 || block == 19) {
+                                    continue;
+                                }
+                                RFData = RFData + getHexToString(byte2hex(mfc.readBlock(block)));
                             }
-                        }else{
-                            setFailedResultText("票劵錯誤\n票卡讀取失敗!");
-                            reading=false;
+                        } else {
+                            setFailedResultText("票券錯誤\n票卡讀取失敗！");
+                            reading = false;
                             return;
                         }
-                    }else{
-                        if(iBlock/4==(iBlock-1)/4){
-                            pData = mfc.readBlock(iBlock);
-                            RFData = RFData + getHexToString(byte2hex(pData));
-                        }else{
-                            if (mfc.authenticateSectorWithKeyA(iBlock / 4, MifareClassic.KEY_DEFAULT)) {
-                                pData = mfc.readBlock(iBlock);
-                                RFData = RFData + getHexToString(byte2hex(pData));
-                            }else{
-                                setFailedResultText("票劵錯誤\n票卡讀取失敗!");
-                                reading=false;
-                                return;
-                            }
+                    }
+                } else if (BlockInfo.bCardType == (byte) 0xFC || BlockInfo.bCardType == (byte) 0xFD) {
+                    if (mfc.authenticateSectorWithKeyA(1, MifareClassic.KEY_DEFAULT)) {
+                        pData = mfc.readBlock(4);
+                        try {
+                            System.arraycopy(pData, 0, BlockInfo.bStartDate, 0, 3);
+                            System.arraycopy(pData, 3, BlockInfo.bEndDate, 0, 3);
+                            System.arraycopy(pData, 6, BlockInfo.bCardID, 0, 8);
+                        } catch (Exception e) {
+                            WriteLog.appendLog("OnlineTickets.java/DownloadDeviceSetup/Exception:" + e.toString());
                         }
-                    }
-                }*/
-
-            for (int iBlock = 4; iBlock < iBlockCount + 4; iBlock++) {
-                //避開 security block
-                if (iBlock == 7 || iBlock == 11 || iBlock == 15 || iBlock == 19) {
-                    iBlockCount++;
-                    continue;
-                }
-                //if (mfc.authenticateSectorWithKeyA(iBlock / 4, MifareClassic.KEY_DEFAULT)) {
-                pData = pDatas[iBlock];
-                RFData = RFData + getHexToString(byte2hex(pData));
-
-                if (BlockInfo.bCardType == (byte) 0xFC || BlockInfo.bCardType == (byte) 0xFD) //定義第四區格式
-                {
-                    try {
-                        System.arraycopy(pData, 0, BlockInfo.bStartDate, 0, 3);
-                        System.arraycopy(pData, 3, BlockInfo.bEndDate, 0, 3);
-                        System.arraycopy(pData, 6, BlockInfo.bCardID, 0, 8);
-                    } catch (Exception e) {
-                        WriteLog.appendLog("OnlineTickets.java/DownloadDeviceSetup/Exception:" + e.toString());
+                    } else {
+                        setFailedResultText("票券錯誤\n票卡讀取失敗！");
+                        reading = false;
+                        return;
                     }
                 }
-                //}
+            } else {
+                setFailedResultText("票券錯誤\n票卡讀取失敗！");
+                reading = false;
+                return;
             }
 
             ary = RFData.split("@", -1);
@@ -474,6 +472,7 @@ public class OfflineTickets extends Activity {
                             setFailedResultText("票劵錯誤\n無效臨時證!");
                         }
                     }
+
                     try {
                         //轉換ASCII to ANSI
                         strCardID = new String(BlockInfo.bCardID, "UTF-8");
@@ -483,13 +482,12 @@ public class OfflineTickets extends Activity {
                         iStartDay = Integer.parseInt(strNowDate) - Integer.parseInt(strStartDate);
                         iEndDay = Integer.parseInt(strNowDate) - Integer.parseInt(strEndDate);
                         //判斷當前時間與有效時間
-                        if ((iStartDay < 0 || iEndDay > 0) && (inRBtn.isChecked() ? "I" : "O").equals("I")) {
+                        if ((iStartDay < 0 || iEndDay > 0) && IO.equals("I")) {
                             setFailedResultText("票劵錯誤\n逾期票卡!");
-                            saveworkdate(tagNo, (inRBtn.isChecked() ? "I" : "O"), strCardID, xmlHelper.ReadValue("NameCode"), "C");
+                            saveworkdate(tagNo, strCardID, "C");
                         } else {//證別有效時間正確即可
-                            setSucceedResultText("票券狀態    驗票成功\n票券身分    " + strCardName + (inRBtn.isChecked() ? "\n票券入場紀錄\n" : "\n票券出場紀錄\n") + getDateTime3());
-                            saveworkdate(tagNo, (inRBtn.isChecked() ? "I" : "O"), strCardID, xmlHelper.ReadValue("NameCode"), "A");
-                            RFData = "";
+                            setSucceedResultText(false, strCardName);
+                            saveworkdate(tagNo, strCardID, "A");
                         }
                     } catch (Exception ex) {
                         setFailedResultText("票劵錯誤\n請重新確認!");
@@ -503,8 +501,10 @@ public class OfflineTickets extends Activity {
                     } else {
                         //離線狀態下出場規則
                         if ((inRBtn.isChecked() ? "I" : "O").equals("O")) {
-                            savedate(tagNo.trim(), false, ary, "A");
+                            //textView1.setText(Long.toString(System.currentTimeMillis()));
                             tickCheck();
+                            savedate(tagNo.trim(), false, ary, "A");
+                            //textView2.setText(Long.toString(System.currentTimeMillis()));
                             reading = false;
                             return;
                         }
@@ -648,8 +648,8 @@ public class OfflineTickets extends Activity {
                         }
 
                         //進場
-                        savedate(tagNo.trim(), false, ary, "A");
                         tickCheck();
+                        savedate(tagNo.trim(), false, ary, "A");
                     }
                     RFData = "";
                 } else {
@@ -657,10 +657,6 @@ public class OfflineTickets extends Activity {
                 }
             }
             reading = false;
-            //} else { // Authentication failed - Handle it
-            //    setFailedResultText("票劵錯誤\n票卡讀取失敗!");
-            //    reading=false;
-            //}
         } catch (IOException ex) {
             if (ex.toString().contains("lost")) {
                 setFailedResultText("票劵錯誤\n請重新感應!");
@@ -679,8 +675,7 @@ public class OfflineTickets extends Activity {
             String VP_ValidDateBegin;
             String VP_ValidDateEnd;
 
-            if (type)   //為true時候代表刷讀票劵，false為RFID
-            {
+            if (type) { //為true時候代表刷讀票劵，false為RFID
                 RF = "";
             } else {
                 RF = guid;
@@ -704,21 +699,40 @@ public class OfflineTickets extends Activity {
                     QRarray[6].trim() + "','" + QRarray[7].trim() + "','" + QRarray[8].trim() + "','" + QRarray[9].trim() + "','" +
                     QRarray[10].trim() + "','" + QRarray[11].trim() + "','" + QRarray[12].trim() + "','" + QRarray[15].trim() + "','" +
                     tmp16 + "','" + checkCode + "','" + getDateTime() + "')";
-            mydbHelper.InsertToOfflineTickets(strSQL);
-        } catch (Exception ex) {
-            //reMsg = "驗票失敗\r\n發生無法預期錯誤";
+            //mydbHelper.InsertToOfflineTickets(strSQL);
+            mThreadHandler.post(connectWifi);
+        } catch (Exception e) {
+            WriteLog.appendLog("OfflineTickets.java/savedate/Exception:" + e.toString());
         }
     }
 
-    private void saveworkdate(String guid, String IO, String CardNo, String CurrentELCode, String checkCode) {
-        String RF = guid;
-        strSQL = "Insert Into WorkCardLog (DeviceID,DirectionType,SensorCode,CodeNo,Current_EL_Code,EL_CODE,Result,SenseDT)" +
-                "Values('" + DeviceID + "','" + IO + "','" + RF + "','" + CardNo + "','" + CurrentELCode + "','" + EL + "','" + checkCode + "','" + getDateTime() + "')";
-        mydbHelper.InsertToOfflineTickets(strSQL);
+    private void saveworkdate(String guid, String CardNo, String checkCode) {
+        try {
+            strSQL = "Insert Into WorkCardLog (DeviceID,DirectionType,SensorCode,CodeNo,Current_EL_Code,EL_CODE,Result,SenseDT)" +
+                    "Values ('" + DeviceID + "','" + IO + "','" + guid + "','" + CardNo + "','" + EL + "','" + EL + "','" + checkCode + "','" + getDateTime() + "')";
+            //mydbHelper.InsertToOfflineTickets(strSQL);
+            mThreadHandler.post(connectWifi);
+        } catch (Exception e) {
+            WriteLog.appendLog("OfflineTickets.java/saveworkdate/Exception:" + e.toString());
+        }
     }
 
+    private Runnable connectWifi = new Runnable() {
+        public void run() {
+            try {
+                mydbHelper.InsertToOfflineTickets(strSQL);
+            } catch (Exception ex) {
+
+            } finally {
+                if (mThreadHandler != null) {
+                    mThreadHandler.removeCallbacks(connectWifi);
+                }
+            }
+        }
+    };
+
     private void tickCheck() {
-        setSucceedResultText("票券狀態    驗票成功\n票券身分    參觀證\n票券名稱    " + mydbHelper.GetBadgeType(ary[2]) + (inRBtn.isChecked() ? "\n票券入場紀錄\n" : "\n票券出場紀錄\n") + getDateTime3());
+        setSucceedResultText(true, mydbHelper.GetBadgeType(ary[2]));
     }
 
     // 解碼作業
@@ -808,17 +822,28 @@ public class OfflineTickets extends Activity {
     }
 
     //票券狀態文字
-    private void setSucceedResultText(String text) {
-        succeedResultTxt.setVisibility(View.VISIBLE);
+    private void setSucceedResultText(boolean type, String name) {
+        inoutTxt.setText((inRBtn.isChecked() ? "票券入場紀錄" : "票券出場紀錄"));
+        stateTxt.setText("驗票成功");
+        //false為服務證或臨時證
+        if (type) {
+            nameLayout.setVisibility(View.VISIBLE);
+            allowTxt.setText("參觀證");
+            nameTxt.setText(name);
+        } else {
+            nameLayout.setVisibility(View.GONE);
+            allowTxt.setText(name);
+        }
+        datetimeTxt.setText(getDateTime3());
+        succeedLayout.setVisibility(View.VISIBLE);
         failedResultTxt.setVisibility(View.GONE);
-        succeedResultTxt.setText(text);
         resultImage.setImageResource(R.drawable.ticket_success);
     }
 
     //票券狀態文字
     private void setFailedResultText(String text) {
+        succeedLayout.setVisibility(View.GONE);
         failedResultTxt.setVisibility(View.VISIBLE);
-        succeedResultTxt.setVisibility(View.GONE);
         failedResultTxt.setText(text);
         resultImage.setImageResource(R.drawable.ticket_failed);
     }

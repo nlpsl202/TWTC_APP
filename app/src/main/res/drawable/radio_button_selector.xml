@@ -1,5 +1,9 @@
-<?xml version="1.0" encoding="utf-8"?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:state_checked="false" android:drawable="@android:drawable/radiobutton_off_background"/>
-    <item android:state_checked="true" android:drawable="@android:drawable/radiobutton_on_background" />
+    <item android:state_enabled="false">
+        <shape>
+            <corners android:radius="5dp" />
+            <solid android:color="#fff" />
+            <stroke android:width="2dp" android:color="#53aade" />
+        </shape>
+    </item>
 </selector>

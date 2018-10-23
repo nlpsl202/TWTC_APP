@@ -5,4 +5,5 @@
     android:maxLines="1"
     android:layout_width="match_parent"
     android:layout_height="?android:attr/listPreferredItemHeight"
-    android:textColor="#aa66cc" />
+    android:textSize="25dp"
+    android:textColor="#000000"/>

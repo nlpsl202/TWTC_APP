@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.wifi.SupplicantState;
@@ -52,12 +53,12 @@ import javax.crypto.spec.SecretKeySpec;
  * Created by Jeff.
  */
 public class OnlineTickets extends Activity {
-    private String strUserTicketName, reMsg, previousBssid;
-    private TextView succeedResultTxt, failedResultTxt, photoTxt;
+    private String DEVICE_ID, strUserTicketName, reMsg, previousBssid, DL_Verify;
+    private TextView stateTxt, allowTxt, nameTxt, datetimeTxt, inoutTxt, failedResultTxt, photoTxt;
     private ImageView resultImage, photoImage;
     private Button returnBtn, homeBtn;
     private RadioButton inRBtn, outRBtn;
-    private LinearLayout wifiLayout, rfidLayout;
+    private LinearLayout wifiLayout, rfidLayout, succeedLayout;
     private String[] ary;
     private int UDSTime = 30;
 
@@ -129,7 +130,7 @@ public class OnlineTickets extends Activity {
         setContentView(R.layout.online_tickets);
 
         Intent intent = getIntent();
-        previousBssid = intent.getStringExtra("BSSID");
+        DEVICE_ID = intent.getStringExtra("DEVICE_ID");
 
         wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
 
@@ -148,7 +149,11 @@ public class OnlineTickets extends Activity {
 
         resultImage = (ImageView) findViewById(R.id.resultImage);
         photoImage = (ImageView) findViewById(R.id.photoImage);
-        succeedResultTxt = (TextView) findViewById(R.id.succeedResultTxt);
+        inoutTxt = (TextView) findViewById(R.id.inoutTxt);
+        stateTxt = (TextView) findViewById(R.id.stateTxt);
+        allowTxt = (TextView) findViewById(R.id.allowTxt);
+        nameTxt = (TextView) findViewById(R.id.nameTxt);
+        datetimeTxt = (TextView) findViewById(R.id.datetimeTxt);
         failedResultTxt = (TextView) findViewById(R.id.failedResultTxt);
         photoTxt = (TextView) findViewById(R.id.photoTxt);
         returnBtn = (Button) findViewById(R.id.returnBtn);
@@ -157,11 +162,12 @@ public class OnlineTickets extends Activity {
         outRBtn = (RadioButton) findViewById(R.id.outRBtn);
         wifiLayout = (LinearLayout) findViewById(R.id.wifiLayout);
         rfidLayout = (LinearLayout) findViewById(R.id.rfidLayout);
+        succeedLayout = (LinearLayout) findViewById(R.id.succeedLayout);
         cbMgr = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
 
         wifiLayout.setVisibility(View.GONE);
         rfidLayout.setVisibility(View.GONE);
-        inRBtn.setChecked(true);
+
 
         mydbHelper = new MyDBHelper(this);
         xmlHelper = new XmlHelper(getFilesDir() + "//connectData.xml");
@@ -176,15 +182,13 @@ public class OnlineTickets extends Activity {
 
                 String TmpName = rs.getString("EL_Code");
                 String worktype = rs.getString("Work_Type");
-                if (worktype != null) {
-                    if (worktype.trim() != "") {
-                        xmlHelper.WriteValue("WorkType", worktype);
-                    }
+                if (worktype != null && !worktype.trim().equals("")) {
+                    xmlHelper.WriteValue("WorkType", worktype);
                 }
 
                 //取得服務證驗證狀態
                 String INCF_Type = DownloadDeviceType();
-                if (INCF_Type.trim() != "") {
+                if (!INCF_Type.trim().equals("")) {
                     xmlHelper.WriteValue("IDCF", INCF_Type);
                 }
                 xmlHelper.WriteValue("UDSTime", Integer.toString(UDSTime));
@@ -207,6 +211,33 @@ public class OnlineTickets extends Activity {
             }
         } catch (Exception ex) {
             WriteLog.appendLog("OnlineTicket.java/OnCreate/Exception:" + ex.toString());
+        }
+
+        DL_Verify = DownloadDeviceSetupFromVM();
+        if (DL_Verify == null || DL_Verify.equals("")) {
+            DL_Verify=xmlHelper.ReadValue("InOutType");
+        }
+
+        xmlHelper.WriteValue("InOutType", DL_Verify);
+
+        if(DL_Verify.equals("N")){
+            inRBtn.setEnabled(true);
+            outRBtn.setEnabled(true);
+            inRBtn.setChecked(true);
+            inRBtn.setTextColor(Color.parseColor("#000000"));
+            outRBtn.setTextColor(Color.parseColor("#000000"));
+        }else if(DL_Verify.equals("I")){
+            inRBtn.setEnabled(true);
+            outRBtn.setEnabled(false);
+            inRBtn.setChecked(true);
+            inRBtn.setTextColor(Color.parseColor("#000000"));
+            outRBtn.setTextColor(Color.parseColor("#DDDDDD"));
+        }else if(DL_Verify.equals("O")){
+            inRBtn.setEnabled(false);
+            outRBtn.setEnabled(true);
+            outRBtn.setChecked(true);
+            inRBtn.setTextColor(Color.parseColor("#DDDDDD"));
+            outRBtn.setTextColor(Color.parseColor("#000000"));
         }
 
         sQRPWDItem = DownloadExhibitionSetup();
@@ -234,10 +265,11 @@ public class OnlineTickets extends Activity {
                     wifiLayout.setVisibility(View.VISIBLE);
                     rfidLayout.setVisibility(View.GONE);
                     if (ary != null) ary = new String[ary.length];
-                    //if(xmlHelper.ReadValue("WorkType").equals("W")){//服務證驗證狀態只能用RFID驗票
-                    //    setResultText(result = "票劵錯誤，無效票卡");
-                    //    return;
-                    //}
+                    //if (xmlHelper.ReadValue("WorkType").equals("W")) {//服務證驗證狀態只能用RFID驗票
+                    if (1 == 2) {
+                        setFailedResultText("票券錯誤\n無效票卡");
+                        return;
+                    }
 
                     String qr = cbMgr.getPrimaryClip().getItemAt(0).getText().toString();
 
@@ -284,24 +316,23 @@ public class OnlineTickets extends Activity {
         homeBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                WiFiConnectSetting.activity.finish();
                 OnlineTickets.this.finish();
             }
         });
 
         //RFID
-        if (xmlHelper.ReadValue("RFID").equals("OPEN")) {
-            mNfcAdapter = NfcAdapter.getDefaultAdapter(this);
-            if (mNfcAdapter == null) {
-                Toast.makeText(OnlineTickets.this, "此裝置無NFC功能，無法進行RFID驗票！", Toast.LENGTH_SHORT).show();
-                return;
-            } else {
-                if (!mNfcAdapter.isEnabled()) {
-                    Toast.makeText(OnlineTickets.this, "NFC功能尚未開啟，請至設定開啟！", Toast.LENGTH_SHORT).show();
-                }
+        mNfcAdapter = NfcAdapter.getDefaultAdapter(this);
+        if (mNfcAdapter == null) {
+            Toast.makeText(OnlineTickets.this, "此裝置無NFC功能，無法進行RFID驗票！", Toast.LENGTH_SHORT).show();
+            return;
+        } else {
+            if (!mNfcAdapter.isEnabled()) {
+                Toast.makeText(OnlineTickets.this, "NFC功能尚未開啟，請至設定開啟！", Toast.LENGTH_SHORT).show();
             }
-            mPendingIntent = PendingIntent.getActivity(this, 0, new Intent(this,
-                    getClass()).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
         }
+        mPendingIntent = PendingIntent.getActivity(this, 0, new Intent(this,
+                getClass()).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
 
         //註冊網路狀態監聽
         IntentFilter intentFilter = new IntentFilter();
@@ -311,32 +342,33 @@ public class OnlineTickets extends Activity {
         //註冊wifi變換監聽
         IntentFilter intentFilter2 = new IntentFilter();
         intentFilter.addAction(WifiManager.SUPPLICANT_STATE_CHANGED_ACTION);
-        registerReceiver(broadcastReceiver, intentFilter2);
+        registerReceiver(wifiChangeReceiver, intentFilter2);
     }//End ON CREATE
 
     @Override
     protected void onResume() {
         super.onResume();
-        cbMgr.removePrimaryClipChangedListener(mPrimaryClipChangedListener);
-        cbMgr.addPrimaryClipChangedListener(mPrimaryClipChangedListener);
         if (xmlHelper.ReadValue("RFID").equals("OPEN")) {
             mNfcAdapter.enableForegroundDispatch(this, mPendingIntent, null, null);
         }
+        cbMgr.removePrimaryClipChangedListener(mPrimaryClipChangedListener);
+        cbMgr.addPrimaryClipChangedListener(mPrimaryClipChangedListener);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        cbMgr.removePrimaryClipChangedListener(mPrimaryClipChangedListener);
         if (xmlHelper.ReadValue("RFID").equals("OPEN")) {
             mNfcAdapter.disableForegroundDispatch(this);
         }
+        cbMgr.removePrimaryClipChangedListener(mPrimaryClipChangedListener);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         unregisterReceiver(connectionReceiver);
+        unregisterReceiver(wifiChangeReceiver);
     }
 
     //RFID感應事件
@@ -352,8 +384,12 @@ public class OnlineTickets extends Activity {
         }
         reading = true;
 
-        wifiLayout.setVisibility(View.VISIBLE);
+        wifiLayout.setVisibility(View.GONE);
         rfidLayout.setVisibility(View.GONE);
+
+        //清空圖像資訊
+        bitmap = null;
+        photoImage.setImageBitmap(bitmap);
 
         String RFData = "";
         String tagNo = "";
@@ -410,84 +446,23 @@ public class OnlineTickets extends Activity {
                             System.arraycopy(pData, 6, BlockInfo.bCardID, 0, 8);
                         } catch (Exception e) {
                             WriteLog.appendLog("OnlineTickets.java/DownloadDeviceSetup/Exception:" + e.toString());
-                        }
-                    } else {
-                        setFailedResultText("票券錯誤\n票卡讀取失敗！");
-                        reading = false;
-                        return;
-                    }
-                } else { //其他證別(Mifare)
-                    //清空圖像資訊
-                    bitmap = null;
-                    photoImage.setImageBitmap(bitmap);
-
-                    if (UpdateImportPass(tagNo, false, "") == true) {
-                        setSucceedResultText("票券狀態    " + reMsg + "\n票券身分    參觀證\n票券名稱    " + strUserTicketName + (inRBtn.isChecked() ? "\n票券入場紀錄\n" : "\n票券出場紀錄\n") + getDateTime());
-                    } else {
-                        setFailedResultText("票券錯誤\n" + reMsg);
-                    }
-                    reading=false;
-                    return;
-                }
-                /*if (BlockInfo.bCardType == (byte) 0xFC || BlockInfo.bCardType == (byte) 0xFD) { //服務證與臨時證
-                    iBlockCount = 1; //僅讀取Block4
-                    pDatas = new byte[iBlockCount + 4][16];
-                    if (mfc.authenticateSectorWithKeyA(1, MifareClassic.KEY_DEFAULT)) {
-                        pDatas[4] = mfc.readBlock(4);
-                        pData=pDatas[4];
-                        try {
-                            System.arraycopy(pData, 0, BlockInfo.bStartDate, 0, 3);
-                            System.arraycopy(pData, 3, BlockInfo.bEndDate, 0, 3);
-                            System.arraycopy(pData, 6, BlockInfo.bCardID, 0, 8);
-                        } catch (Exception e) {
-                            WriteLog.appendLog("OnlineTickets.java/DownloadDeviceSetup/Exception:" + e.toString());
-                        }
-                    } else {
-                        setFailedResultText("票券錯誤\n票卡讀取失敗！");
-                        reading = false;
-                        return;
-                    }
-                } else if (BlockInfo.bCardType >= 0x01 && BlockInfo.bCardType <= 0x0F) { //一般證別
-                    iBlockCount = BlockInfo.bCardType; //讀取會用到的Block數，從第Block4開始起算
-                    pDatas = new byte[iBlockCount + 4 + (iBlockCount + 4) / 4][16];
-                    for (int i = 1; i <= (iBlockCount + 4 + (iBlockCount + 4) / 4) / 4; i++) {
-                        if (mfc.authenticateSectorWithKeyA(i, MifareClassic.KEY_DEFAULT)) {
-                            for (int j = 0; j < 4; j++) {
-                                int block = i * 4 + j;
-                                if (block == 0 || block == 7 || block == 11 || block == 15 || block == 19 || block > pDatas.length - 1) {
-                                    continue;
-                                }
-                                pDatas[block] = mfc.readBlock(block);
-                            }
-                        } else {
-                            setFailedResultText("票券錯誤\n票卡讀取失敗！");
                             reading = false;
                             return;
                         }
-                    }
-
-                    for (int iBlock = 4; iBlock < iBlockCount + 4; iBlock++) {
-                        //避開 security block
-                        if (iBlock == 7 || iBlock == 11 || iBlock == 15 || iBlock == 19) {
-                            iBlockCount++;
-                            continue;
-                        }
-
-                        pData = pDatas[iBlock];
-                        RFData = RFData + getHexToString(byte2hex(pData));
+                    } else {
+                        setFailedResultText("票券錯誤\n票卡讀取失敗！");
+                        reading = false;
+                        return;
                     }
                 } else { //其他證別(Mifare)
-                    //清空圖像資訊
-                    bitmap = null;
-                    photoImage.setImageBitmap(bitmap);
-
                     if (UpdateImportPass(tagNo, false, "") == true) {
-                        setSucceedResultText("票券狀態    " + reMsg + "\n票券身分    參觀證\n票券名稱    " + strUserTicketName + (inRBtn.isChecked() ? "\n票券入場紀錄\n" : "\n票券出場紀錄\n") + getDateTime());
+                        setSucceedResultText(reMsg, strUserTicketName);
                     } else {
                         setFailedResultText("票券錯誤\n" + reMsg);
                     }
+                    reading = false;
                     return;
-                }*/
+                }
             } else {
                 setFailedResultText("票券錯誤\n票卡讀取失敗！");
                 reading = false;
@@ -508,31 +483,20 @@ public class OnlineTickets extends Activity {
                 //判斷當前是否允許服務證驗證
                 //if (!xmlHelper.ReadValue("WorkType").equals("W")) {
                 if (!(1 == 1)) {
-                    //清空圖像資訊
-                    bitmap = null;
-                    photoImage.setImageBitmap(bitmap);
                     setFailedResultText("票券錯誤\n不允許服務證驗證");
                 } else {
                     if (BlockInfo.bCardType == (byte) 0xFD) { //服務證
                         if (BlockInfo.bCardID[0] == 'A' || BlockInfo.bCardID[0] == 'G' || BlockInfo.bCardID[0] == 'N') {
-                            //do nothing
                             strCardName = "服務證";
                         } else {
-                            //清空圖像資訊
-                            bitmap = null;
-                            photoImage.setImageBitmap(bitmap);
                             setFailedResultText("票券錯誤\n(格式)無效服務證");
                         }
                     }
                     if (BlockInfo.bCardType == (byte) 0xFC) { //臨時證
                         if ((BlockInfo.bCardID[0] == 'A' || BlockInfo.bCardID[0] == 'G' || BlockInfo.bCardID[0] == 'N') &&
                                 (BlockInfo.bCardID[1] == 'D' || BlockInfo.bCardID[1] == 'D' || BlockInfo.bCardID[1] == 'D')) {
-                            //do nothing
                             strCardName = "臨時證";
                         } else {
-                            //清空圖像資訊
-                            bitmap = null;
-                            photoImage.setImageBitmap(bitmap);
                             setFailedResultText("票券錯誤\n(格式)無效臨時證");
                         }
                     }
@@ -543,59 +507,39 @@ public class OnlineTickets extends Activity {
                         strEndDate = String.format("%04d", 2000 + (BlockInfo.bEndDate[0] & 0xFF)) + String.format("%02d", BlockInfo.bEndDate[1] & 0xFF) + String.format("%02d", BlockInfo.bEndDate[2] & 0xFF);
                         Date date = new Date();
                         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-                        String dateString = sdf.format(date);
+                        String strNowDate = sdf.format(date);
                         //判斷當前時間與有效時間
-                        if (Integer.parseInt(dateString) < Integer.parseInt(strStartDate) || Integer.parseInt(dateString) > Integer.parseInt(strEndDate)) {
-                            //清空圖像資訊
-                            bitmap = null;
-                            photoImage.setImageBitmap(bitmap);
+                        if (Integer.parseInt(strNowDate) < Integer.parseInt(strStartDate) || Integer.parseInt(strNowDate) > Integer.parseInt(strEndDate)) {
                             setFailedResultText("票劵錯誤\n(逾期)無效票卡");
-                        } else {//向中央取得權限
+                        } else { //向中央取得權限
                             if (UpdateCertiCardPassRecord(tagNo, strCardID, xmlHelper.ReadValue("NameCode")) == true) {
                                 //顯示登入者圖像
                                 if (bitmap != null) {
-                                    wifiLayout.setVisibility(View.GONE);
                                     rfidLayout.setVisibility(View.VISIBLE);
                                     photoImage.setImageBitmap(bitmap);
                                 }
-                                photoTxt.setText("票券狀態    驗票成功\n\n票券身分    " + strCardName + (inRBtn.isChecked() ? "\n\n票券入場紀錄\n\n" : "\n\n票券出場紀錄\n\n") + getDateTime());
+                                photoTxt.setText("票券狀態    驗票成功\n票券身分    " + strCardName + (inRBtn.isChecked() ? "\n票券入場紀錄\n" : "\n票券出場紀錄\n") + getDateTime());
                             } else {
-                                //清空圖像資訊
-                                bitmap = null;
-                                photoImage.setImageBitmap(bitmap);
-                                //photoImage.setVisibility(View.GONE);
                                 setFailedResultText("票券錯誤\n" + reMsg);
                             }
-                            RFData = "";
                         }
                     } catch (Exception ex) {
-                        //清空圖像資訊
-                        bitmap = null;
-                        photoImage.setImageBitmap(bitmap);
-                        setFailedResultText("票券狀態    票劵錯誤\r\n(異常)請重新確認");
+                        setFailedResultText("票劵錯誤\n(異常)請重新確認");
                         reading = false;
                     }
                 }
             } else {
-                //清空圖像資訊
-                bitmap = null;
-                photoImage.setImageBitmap(bitmap);
-                wifiLayout.setVisibility(View.VISIBLE);
-                rfidLayout.setVisibility(View.GONE);
                 if (ary.length == 17) {
                     if (UpdatePassRecord(tagNo, false, ary) == true) {
-                        setSucceedResultText("票券狀態    " + reMsg + "\n票券身分    參觀證\n票券名稱    " + mydbHelper.GetBadgeType(ary[2].toString()) + (inRBtn.isChecked() ? "\n票券入場紀錄\n" : "\n票券出場紀錄\n") + getDateTime());
+                        setSucceedResultText(reMsg, mydbHelper.GetBadgeType(ary[2].toString()));
                     } else {
                         setFailedResultText("票劵錯誤\n" + reMsg);
                     }
-                    RFData = "";
                 } else {
                     setFailedResultText("票劵錯誤\n無效票卡");
                 }
             }
-            //} else { // Authentication failed - Handle it
             reading = false;
-            //}
         } catch (IOException ex) {
             reading = false;
             WriteLog.appendLog("OnlineTicket.java/DownloadDeviceType/Exception:" + ex.toString());
@@ -605,7 +549,7 @@ public class OnlineTickets extends Activity {
     //一維條碼(BARCODE)驗票
     private void BarCodeCheck(String qr) {
         if (UpdateImportPass("", true, qr) == true) {
-            setSucceedResultText("票券狀態    " + reMsg + "\n票券身分    參觀證\n票券名稱    " + strUserTicketName + (inRBtn.isChecked() ? "\n票券入場紀錄\n" : "\n票券出場紀錄\n") + getDateTime());
+            setSucceedResultText(reMsg, strUserTicketName);
         } else {
             setFailedResultText("票劵錯誤\n" + reMsg);
         }
@@ -614,7 +558,7 @@ public class OnlineTickets extends Activity {
     //二維條碼(QRCODE)驗票
     private void tickCheck() {
         if (UpdatePassRecord(ary[0].toString().trim(), true, ary) == true) {
-            setSucceedResultText("票券狀態    " + reMsg + "\n票券身分    參觀證\n票券名稱    " + mydbHelper.GetBadgeType(ary[2].toString()) + (inRBtn.isChecked() ? "\n票券入場紀錄\n" : "\n票券出場紀錄\n") + getDateTime());
+            setSucceedResultText(reMsg, mydbHelper.GetBadgeType(ary[2].toString()));
         } else {
             setFailedResultText("票劵錯誤\n" + reMsg);
         }
@@ -637,7 +581,7 @@ public class OnlineTickets extends Activity {
                 }
             }
             CallableStatement cstmtUIP = conUIP.prepareCall("{ call dbo.SP_UpdateImportPass(?)}");
-            cstmtUIP.setString("DeviceID", xmlHelper.ReadValue("MachineID"));
+            cstmtUIP.setString("DeviceID", DEVICE_ID);
             cstmtUIP.setString("DirectionType", inRBtn.isChecked() ? "I" : "O");
             cstmtUIP.setString("SensorCode", RF);
             cstmtUIP.setString("BarCode", barcode);
@@ -682,7 +626,7 @@ public class OnlineTickets extends Activity {
     }
 
     //二維條碼(QRCODE)驗票SP
-    private Boolean UpdatePassRecord(String guid, Boolean type, String[] QRarray) {
+    private Boolean UpdatePassRecord(String guid, boolean type, String[] QRarray) {
         Connection conUPR = DBExhibitConnection();
         try {
             UUID u = UUID.randomUUID();
@@ -695,7 +639,7 @@ public class OnlineTickets extends Activity {
             }
 
             CallableStatement cstmtUPR = conUPR.prepareCall("{ call dbo.SP_UpdatePassRecord(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}");
-            cstmtUPR.setString("DeviceID", xmlHelper.ReadValue("MachineID"));
+            cstmtUPR.setString("DeviceID", DEVICE_ID);
             cstmtUPR.setString("DirectionType", inRBtn.isChecked() ? "I" : "O");
             cstmtUPR.setString("SensorCode", RF);
             cstmtUPR.setString("SysCode", u.toString());
@@ -758,7 +702,7 @@ public class OnlineTickets extends Activity {
         try {
             String RF = guid.toUpperCase();
             CallableStatement cstmtUCCPR2 = conUCCPR2.prepareCall("{ call dbo.SP_UpdateCertiCardPassRecord(?,?,?,?,?,?)}");
-            cstmtUCCPR2.setString("DeviceID", xmlHelper.ReadValue("MachineID"));
+            cstmtUCCPR2.setString("DeviceID", DEVICE_ID);
             cstmtUCCPR2.setString("DirectionType", inRBtn.isChecked() ? "I" : "O");
             cstmtUCCPR2.setString("SensorCode", RF);
             cstmtUCCPR2.setString("CardNo", cardNo);
@@ -804,12 +748,29 @@ public class OnlineTickets extends Activity {
         Connection conDDS = DBCDPSConnection();
         try {
             CallableStatement cstmtDDS = conDDS.prepareCall("{ call dbo.SP_DownloadDeviceSetup(?)}");
-            cstmtDDS.setString("DeviceID", xmlHelper.ReadValue("MachineID"));
+            cstmtDDS.setString("DeviceID", DEVICE_ID);
             rsDDS = cstmtDDS.executeQuery();
         } catch (Exception e) {
             WriteLog.appendLog("OnlineTickets.java/DownloadDeviceSetup/Exception:" + e.toString());
         }
         return rsDDS;
+    }
+
+    //VM下載資料SP
+    public String DownloadDeviceSetupFromVM() {
+        String DL_Verify = "";
+        Connection conDDSFV = DBExhibitConnection();
+        try {
+            CallableStatement cstmtDDSFV = conDDSFV.prepareCall("{ call dbo.SP_DownloadDeviceSetupFromVM(?)}");
+            cstmtDDSFV.setString("DEVICE_ID", DEVICE_ID);
+            ResultSet rsDDSFV = cstmtDDSFV.executeQuery();
+            while (rsDDSFV.next()) {
+                DL_Verify = rsDDSFV.getString("DL_Verify");
+            }
+        } catch (Exception e) {
+            WriteLog.appendLog("OnlineTickets.java/DownloadDeviceSetupFromVM/Exception:" + e.toString());
+        }
+        return DL_Verify;
     }
 
     //中央下載資料SP
@@ -818,7 +779,7 @@ public class OnlineTickets extends Activity {
         String value = "1";
         try {
             CallableStatement cstmtDDT = conDDT.prepareCall("{ call dbo.SP_DownloadExhibitionSetup(?)}");
-            cstmtDDT.setString("DEVICE_ID", xmlHelper.ReadValue("MachineID"));
+            cstmtDDT.setString("DEVICE_ID", DEVICE_ID);
             ResultSet rsDDT = cstmtDDT.executeQuery();
             while (rsDDT.next()) {
                 if (rsDDT.getString("ES_ParamCode").equals("UDSTime")) {
@@ -867,7 +828,7 @@ public class OnlineTickets extends Activity {
         Connection conDBT = DBExhibitConnection();
         try {
             //CallableStatement cstmt = conDownloadAllExhibition.prepareCall("{ call dbo.SP_DownloadBadgeType(?)}");
-            //cstmt.setString("DEVICE_ID",xmlHelper.ReadValue("MachineID"));
+            //cstmt.setString("DEVICE_ID",DEVICE_ID);
             String query = "select BT_TypeID,convert(nvarchar,BT_TypeName)as BT_TypeName,BT_MaterialType,convert(nvarchar,BT_Memo) as BT_Memo from eBadgeType";
             Statement stmtDBT = conDBT.createStatement();
             rsDBT = stmtDBT.executeQuery(query);
@@ -884,7 +845,7 @@ public class OnlineTickets extends Activity {
         String[] strQRPWD = {"", ""};
         try {
             CallableStatement cstmtDES = conDES.prepareCall("{ call dbo.SP_DownloadExhibitionSetup(?)}");
-            cstmtDES.setString("Device_ID", xmlHelper.ReadValue("MachineID"));
+            cstmtDES.setString("Device_ID", DEVICE_ID);
             rsDES = cstmtDES.executeQuery();
 
             while (rsDES.next()) {
@@ -907,7 +868,7 @@ public class OnlineTickets extends Activity {
         String reportMessage = "";
         try {
             CallableStatement cstmtUDS = conUDS.prepareCall("{ call dbo.SP_UpdateDeviceStatus(?,?,?)}");
-            cstmtUDS.setString("DeviceID", xmlHelper.ReadValue("MachineID"));
+            cstmtUDS.setString("DeviceID", DEVICE_ID);
             cstmtUDS.setString("ServiceType", "0001");
             cstmtUDS.registerOutParameter("ReturnMsg", java.sql.Types.VARCHAR);
             cstmtUDS.execute();
@@ -929,7 +890,7 @@ public class OnlineTickets extends Activity {
         Connection con = DBCDPSConnection();
         try {
             CallableStatement cstmt = con.prepareCall("{ call dbo.SP_UpdateDeviceStatus(?,?,?)}");
-            cstmt.setString("DeviceID", xmlHelper.ReadValue("MachineID"));
+            cstmt.setString("DeviceID", DEVICE_ID);
             cstmt.setString("ServiceType", "0001");
             cstmt.registerOutParameter("ReturnMsg", java.sql.Types.VARCHAR);
             cstmt.execute();
@@ -1051,17 +1012,23 @@ public class OnlineTickets extends Activity {
     }
 
     //票券狀態文字
-    private void setSucceedResultText(String text) {
-        succeedResultTxt.setVisibility(View.VISIBLE);
+    private void setSucceedResultText(String state, String name) {
+        wifiLayout.setVisibility(View.VISIBLE);
+        inoutTxt.setText((inRBtn.isChecked() ? "票券入場紀錄" : "票券出場紀錄"));
+        stateTxt.setText(state);
+        allowTxt.setText("參觀證");
+        nameTxt.setText(name);
+        datetimeTxt.setText(getDateTime());
+        succeedLayout.setVisibility(View.VISIBLE);
         failedResultTxt.setVisibility(View.GONE);
-        succeedResultTxt.setText(text);
         resultImage.setImageResource(R.drawable.ticket_success);
     }
 
     //票券狀態文字
     private void setFailedResultText(String text) {
+        wifiLayout.setVisibility(View.VISIBLE);
+        succeedLayout.setVisibility(View.GONE);
         failedResultTxt.setVisibility(View.VISIBLE);
-        succeedResultTxt.setVisibility(View.GONE);
         failedResultTxt.setText(text);
         resultImage.setImageResource(R.drawable.ticket_failed);
     }
@@ -1098,7 +1065,7 @@ public class OnlineTickets extends Activity {
     }
 
     //監控wifi是否變更
-    private final BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+    private final BroadcastReceiver wifiChangeReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();

@@ -12,6 +12,8 @@ import android.graphics.drawable.ColorDrawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
@@ -29,12 +31,16 @@ import java.util.UUID;
  * Created by Jeff.
  */
 public class OfflineExport extends Activity {
-    private Button ImportBtn, ReturnBtn,homeBtn;
-    private TextView ResultTxt, ResultTxt2;
+    private String EL_CODE;
+    private int iTotalCount, iNowCount;
+    private Button ImportBtn, ReturnBtn, homeBtn;
+    private TextView ResultTxt, ResultTxt2, ResultTxt3;
     private MyDBHelper mydbHelper;
     private XmlHelper xmlHelper;
     private Dialog alertDialog;
 
+    private Cursor cSql, cWorkSql;
+    private Handler handler;
     private Connection DBCDPSConnection() {
         ConnectionClass.ip = xmlHelper.ReadValue("ServerIP");
         ConnectionClass.db = "TWTC_CDPS";
@@ -60,22 +66,44 @@ public class OfflineExport extends Activity {
 
         ReturnBtn = (Button) findViewById(R.id.ReturnBtn);
         ImportBtn = (Button) findViewById(R.id.ImportBtn);
-        homeBtn = (Button) findViewById(R.id.HomeBtn);
+        homeBtn = (Button) findViewById(R.id.homeBtn);
         ResultTxt = (TextView) findViewById(R.id.ResultTxt);
         ResultTxt2 = (TextView) findViewById(R.id.ResultTxt2);
+        ResultTxt3 = (TextView) findViewById(R.id.ResultTxt3);
 
         mydbHelper = new MyDBHelper(this);
         xmlHelper = new XmlHelper(getFilesDir() + "//connectData.xml");
 
+        ResultTxt3.setVisibility(View.GONE);
+
+        //再子線程中更新UI的方法
+        handler=new Handler(){
+            @Override
+            public void handleMessage(Message msg) {
+                if(msg.what==0){
+                    ResultTxt.setText("無法上傳！");
+                    ResultTxt2.setText("上傳失敗，請再次嘗試。");
+                }else if (msg.what==1){
+                    ResultTxt3.setVisibility(View.VISIBLE);
+                    ResultTxt3.setText("上傳進度：" + Integer.toString(iNowCount) + "/" + Integer.toString(iTotalCount) + "筆");
+                }else if(msg.what==2){
+                    ResultTxt.setText("上傳成功！");
+                    ResultTxt2.setText("上傳完畢，共上傳 " + iTotalCount + " 筆數據。");
+                }
+            }
+        };
+
         ImportBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                ResultTxt3.setVisibility(View.GONE);
                 if (checkInternetConnect()) {
-                    final String EL = xmlHelper.ReadValue("NameCode");
+                    EL_CODE = xmlHelper.ReadValue("NameCode");
                     //取得對應資料表
-                    final Cursor cSql = mydbHelper.SelectFromBarcodeLog();
-                    final Cursor cWorkSql = mydbHelper.SelectFromWorkCardLog();
-                    final int iTotalCount = cSql.getCount() + cWorkSql.getCount();
+                    cSql = mydbHelper.SelectFromBarcodeLog();
+                    cWorkSql = mydbHelper.SelectFromWorkCardLog();
+                    iTotalCount = cSql.getCount() + cWorkSql.getCount();
+                    iNowCount = 0;
                     if (iTotalCount > 0) {
                         alertDialog = new Dialog(OfflineExport.this);
                         alertDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -86,26 +114,74 @@ public class OfflineExport extends Activity {
                             @Override
                             public void onClick(View v) {
                                 try {
-                                    //上傳參觀離線資料
-                                    if (cSql.getCount() > 0 && cSql != null) {
-                                        if (!UpdateOfflineRecord(cSql, EL)) {
-                                            ResultTxt.setText("無法上傳！");
-                                            ResultTxt2.setText("上傳失敗，請再次嘗試。");
-                                            alertDialog.cancel();
+                                    ResultTxt3.setText("上傳進度：0/" + Integer.toString(iTotalCount) + "筆");
+                                    new Thread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            //上傳參觀證離線資料
+                                            if (cSql.getCount() > 0 && cSql != null) {
+                                                if (!UpdateOfflineRecord(cSql, EL_CODE)) {
+                                                    handler.sendEmptyMessage(0);
+                                                }
+                                            }
+
+                                            //上傳服務證離線資料
+                                            if (cWorkSql.getCount() > 0 && cWorkSql != null) {
+                                                if (UpdateOfflineCardPassRecord(cWorkSql, EL_CODE) == false) {
+                                                    handler.sendEmptyMessage(0);
+                                                }
+                                            }
+
+                                            handler.sendEmptyMessage(2);
                                         }
+                                    }).start();
+
+                                    /*//上傳參觀證離線資料
+                                    if (cSql.getCount() > 0 && cSql != null) {
+                                        new Thread(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                if (!UpdateOfflineRecord(cSql, EL_CODE)) {
+                                                    handler.sendEmptyMessage(0);
+                                                    //ResultTxt.postInvalidate();
+                                                    //ResultTxt.setText("無法上傳！");
+                                                    //ResultTxt2.postInvalidate();
+                                                    //ResultTxt2.setText("上傳失敗，請再次嘗試。");
+                                                    //alertDialog.cancel();
+                                                }
+                                            }
+                                        }).start();
+                                        //if (!UpdateOfflineRecord(cSql, EL_CODE)) {
+                                        //    ResultTxt.setText("無法上傳！");
+                                        //    ResultTxt2.setText("上傳失敗，請再次嘗試。");
+                                        //    alertDialog.cancel();
+                                        //}
                                     }
 
-                                    //上傳服務離線資料
+                                    //上傳服務證離線資料
                                     if (cWorkSql.getCount() > 0 && cWorkSql != null) {
-                                        if (UpdateOfflineCardPassRecord(cWorkSql, EL) == false) {
-                                            ResultTxt.setText("無法上傳！");
-                                            ResultTxt2.setText("上傳失敗，請再次嘗試。" + iTotalCount + " 筆！");
-                                            return;
-                                        }
+                                        new Thread(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                if (UpdateOfflineCardPassRecord(cWorkSql, EL_CODE) == false) {
+                                                    handler.sendEmptyMessage(0);
+                                                    //ResultTxt.postInvalidate();
+                                                    //ResultTxt.setText("無法上傳！");
+                                                    //ResultTxt2.postInvalidate();
+                                                    //ResultTxt2.setText("上傳失敗，請再次嘗試。");
+                                                    //return;
+                                                }
+                                            }
+                                        }).start();
+                                        //if (UpdateOfflineCardPassRecord(cWorkSql, EL_CODE) == false) {
+                                        //    ResultTxt.setText("無法上傳！");
+                                        //    ResultTxt2.setText("上傳失敗，請再次嘗試。" + iTotalCount + " 筆！");
+                                        //    return;
+                                        //}
                                     }
 
                                     ResultTxt.setText("上傳成功！");
-                                    ResultTxt2.setText("上傳完畢，共上傳 " + iTotalCount + " 筆數據。");
+                                    ResultTxt2.setText("上傳完畢，共上傳 " + iTotalCount + " 筆數據。");*/
                                 } catch (Exception e) {
                                     ResultTxt.setText("無法上傳！");
                                     WriteLog.appendLog("OfflineExport.java/upload/Exception:" + e.toString());
@@ -158,11 +234,11 @@ public class OfflineExport extends Activity {
     //上傳離線參觀證資料
     private boolean UpdateOfflineRecord(Cursor c, String ELCode) {
         //生成物件
-        Connection con = DBExhibitConnection();
+        Connection conUpdateOfflineRecord = DBExhibitConnection();
         try {
             UUID u = UUID.randomUUID();
             boolean Revc = false;
-            CallableStatement cstmt = con.prepareCall("{ call dbo.SP_UpdateOfflinePassRecord(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}");
+            CallableStatement cstmtUpdateOfflineRecord = conUpdateOfflineRecord.prepareCall("{ call dbo.SP_UpdateOfflinePassRecord(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}");
             while (c.moveToNext()) {
                 try {
                     if (!c.getString(c.getColumnIndex("EL_Code")).trim().equals(ELCode)) {
@@ -177,52 +253,55 @@ public class OfflineExport extends Activity {
 
                     u = UUID.fromString(c.getString(c.getColumnIndex("SysCode")));
 
-                    cstmt.setString("DeviceID", c.getString(c.getColumnIndex("DeviceID")).trim());
-                    cstmt.setString("DirectionType", c.getString(c.getColumnIndex("DirectionType")).trim());
-                    cstmt.setString("SensorCode", c.getString(c.getColumnIndex("SensorCode")).trim());
-                    cstmt.setString("SysCode", u.toString());
-                    cstmt.setString("EL_Code", c.getString(c.getColumnIndex("Current_EL_Code")).trim());
-                    cstmt.setString("BT_TypeID", c.getString(c.getColumnIndex("BT_TypeID")).trim());
-                    cstmt.setString("VP_ValidDateRule", c.getString(c.getColumnIndex("VP_ValidDateRule")).trim());
+                    cstmtUpdateOfflineRecord.setString("DeviceID", c.getString(c.getColumnIndex("DeviceID")).trim());
+                    cstmtUpdateOfflineRecord.setString("DirectionType", c.getString(c.getColumnIndex("DirectionType")).trim());
+                    cstmtUpdateOfflineRecord.setString("SensorCode", c.getString(c.getColumnIndex("SensorCode")).trim());
+                    cstmtUpdateOfflineRecord.setString("SysCode", u.toString());
+                    cstmtUpdateOfflineRecord.setString("EL_Code", c.getString(c.getColumnIndex("Current_EL_Code")).trim());
+                    cstmtUpdateOfflineRecord.setString("BT_TypeID", c.getString(c.getColumnIndex("BT_TypeID")).trim());
+                    cstmtUpdateOfflineRecord.setString("VP_ValidDateRule", c.getString(c.getColumnIndex("VP_ValidDateRule")).trim());
 
                     SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
                     //判斷允許入場日期
                     if (!c.getString(c.getColumnIndex("VP_ValidDateBegin")).trim().equals("")) {
                         Date NewDateB = sdf.parse(c.getString(c.getColumnIndex("VP_ValidDateBegin")).trim());
-                        cstmt.setDate("VP_ValidDateBegin", new java.sql.Date(NewDateB.getTime()));
+                        cstmtUpdateOfflineRecord.setDate("VP_ValidDateBegin", new java.sql.Date(NewDateB.getTime()));
                     } else {
-                        cstmt.setDate("VP_ValidDateBegin", null);
+                        cstmtUpdateOfflineRecord.setDate("VP_ValidDateBegin", null);
                     }
 
                     if (!c.getString(c.getColumnIndex("VP_ValidDateEnd")).trim().equals("")) {
                         Date NewDateB = sdf.parse(c.getString(c.getColumnIndex("VP_ValidDateEnd")).trim());
-                        cstmt.setDate("VP_ValidDateEnd", new java.sql.Date(NewDateB.getTime()));
+                        cstmtUpdateOfflineRecord.setDate("VP_ValidDateEnd", new java.sql.Date(NewDateB.getTime()));
                     } else {
-                        cstmt.setDate("VP_ValidDateEnd", null);
+                        cstmtUpdateOfflineRecord.setDate("VP_ValidDateEnd", null);
                     }
-                    cstmt.setString("VP_ValidTimeRule", c.getString(c.getColumnIndex("VP_ValidTimeRule")).trim());
-                    cstmt.setString("VP_ValidTimeBegin", c.getString(c.getColumnIndex("VP_ValidTimeBegin")).trim());
-                    cstmt.setString("VP_ValidTimeEnd", c.getString(c.getColumnIndex("VP_ValidTimeEnd")).trim());
-                    cstmt.setString("VP_UseAreaAssign", c.getString(c.getColumnIndex("VP_UseAreaAssign")).trim());
-                    cstmt.setString("VP_UsageTimeType", c.getString(c.getColumnIndex("VP_UsageTimeType")).trim());
-                    cstmt.setString("VP_UsageTimeTotal", c.getString(c.getColumnIndex("VP_UsageTimeTotal")).trim());
-                    cstmt.setString("VP_UsageTimePerDay", c.getString(c.getColumnIndex("VP_UsageTimePerDay")).trim());
-                    cstmt.setString("IV_CheckCode", c.getString(c.getColumnIndex("IV_CheckCode")).trim());
-                    cstmt.setString("IV_CheckCode2", c.getString(c.getColumnIndex("IV_CheckCode2")).trim());
-                    cstmt.setString("IsFuncCar", "N");
-                    cstmt.setString("SenseDT", c.getString(c.getColumnIndex("SenseDT")).trim());
-                    cstmt.setString("Result", c.getString(c.getColumnIndex("Result")).trim());
-                    cstmt.registerOutParameter("ReturnMsg", java.sql.Types.VARCHAR);
+                    cstmtUpdateOfflineRecord.setString("VP_ValidTimeRule", c.getString(c.getColumnIndex("VP_ValidTimeRule")).trim());
+                    cstmtUpdateOfflineRecord.setString("VP_ValidTimeBegin", c.getString(c.getColumnIndex("VP_ValidTimeBegin")).trim());
+                    cstmtUpdateOfflineRecord.setString("VP_ValidTimeEnd", c.getString(c.getColumnIndex("VP_ValidTimeEnd")).trim());
+                    cstmtUpdateOfflineRecord.setString("VP_UseAreaAssign", c.getString(c.getColumnIndex("VP_UseAreaAssign")).trim());
+                    cstmtUpdateOfflineRecord.setString("VP_UsageTimeType", c.getString(c.getColumnIndex("VP_UsageTimeType")).trim());
+                    cstmtUpdateOfflineRecord.setString("VP_UsageTimeTotal", c.getString(c.getColumnIndex("VP_UsageTimeTotal")).trim());
+                    cstmtUpdateOfflineRecord.setString("VP_UsageTimePerDay", c.getString(c.getColumnIndex("VP_UsageTimePerDay")).trim());
+                    cstmtUpdateOfflineRecord.setString("IV_CheckCode", c.getString(c.getColumnIndex("IV_CheckCode")).trim());
+                    cstmtUpdateOfflineRecord.setString("IV_CheckCode2", c.getString(c.getColumnIndex("IV_CheckCode2")).trim());
+                    cstmtUpdateOfflineRecord.setString("IsFuncCar", "N");
+                    cstmtUpdateOfflineRecord.setString("SenseDT", c.getString(c.getColumnIndex("SenseDT")).trim());
+                    cstmtUpdateOfflineRecord.setString("Result", c.getString(c.getColumnIndex("Result")).trim());
+                    cstmtUpdateOfflineRecord.registerOutParameter("ReturnMsg", java.sql.Types.VARCHAR);
                 } catch (Exception ex) {//資料錯誤刪除並繼續
 
                     mydbHelper.DeleteOfflineData("BarcodeLog", c.getString(c.getColumnIndex("Rec")));
                     //this.DisplayTransStatus(TotalCount, (NowCount += 1), ((NowCount += 1) >= TotalCount ? false : true));
                     continue;
                 }
-                cstmt.execute();
+                cstmtUpdateOfflineRecord.execute();
 
-                if (cstmt.getString(22) != null) {
-                    String SourceText = cstmt.getString(22).trim();
+                iNowCount+=1;
+                handler.sendEmptyMessage(1);
+
+                if (cstmtUpdateOfflineRecord.getString(22) != null) {
+                    String SourceText = cstmtUpdateOfflineRecord.getString(22).trim();
                     Revc = SourceText.contains("成功");
 
                     if (!Revc) {
@@ -247,7 +326,7 @@ public class OfflineExport extends Activity {
             return false;
         } finally {//釋放物件
             try {
-                con.close();
+                conUpdateOfflineRecord.close();
             } catch (Exception ex) {
                 WriteLog.appendLog("OfflineExport.java/con.close()/Exception:" + ex.toString());
             }
@@ -256,10 +335,10 @@ public class OfflineExport extends Activity {
 
     private boolean UpdateOfflineCardPassRecord(Cursor c, String ELCode) {
         //生成物件
-        Connection con = DBCDPSConnection();
+        Connection conUpdateOfflineCardPassRecord = DBCDPSConnection();
         try {
             boolean Revc = false;
-            CallableStatement cstmt = con.prepareCall("{ call dbo.SP_UpdateOfflineCardPassRecord(?,?,?,?,?,?,?,?)}");
+            CallableStatement cstmtUpdateOfflineCardPassRecord = conUpdateOfflineCardPassRecord.prepareCall("{ call dbo.SP_UpdateOfflineCardPassRecord(?,?,?,?,?,?,?,?)}");
             while (c.moveToNext()) {
                 try {
                     if (!c.getString(c.getColumnIndex("EL_Code")).trim().equals(ELCode)) {
@@ -273,25 +352,27 @@ public class OfflineExport extends Activity {
                         continue;
                     }
 
-                    cstmt.setString("DeviceID", c.getString(c.getColumnIndex("DeviceID")).trim());
-                    cstmt.setString("DirectionType", c.getString(c.getColumnIndex("DirectionType")).trim());
-                    cstmt.setString("SensorCode", c.getString(c.getColumnIndex("SensorCode")).trim());
-                    cstmt.setString("CardNo", c.getString(c.getColumnIndex("CodeNo")).trim());
-                    cstmt.setString("EL_Code", c.getString(c.getColumnIndex("Current_EL_Code")).trim());
-                    cstmt.setString("SenseDT", c.getString(c.getColumnIndex("SenseDT")).trim());
-                    cstmt.setString("Result", c.getString(c.getColumnIndex("Result")).trim());
-                    cstmt.registerOutParameter("ReturnMsg", java.sql.Types.VARCHAR);
-                } catch (Exception e) {//資料錯誤刪除並繼續
+                    cstmtUpdateOfflineCardPassRecord.setString("DeviceID", c.getString(c.getColumnIndex("DeviceID")).trim());
+                    cstmtUpdateOfflineCardPassRecord.setString("DirectionType", c.getString(c.getColumnIndex("DirectionType")).trim());
+                    cstmtUpdateOfflineCardPassRecord.setString("SensorCode", c.getString(c.getColumnIndex("SensorCode")).trim());
+                    cstmtUpdateOfflineCardPassRecord.setString("CardNo", c.getString(c.getColumnIndex("CodeNo")).trim());
+                    cstmtUpdateOfflineCardPassRecord.setString("EL_Code", c.getString(c.getColumnIndex("Current_EL_Code")).trim());
+                    cstmtUpdateOfflineCardPassRecord.setString("SenseDT", c.getString(c.getColumnIndex("SenseDT")).trim());
+                    cstmtUpdateOfflineCardPassRecord.setString("Result", c.getString(c.getColumnIndex("Result")).trim());
+                    cstmtUpdateOfflineCardPassRecord.registerOutParameter("ReturnMsg", java.sql.Types.VARCHAR);
+                    cstmtUpdateOfflineCardPassRecord.execute();
 
+                    iNowCount+=1;
+                    handler.sendEmptyMessage(1);
+
+                } catch (Exception e) {//資料錯誤刪除並繼續
                     mydbHelper.DeleteOfflineData("WorkCardLog", c.getString(c.getColumnIndex("Rec")));
                     //this.DisplayTransStatus(TotalCount, (NowCount += 1), ((NowCount += 1) >= TotalCount ? false : true));
                     WriteLog.appendLog("OfflineExport.java/UpdateOfflineCardPassRecord/Exception:" + e.toString());
                     continue;
                 }
-                cstmt.execute();
-
-                if (cstmt.getString(8) != null) {
-                    String SourceText = cstmt.getString(8).trim();
+                if (cstmtUpdateOfflineCardPassRecord.getString(8) != null) {
+                    String SourceText = cstmtUpdateOfflineCardPassRecord.getString(8).trim();
                     Revc = SourceText.contains("成功");
 
                     if (!Revc) {
@@ -315,7 +396,7 @@ public class OfflineExport extends Activity {
             return false;
         } finally {//釋放物件
             try {
-                con.close();
+                conUpdateOfflineCardPassRecord.close();
             } catch (Exception ex) {
                 WriteLog.appendLog("OfflineExport.java/con.close()/Exception:" + ex.toString());
             }

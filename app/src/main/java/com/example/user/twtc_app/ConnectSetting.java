@@ -25,7 +25,7 @@ import java.io.StringWriter;
  */
 public class ConnectSetting extends Activity {
     Button Confirm_btn,Return_btn;
-    EditText MachineID_et,IP_et,SqlAccount_et,SqlPassword_et,Password_et,URL_et;
+    EditText MachineID_et,IP_et,SqlAccount_et,SqlPassword_et,Password_et;
     CheckBox RFID_cb;
     File file;
     XmlHelper xmlHelper;
@@ -33,12 +33,8 @@ public class ConnectSetting extends Activity {
     Spinner spinner;
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.connect_setting);
-
-        xmlHelper=new XmlHelper(getFilesDir()+"//connectData.xml");
-        //getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE, R.layout.titlebar);
 
         Confirm_btn=(Button)findViewById(R.id.Confirm_btn);
         Return_btn=(Button)findViewById(R.id.Return_btn);
@@ -47,16 +43,14 @@ public class ConnectSetting extends Activity {
         SqlAccount_et=(EditText)findViewById(R.id.SqlAccount_et);
         SqlPassword_et=(EditText)findViewById(R.id.SqlPassword_et);
         Password_et=(EditText)findViewById(R.id.Password_et);
-        //URL_et=(EditText)findViewById(R.id.URL_et);
-        RFID_cb=(CheckBox) findViewById(R.id.RFID_cb);
         spinner= (Spinner) findViewById(R.id.spinner);
+        RFID_cb=(CheckBox) findViewById(R.id.RFID_cb);
 
-        ArrayAdapter<CharSequence> nAdapter = ArrayAdapter.createFromResource(
-                this, R.array.ticket_type_array, android.R.layout.simple_spinner_item );
-        nAdapter.setDropDownViewResource(
-                android.R.layout.simple_spinner_dropdown_item);
-        spinner.setAdapter(nAdapter);
+        ArrayAdapter adapter = ArrayAdapter.createFromResource(this,R.array.ticket_type_array, R.layout.spinner_item);
+        adapter.setDropDownViewResource(R.layout.spinner_dropdown_item);
+        spinner.setAdapter(adapter);
 
+        xmlHelper=new XmlHelper(getFilesDir()+"//connectData.xml");
         file = new File(getFilesDir()+"//connectData.xml");
 
         if(file.exists()){
@@ -65,7 +59,8 @@ public class ConnectSetting extends Activity {
             SqlAccount_et.setText(xmlHelper.ReadValue("sa"));
             SqlPassword_et.setText(xmlHelper.ReadValue("SQLPassWord"));
             Password_et.setText(xmlHelper.ReadValue("SetupPassWord"));
-            //URL_et.setText(xmlHelper.ReadValue("WebServiceUrl"));
+            ArrayAdapter adapter2 = ArrayAdapter.createFromResource(this,R.array.ticket_type_array_value, R.layout.spinner_item);
+            spinner.setSelection(adapter2.getPosition(xmlHelper.ReadValue("InOutType")));
             RFID_cb.setChecked(xmlHelper.ReadValue("RFID") .equals("OPEN")  ? true : false);
         }
 
@@ -111,68 +106,12 @@ public class ConnectSetting extends Activity {
                 xmlHelper.WriteValue("sa",SqlAccount_et.getText().toString());
                 xmlHelper.WriteValue("SQLPassWord",SqlPassword_et.getText().toString());
                 xmlHelper.WriteValue("SetupPassWord",Password_et.getText().toString());
-                //xmlHelper.WriteValue("WebServiceUrl",URL_et.getText().toString());
+                int spinner_pos = spinner.getSelectedItemPosition();
+                String[] ticket_type_array_value = getResources().getStringArray(R.array.ticket_type_array_value);
+                String InOutType = ticket_type_array_value[spinner_pos];
+                xmlHelper.WriteValue("InOutType",InOutType);
                 xmlHelper.WriteValue("RFID",RFID_cb.isChecked() ? "OPEN":"CLOSE");
-                /*try {
-                    FileOutputStream fos = new FileOutputStream(new File(getFilesDir(), "connectData.xml"));
-                    XmlSerializer xmlSerializer = Xml.newSerializer();
-                    StringWriter writer = new StringWriter();
-                    xmlSerializer.setOutput(writer);
-                    xmlSerializer.startDocument("UTF-8", true);
-                    xmlSerializer.text("\n");
-                    xmlSerializer.startTag(null, "Setup");
-                    xmlSerializer.text("\n\t");
-                    xmlSerializer.startTag(null, "MachineID");
-                    xmlSerializer.text(MachineID_et.getText().toString());
-                    xmlSerializer.endTag(null, "MachineID");
-                    xmlSerializer.text("\n\t");
-                    xmlSerializer.startTag(null, "ServerIP");
-                    xmlSerializer.text(IP_et.getText().toString());
-                    xmlSerializer.endTag(null, "ServerIP");
-                    xmlSerializer.text("\n\t");
-                    xmlSerializer.startTag(null,"sa");
-                    xmlSerializer.text(SqlAccount_et.getText().toString());
-                    xmlSerializer.endTag(null, "sa");
-                    xmlSerializer.text("\n\t");
-                    xmlSerializer.startTag(null,"SQLPassWord");
-                    xmlSerializer.text(SqlPassword_et.getText().toString());
-                    xmlSerializer.endTag(null, "SQLPassWord");
-                    xmlSerializer.text("\n\t");
-                    xmlSerializer.startTag(null,"SetupPassWord");
-                    xmlSerializer.text(Password_et.getText().toString());
-                    xmlSerializer.endTag(null, "SetupPassWord");
-                    xmlSerializer.text("\n\t");
-                    xmlSerializer.startTag(null,"WebServiceUrl");
-                    xmlSerializer.text(URL_et.getText().toString());
-                    xmlSerializer.endTag(null, "WebServiceUrl");
-                    xmlSerializer.text("\n\t");
-                    xmlSerializer.startTag(null,"RFID");
-                    xmlSerializer.text(RFID_cb.isChecked() ? "OPEN":"CLOSE");
-                    xmlSerializer.endTag(null, "RFID");
-                    xmlSerializer.text("\n");
-                    xmlSerializer.endTag(null, "Setup");
-                    xmlSerializer.endDocument();
-                    xmlSerializer.flush();
-                    String dataWrite = writer.toString();
-                    fos.write(dataWrite.getBytes());
-                    fos.close();
-                }
-                catch (FileNotFoundException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-                catch (IllegalArgumentException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-                catch (IllegalStateException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-                catch (IOException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }*/
+
                 Toast.makeText(ConnectSetting.this, "存檔成功！", Toast.LENGTH_SHORT).show();
                 ConnectSetting.this.finish();
             }

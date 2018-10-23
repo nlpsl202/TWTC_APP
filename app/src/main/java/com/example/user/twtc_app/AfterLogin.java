@@ -1,10 +1,12 @@
 package com.example.user.twtc_app;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Color;
@@ -12,6 +14,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.os.Environment;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
@@ -77,10 +80,14 @@ public class AfterLogin extends Activity {
         WifiTicketBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (CheckOnline()) {
-                    Intent callSub = new Intent();
-                    callSub.setClass(AfterLogin.this, WiFiConnectSetting.class);
-                    startActivity(callSub);
+                if (pingIP()) {
+                    if (CheckOnline()) {
+                        Intent callSub = new Intent();
+                        callSub.setClass(AfterLogin.this, WiFiConnectSetting.class);
+                        startActivity(callSub);
+                    } else {
+                        Toast.makeText(AfterLogin.this, "設備回報失敗，請確認IP及網路連線是否正確!", Toast.LENGTH_SHORT).show();
+                    }
                 } else {
                     Toast.makeText(AfterLogin.this, "設備回報失敗，請確認IP及網路連線是否正確!", Toast.LENGTH_SHORT).show();
                 }
@@ -192,6 +199,9 @@ public class AfterLogin extends Activity {
     //設備回報
     private boolean CheckOnline() {
         Connection con = DBCDPSConnection();
+        if (con == null) {
+            return false;
+        }
         try {
             CallableStatement cstmt = con.prepareCall("{ call dbo.SP_UpdateDeviceStatus(?,?,?)}");
             cstmt.setString("DeviceID", xmlHelper.ReadValue("MachineID"));
@@ -211,7 +221,7 @@ public class AfterLogin extends Activity {
         }
     }
 
-    /*private boolean pingIP() {
+    private boolean pingIP() {
         try {
             Process process = new ProcessBuilder().command("/system/bin/ping", "-c 2", xmlHelper.ReadValue("ServerIP").trim())
                     .redirectErrorStream(true)
@@ -235,12 +245,41 @@ public class AfterLogin extends Activity {
             WriteLog.appendLog("AfterLogin.java/ping/Exception:" + e.toString());
             return false;
         }
-    }*/
+    }
 
     //檢查網路是否連線
     public boolean checkInternetConnect() {
         ConnectivityManager cManager = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
         return cManager.getActiveNetworkInfo() != null;
+    }
+
+    //於登入頁面按下返回鍵後跳出確認視窗
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {//捕捉返回鍵
+        if ((keyCode == KeyEvent.KEYCODE_BACK)) {
+            ConfirmExit();//按返回鍵，則執行退出確認
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
+    }
+
+    public void ConfirmExit() {//退出確認
+        AlertDialog.Builder ad = new AlertDialog.Builder(AfterLogin.this);
+        ad.setTitle("離開");
+        ad.setMessage("確定要離開此程式嗎?");
+        ad.setPositiveButton("是", new DialogInterface.OnClickListener() {//退出按鈕
+            public void onClick(DialogInterface dialog, int i) {
+                WriteLog.appendLog("MainActivity.java/應用程式關閉");
+                AfterLogin.this.finish();//關閉activity
+                System.exit(0);
+            }
+        });
+        ad.setNegativeButton("否", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int i) {
+                //不退出不用執行任何操作
+            }
+        });
+        ad.show();//顯示對話框
     }
 
     private final BroadcastReceiver connectionReceiver = new BroadcastReceiver() {

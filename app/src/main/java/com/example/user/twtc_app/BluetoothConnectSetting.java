@@ -30,18 +30,18 @@ import java.util.UUID;
  * Created by Jeff.
  */
 public class BluetoothConnectSetting extends Activity {
-    public static List<BluetoothDevice> connectedBluetoothDevices=new ArrayList<BluetoothDevice>();
+    public static List<BluetoothDevice> connectedBluetoothDevices = new ArrayList<BluetoothDevice>();
     public static BluetoothDevice connectedBluetoothDevice;
     public static BluetoothSocket mmSocket;
     private TextView btStatusTxt;
-    ClipboardManager cbMgr;
-    ClipboardManager.OnPrimaryClipChangedListener mPrimaryClipChangedListener;
-    EditText Address;
-    Button BtBtn,ConnectBtn,ReturnBtn,HomeBtn;
-    BluetoothAdapter mBluetoothAdapter;
-    BluetoothDevice mmDevice;
-    String address;
-    XmlHelper xmlHelper;
+    private ClipboardManager cbMgr;
+    private ClipboardManager.OnPrimaryClipChangedListener mPrimaryClipChangedListener;
+    private EditText Address;
+    private Button BtBtn, ConnectBtn, ReturnBtn, homeBtn;
+    private BluetoothAdapter mBluetoothAdapter;
+    private BluetoothDevice mmDevice;
+    private String address;
+    private XmlHelper xmlHelper;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -49,15 +49,15 @@ public class BluetoothConnectSetting extends Activity {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.bluetooth_connect_setting);
 
-        BtBtn=(Button)findViewById(R.id.BtBtn);
+        BtBtn = (Button) findViewById(R.id.BtBtn);
         ConnectBtn = (Button) findViewById(R.id.ConnectBtn);
-        ReturnBtn=(Button)findViewById(R.id.ReturnBtn);
-        HomeBtn=(Button)findViewById(R.id.HomeBtn);
-        Address=(EditText) findViewById(R.id.Address);
-        btStatusTxt=(TextView) findViewById(R.id.btStatusTxt);
-        cbMgr=(ClipboardManager)getSystemService(Context.CLIPBOARD_SERVICE);
+        ReturnBtn = (Button) findViewById(R.id.ReturnBtn);
+        homeBtn = (Button) findViewById(R.id.homeBtn);
+        Address = (EditText) findViewById(R.id.Address);
+        btStatusTxt = (TextView) findViewById(R.id.btStatusTxt);
+        cbMgr = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
 
-        xmlHelper=new XmlHelper(getFilesDir()+"//connectData.xml");
+        xmlHelper = new XmlHelper(getFilesDir() + "//connectData.xml");
 
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
@@ -70,19 +70,17 @@ public class BluetoothConnectSetting extends Activity {
         IntentFilter filter2 = new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED);
         registerReceiver(mReceiver2, filter2);
 
-        if(mBluetoothAdapter.isEnabled()) {
+        if (mBluetoothAdapter.isEnabled()) {
             BtBtn.setBackgroundResource(R.drawable.switch_on);
             btStatusTxt.setText("藍芽已開啟");
-        }else{
+        } else {
             BtBtn.setBackgroundResource(R.drawable.switch_off);
             btStatusTxt.setText("藍芽已關閉");
         }
 
         //Bluetooth OnOff
-        BtBtn.setOnClickListener(new View.OnClickListener()
-        {
-            public void onClick(View v)
-            {
+        BtBtn.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
                 BtBtn.setClickable(false);
                 if (mBluetoothAdapter.isEnabled()) {
                     btStatusTxt.setText("藍芽已關閉");
@@ -97,18 +95,21 @@ public class BluetoothConnectSetting extends Activity {
         });
 
         //Bluetooth Connect Button
-        ConnectBtn.setOnClickListener(new View.OnClickListener()
-        {
-            public void onClick(View v)
-            {
-                try{
-                    if(connectedBluetoothDevices.size()>0){
-                        Toast.makeText(BluetoothConnectSetting.this,"藍牙裝置已連線", Toast.LENGTH_SHORT).show();
-                    }else{
+        ConnectBtn.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                try {
+                    if (connectedBluetoothDevices.size() > 0) {
+                        Toast.makeText(BluetoothConnectSetting.this, "藍牙裝置已連線", Toast.LENGTH_SHORT).show();
+                    } else {
                         findBT(Address.getText().toString());
-                        Toast.makeText(BluetoothConnectSetting.this,"藍牙裝置連線成功", Toast.LENGTH_SHORT).show();
+                        if (connectedBluetoothDevices.size() > 0) {
+                            Toast.makeText(BluetoothConnectSetting.this, "藍牙裝置連線成功", Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(BluetoothConnectSetting.this, "藍牙裝置連線失敗", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
                     }
-                    xmlHelper.WriteValue("BlueToothID",Address.getText().toString().trim());
+                    xmlHelper.WriteValue("BlueToothID", Address.getText().toString().trim());
                     Intent intent = new Intent();
                     intent.setClass(BluetoothConnectSetting.this, BluetoothTickets.class);
                     startActivity(intent);
@@ -116,29 +117,29 @@ public class BluetoothConnectSetting extends Activity {
                     //Intent callSub = new Intent();
                     //callSub.setClass(BluetoothConnectSetting.this, BluetoothTickets.class);
                     //startActivity(callSub);
-                }catch(Exception ex){
+                } catch (Exception ex) {
                     Toast.makeText(BluetoothConnectSetting.this, "連接藍牙失敗", Toast.LENGTH_SHORT).show();
                 }
             }
         });
 
-        mPrimaryClipChangedListener =new ClipboardManager.OnPrimaryClipChangedListener(){
+        mPrimaryClipChangedListener = new ClipboardManager.OnPrimaryClipChangedListener() {
             public void onPrimaryClipChanged() {
-                try{
+                try {
                     setVibrate(100);
                     Address.setText("");
-                    if(connectedBluetoothDevices.size()>0){
-                        Toast.makeText(BluetoothConnectSetting.this,"藍牙裝置已連線", Toast.LENGTH_SHORT).show();
+                    if (connectedBluetoothDevices.size() > 0) {
+                        Toast.makeText(BluetoothConnectSetting.this, "藍牙裝置已連線", Toast.LENGTH_SHORT).show();
                         Intent intent = new Intent();
                         intent.setClass(BluetoothConnectSetting.this, BluetoothTickets.class);
                         startActivity(intent);
                         BluetoothConnectSetting.this.finish();
-                    }else{
-                        address=cbMgr.getPrimaryClip().getItemAt(0).getText().toString();
+                    } else {
+                        address = cbMgr.getPrimaryClip().getItemAt(0).getText().toString();
                         findBT(address);
-                        if(connectedBluetoothDevices.size()>0){
-                            xmlHelper.WriteValue("BlueToothID",address.trim());
-                            Toast.makeText(BluetoothConnectSetting.this,"藍牙裝置連線成功", Toast.LENGTH_SHORT).show();
+                        if (connectedBluetoothDevices.size() > 0) {
+                            xmlHelper.WriteValue("BlueToothID", address.trim());
+                            Toast.makeText(BluetoothConnectSetting.this, "藍牙裝置連線成功", Toast.LENGTH_SHORT).show();
                             Intent intent = new Intent();
                             intent.setClass(BluetoothConnectSetting.this, BluetoothTickets.class);
                             startActivity(intent);
@@ -148,21 +149,21 @@ public class BluetoothConnectSetting extends Activity {
                     //Intent callSub = new Intent();
                     //callSub.setClass(BluetoothConnectSetting.this, BluetoothTickets.class);
                     //startActivity(callSub);
-                }catch(Exception ex){
+                } catch (Exception ex) {
                     Toast.makeText(BluetoothConnectSetting.this, "連接藍牙失敗", Toast.LENGTH_SHORT).show();
                 }
             }
         };
         cbMgr.addPrimaryClipChangedListener(mPrimaryClipChangedListener);
 
-        ReturnBtn.setOnClickListener(new View.OnClickListener(){
+        ReturnBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 BluetoothConnectSetting.this.finish();
             }
         });
 
-        HomeBtn.setOnClickListener(new View.OnClickListener(){
+        homeBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 BluetoothConnectSetting.this.finish();
@@ -190,52 +191,48 @@ public class BluetoothConnectSetting extends Activity {
         unregisterReceiver(mReceiver2);
     }
 
-    void findBT(String Address)
-    {
+    void findBT(String Address) {
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        if(mBluetoothAdapter == null)
-        {
-            Toast.makeText(BluetoothConnectSetting.this,"無藍牙功能", Toast.LENGTH_SHORT).show();
+        if (mBluetoothAdapter == null) {
+            Toast.makeText(BluetoothConnectSetting.this, "無藍牙功能", Toast.LENGTH_SHORT).show();
         }
 
-        if(!mBluetoothAdapter.isEnabled())
-        {
+        if (!mBluetoothAdapter.isEnabled()) {
             Intent enableBluetooth = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             startActivity(enableBluetooth);
         }
 
         Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();
-        if(pairedDevices.size() > 0)
-        {
-            for(BluetoothDevice device : pairedDevices)
-            {
-                if(device.getAddress().equals(Address)){
-                    mmDevice=device;
-                    try{
+        if (pairedDevices.size() > 0) {
+            for (BluetoothDevice device : pairedDevices) {
+                if (device.getAddress().equals(Address)) {
+                    mmDevice = device;
+                    try {
                         connectBT();
-                        connectedBluetoothDevice=mmDevice;
+                        connectedBluetoothDevice = mmDevice;
                         connectedBluetoothDevices.add(device);
                         //Toast.makeText(BluetoothConnectSetting.this, "藍牙連線成功", Toast.LENGTH_SHORT).show();
-                    }catch (Exception e) {
-
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        WriteLog.appendLog("BluetoothConnectSetting.java/findBT/" + e.toString());
                     }
                 }
             }
         }
-        if(connectedBluetoothDevices.size()==0){
+
+        if (connectedBluetoothDevices.size() == 0) {
             mBluetoothAdapter.startDiscovery();
         }
     }
 
-    void connectBT() throws IOException
-    {
+    void connectBT() throws IOException {
         UUID uuid = UUID.fromString("7A51FDC2-FDDF-4c9b-AFFC-98BCD91BF93B"); //Standard SerialPortService ID
         mmSocket = mmDevice.createRfcommSocketToServiceRecord(uuid);
         mmSocket.connect();
     }
 
     //震動
-    public void setVibrate(int time){
+    public void setVibrate(int time) {
         Vibrator myVibrator = (Vibrator) getSystemService(Service.VIBRATOR_SERVICE);
         myVibrator.vibrate(time);
     }
@@ -247,7 +244,7 @@ public class BluetoothConnectSetting extends Activity {
             String action = intent.getAction();
             BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
             if (action.equals(BluetoothDevice.ACTION_FOUND)) {
-                if(device.getAddress().toString().equals(address)){
+                if (device.getAddress().toString().equals(address)) {
                     try {
                         Method method = device.getClass().getMethod("createBond", (Class[]) null);
                         method.invoke(device, (Object[]) null);
@@ -260,7 +257,7 @@ public class BluetoothConnectSetting extends Activity {
                 if (!connectedBluetoothDevices.contains(device)) {
                     connectedBluetoothDevices.add(device);
                 }
-            }else if (action.equals(device.ACTION_ACL_DISCONNECTED)) {
+            } else if (action.equals(device.ACTION_ACL_DISCONNECTED)) {
                 if (connectedBluetoothDevices.contains(device)) {
                     connectedBluetoothDevices.remove(device);
                 }

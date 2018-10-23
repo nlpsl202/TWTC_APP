@@ -1,8 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <array name="ticket_type_array">
-        <item>僅出館</item>
-        <item>僅入館</item>
+    <string-array name="ticket_type_array">
         <item>自由模式</item>
-    </array>
+        <item>僅入館</item>
+        <item>僅出館</item>
+    </string-array>
+
+    <string-array name="ticket_type_array_value">
+        <item>N</item>
+        <item>I</item>
+        <item>O</item>
+    </string-array>
 </resources>

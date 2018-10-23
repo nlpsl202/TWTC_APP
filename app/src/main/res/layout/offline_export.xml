@@ -42,8 +42,17 @@
 
     </LinearLayout>
 
+    <TextView
+        android:id="@+id/ResultTxt3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="450dp"
+        android:textColor="#000000"
+        android:text="上傳進度："
+        android:textSize="20dp" />
+
     <RelativeLayout
-        android:id="@+id/ReturnLayout"
         android:layout_width="match_parent"
         android:layout_height="62dp"
         android:layout_alignParentBottom="true"
@@ -70,8 +79,8 @@
     </RelativeLayout>
 
     <Button
-        android:id="@+id/HomeBtn"
-        android:layout_width="159px"
+        android:id="@+id/homeBtn"
+        android:layout_width="180px"
         android:layout_height="159px"
         android:background="@drawable/home_btn_selector"
         android:layout_centerHorizontal="true"

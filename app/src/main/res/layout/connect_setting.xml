@@ -169,9 +169,9 @@
 
             <ImageView
                 android:id="@+id/textView6"
-                android:layout_width="wrap_content"
+                android:layout_width="150px"
                 android:layout_height="80px"
-                android:background="@drawable/connect_setting_url_text"/>
+                android:background="@drawable/connect_setting_inout_text"/>
 
         </LinearLayout>
 
