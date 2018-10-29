@@ -192,33 +192,33 @@ public class BluetoothConnectSetting extends Activity {
     }
 
     void findBT(String Address) {
-        mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        if (mBluetoothAdapter == null) {
-            Toast.makeText(BluetoothConnectSetting.this, "無藍牙功能", Toast.LENGTH_SHORT).show();
-        }
+            mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+            if (mBluetoothAdapter == null) {
+                Toast.makeText(BluetoothConnectSetting.this, "無藍牙功能", Toast.LENGTH_SHORT).show();
+            }
 
-        if (!mBluetoothAdapter.isEnabled()) {
-            Intent enableBluetooth = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            startActivity(enableBluetooth);
-        }
+            if (!mBluetoothAdapter.isEnabled()) {
+                Intent enableBluetooth = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+                startActivity(enableBluetooth);
+            }
 
-        Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();
-        if (pairedDevices.size() > 0) {
-            for (BluetoothDevice device : pairedDevices) {
-                if (device.getAddress().equals(Address)) {
-                    mmDevice = device;
-                    try {
-                        connectBT();
-                        connectedBluetoothDevice = mmDevice;
-                        connectedBluetoothDevices.add(device);
-                        //Toast.makeText(BluetoothConnectSetting.this, "藍牙連線成功", Toast.LENGTH_SHORT).show();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        WriteLog.appendLog("BluetoothConnectSetting.java/findBT/" + e.toString());
+            Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();
+            if (pairedDevices.size() > 0) {
+                for (BluetoothDevice device : pairedDevices) {
+                    if (device.getAddress().equals(Address)) {
+                        mmDevice = device;
+                        try {
+                            connectBT();
+                            connectedBluetoothDevice = mmDevice;
+                            connectedBluetoothDevices.add(device);
+                            //Toast.makeText(BluetoothConnectSetting.this, "藍牙連線成功", Toast.LENGTH_SHORT).show();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            WriteLog.appendLog("BluetoothConnectSetting.java/findBT/" + e.toString());
+                        }
                     }
                 }
             }
-        }
 
         if (connectedBluetoothDevices.size() == 0) {
             mBluetoothAdapter.startDiscovery();
