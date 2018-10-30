@@ -11,6 +11,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.nfc.NfcAdapter;
 import android.nfc.Tag;
 import android.nfc.tech.MifareClassic;
@@ -36,7 +37,7 @@ import java.util.Date;
  * Created by Jeff.
  */
 public class BluetoothTickets extends Activity {
-    private String PCReturnData, restr = "", sWorkCardNo;
+    private String PCReturnData, restr = "", sWorkCardNo,DL_Verify;
     private TextView stateTxt, allowTxt, nameTxt, datetimeTxt, inoutTxt, failedResultTxt, photoTxt;
     private ImageView resultImage, photoImage;
     private Button returnBtn, homeBtn;
@@ -124,6 +125,33 @@ public class BluetoothTickets extends Activity {
         } catch (Exception ex) {
             ex.printStackTrace();
             WriteLog.appendLog("BluetoothTickets.java/setBT/Exception:" + ex.toString());
+        }
+
+        DL_Verify=sendData("InOutType");
+        if (DL_Verify == null || DL_Verify.equals("")) {
+            DL_Verify = xmlHelper.ReadValue("InOutType");
+        }
+
+        xmlHelper.WriteValue("InOutType", DL_Verify);
+
+        if (DL_Verify.equals("N")) {
+            inRBtn.setEnabled(true);
+            outRBtn.setEnabled(true);
+            inRBtn.setChecked(true);
+            inRBtn.setTextColor(Color.parseColor("#000000"));
+            outRBtn.setTextColor(Color.parseColor("#000000"));
+        } else if (DL_Verify.equals("I")) {
+            inRBtn.setEnabled(true);
+            outRBtn.setEnabled(false);
+            inRBtn.setChecked(true);
+            inRBtn.setTextColor(Color.parseColor("#000000"));
+            outRBtn.setTextColor(Color.parseColor("#DDDDDD"));
+        } else if (DL_Verify.equals("O")) {
+            inRBtn.setEnabled(false);
+            outRBtn.setEnabled(true);
+            outRBtn.setChecked(true);
+            inRBtn.setTextColor(Color.parseColor("#DDDDDD"));
+            outRBtn.setTextColor(Color.parseColor("#000000"));
         }
 
         //掃描事件

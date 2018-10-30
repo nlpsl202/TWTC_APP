@@ -120,7 +120,7 @@ public class OfflineTickets extends Activity {
 
         resultLayout.setVisibility(View.GONE);
         inRBtn.setChecked(true);
-        IO="I";
+        IO = "I";
 
         sQRPWDItem[0] = xmlHelper.ReadValue("Key1");
         sQRPWDItem[1] = xmlHelper.ReadValue("Key2");
@@ -670,7 +670,8 @@ public class OfflineTickets extends Activity {
 
     private void savedate(String guid, Boolean type, String[] QRarray, String checkCode) {
         try {
-            UUID u = UUID.nameUUIDFromBytes(QRarray[0].getBytes());
+            //UUID u = UUID.nameUUIDFromBytes(QRarray[0].getBytes());
+            UUID u = UUID.fromString(QRarray[0]);
             String RF;
             String VP_ValidDateBegin;
             String VP_ValidDateEnd;

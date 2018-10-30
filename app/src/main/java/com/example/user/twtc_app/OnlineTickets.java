@@ -215,24 +215,24 @@ public class OnlineTickets extends Activity {
 
         DL_Verify = DownloadDeviceSetupFromVM();
         if (DL_Verify == null || DL_Verify.equals("")) {
-            DL_Verify=xmlHelper.ReadValue("InOutType");
+            DL_Verify = xmlHelper.ReadValue("InOutType");
         }
 
         xmlHelper.WriteValue("InOutType", DL_Verify);
 
-        if(DL_Verify.equals("N")){
+        if (DL_Verify.equals("N")) {
             inRBtn.setEnabled(true);
             outRBtn.setEnabled(true);
             inRBtn.setChecked(true);
             inRBtn.setTextColor(Color.parseColor("#000000"));
             outRBtn.setTextColor(Color.parseColor("#000000"));
-        }else if(DL_Verify.equals("I")){
+        } else if (DL_Verify.equals("I")) {
             inRBtn.setEnabled(true);
             outRBtn.setEnabled(false);
             inRBtn.setChecked(true);
             inRBtn.setTextColor(Color.parseColor("#000000"));
             outRBtn.setTextColor(Color.parseColor("#DDDDDD"));
-        }else if(DL_Verify.equals("O")){
+        } else if (DL_Verify.equals("O")) {
             inRBtn.setEnabled(false);
             outRBtn.setEnabled(true);
             outRBtn.setChecked(true);
@@ -629,9 +629,8 @@ public class OnlineTickets extends Activity {
     private Boolean UpdatePassRecord(String guid, boolean type, String[] QRarray) {
         Connection conUPR = DBExhibitConnection();
         try {
-            UUID u = UUID.randomUUID();
-            u = UUID.nameUUIDFromBytes(QRarray[0].getBytes());
-
+            //UUID u = UUID.nameUUIDFromBytes(QRarray[0].getBytes());
+            UUID u = UUID.fromString(QRarray[0]);
             String RF = "";
 
             if (type == false) {//為true時候代表刷讀票劵，false為RFID
@@ -643,8 +642,8 @@ public class OnlineTickets extends Activity {
             cstmtUPR.setString("DirectionType", inRBtn.isChecked() ? "I" : "O");
             cstmtUPR.setString("SensorCode", RF);
             cstmtUPR.setString("SysCode", u.toString());
-            //cstmtUPR.setString("EL_Code",QRarray[1].toString().trim());
-            cstmtUPR.setString("EL_Code", "TE2017");
+            cstmtUPR.setString("EL_Code", QRarray[1].toString().trim());
+            //cstmtUPR.setString("EL_Code", "TE2017");
             cstmtUPR.setString("BT_TypeID", QRarray[2].toString().trim());
             cstmtUPR.setString("VP_ValidDateRule", QRarray[3].toString().trim());
             SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
@@ -661,13 +660,13 @@ public class OnlineTickets extends Activity {
                 cstmtUPR.setDate("VP_ValidDateEnd", null);
             }
             cstmtUPR.setString("VP_ValidTimeRule", QRarray[6].toString().trim());
-            //cstmtUPR.setString("VP_ValidTimeBegin",QRarray[7].toString().trim());
-            cstmtUPR.setString("VP_ValidTimeBegin", "20180101");
-            //cstmtUPR.setString("VP_ValidTimeEnd",QRarray[8].toString().trim());
-            cstmtUPR.setString("VP_ValidTimeEnd", "20181231");
+            cstmtUPR.setString("VP_ValidTimeBegin", QRarray[7].toString().trim());
+            //cstmtUPR.setString("VP_ValidTimeBegin", "20180101");
+            cstmtUPR.setString("VP_ValidTimeEnd", QRarray[8].toString().trim());
+            //cstmtUPR.setString("VP_ValidTimeEnd", "20181231");
             cstmtUPR.setString("VP_UseAreaAssign", QRarray[9].toString().trim());
-            //cstmtUPR.setString("VP_UsageTimeType",QRarray[10].toString().trim());
-            cstmtUPR.setString("VP_UsageTimeType", "0");
+            cstmtUPR.setString("VP_UsageTimeType",QRarray[10].toString().trim());
+            //cstmtUPR.setString("VP_UsageTimeType", "0");
             cstmtUPR.setString("VP_UsageTimeTotal", QRarray[11].toString().trim());
             cstmtUPR.setString("VP_UsageTimePerDay", QRarray[12].toString().trim());
             cstmtUPR.setString("IV_CheckCode", QRarray[15].toString().trim());
